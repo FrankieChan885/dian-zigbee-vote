@@ -11,18 +11,25 @@
  *      date        author      action
  *  ------------------------------------------------------------
  *      2011-03-11  tankery     created file
+ *      2011-03-17  tankery     add exception branch
  *
  * Copyright (c) Tankery Chen 2011 @ Dian Group
  */
 #include "dianvoteplayer.h"
+#include "../utilities/exceptions.h"
 
-#include <QtGui>
 #include <QApplication>
+#include <QMessageBox>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    DianVotePlayer w;
-    w.show();
+    try {
+        DianVotePlayer *w = new DianVotePlayer();
+        w->show();
+    } catch (UiException *uie) {
+        QMessageBox::critical(0, "error", uie->what());
+        return 0;
+    }
     return a.exec();
 }

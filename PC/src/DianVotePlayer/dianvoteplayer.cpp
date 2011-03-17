@@ -13,6 +13,7 @@
  * Copyright (c) Tankery Chen 2011 @ Dian Group
  */
 #include "dianvoteplayer.h"
+#include "../utilities/exceptions.h"
 
 #include <QDir>
 #include <QtUiTools/QUiLoader>
@@ -36,7 +37,7 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
     QFile file(uiFile);
     dianvoteWindow = (QMainWindow*) uiLoader.load(&file);
     if (dianvoteWindow == 0) {
-        throw 0;
+        throw new UiException(UiException::UI_FILE_NOTFOUND);
     }
 
     // set parent to the specific one.

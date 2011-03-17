@@ -15,7 +15,7 @@
 # basic configuration
 PROJECT      = DianVotePlayer
 TEMPLATE     = app
-TARGET = DianVotePlayer
+TARGET       = DianVotePlayer
 
 CONFIG      += qt warn_on uitools
 
