@@ -1,4 +1,11 @@
 QPushButton {
     color:red;
-    background-color:#FFFFFF
+    background-color: yellow
+    background-image:url(/home/tankery/Pictures/StrangeGoogle.png)
 }
+
+/*
+QDialog {
+    background-image:url(/home/tankery/Pictures/StrangeGoogle.png)
+}
+*/

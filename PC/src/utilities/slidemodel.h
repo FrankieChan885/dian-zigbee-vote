@@ -1,33 +1,33 @@
 /**
- * @file slidedoc.h
+ * @file slidemodel.h
  * @brief 
- *  this is the QSlideDoc class definition file.
+ *  this is the QSlideModel class definition file.
  *
  * @author tankery.chen@gmail.com
  * @version 1.0.0.0
  * @date 2011-03-18
  */
-#ifndef __SLIDEDOC_H_
-#define __SLIDEDOC_H_
+#ifndef __SLIDEMODEL_H_
+#define __SLIDEMODEL_H_
 
 #include <QString>
 #include <QXMLStreamReader>
 
 /**
- * @brief QSlideDoc holding the single topic content using XML stream, 
+ * @brief QSlideModel holding the single topic content using XML stream, 
  * and provide a interface to access topic XML stream easy.
  */
-class QSlideDoc
+class QSlideModel
 {
     Q_OBJECT
 
 public:
     /**
-     * @brief QSlideDoc initial the QSlideDoc using XML stream.
+     * @brief QSlideModel initial the QSlideModel using XML stream.
      *
      */
-    QSlideDoc(const QString& xmlStream);
-    ~QSlideDoc();
+    QSlideModel(const QString& xmlStream);
+    ~QSlideModel();
 
     /**
      * @brief setTopic set the topic (title) of slide
@@ -85,14 +85,16 @@ public:
      */
     QString& getSelection(char option);
 
+
+    /////////////////////// Static functions ///////////////////////
     /**
      * @brief index2Option translate index to option
      */
-    char index2Option(int index);
+    static char index2Option(int index);
     /**
      * @brief option2Index translate option to index
      */
-    int option2Index(char option);
+    static int option2Index(char option);
 
 private:
     /**
@@ -101,5 +103,5 @@ private:
     QXmlStreamReader topicContent;
 };
 
-#endif // __SLIDEDOC_H_
+#endif // __SLIDEMODEL_H_
 
