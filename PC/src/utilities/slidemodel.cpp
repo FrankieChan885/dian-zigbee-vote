@@ -8,7 +8,9 @@
  * @date 2011-03-25
  */
 #include <QString>
-#include <QXMLStreamReader>
+#include <QStringList>
+#include <QtXml/QXmlStreamReader>
+#include "slidemodel.h"
 
 /**
  * @brief QSlideModel initial the QSlideModel using XML stream.
@@ -62,7 +64,7 @@ void QSlideModel::setSelection(char option, const QString& sel) {
  *
  * @return the topic.
  */
-QString& QSlideModel::getTopic() {
+QString QSlideModel::getTopic() {
     // @TODO read topic frome xml file
     // now for test
     return QString("中文标题, and English");
@@ -73,7 +75,7 @@ QString& QSlideModel::getTopic() {
  *
  * @return the selections list
  */
-QStringList& QSlideModel::getSelections() {
+QStringList QSlideModel::getSelections() {
     // @TODO read selections frome xml file to string list.
     // now for test
     static QStringList sels;
@@ -91,7 +93,7 @@ QStringList& QSlideModel::getSelections() {
  *
  * @return the selection
  */
-QString& QSlideModel::getSelection(int index) {
+QString QSlideModel::getSelection(int index) {
     // @TODO read selection frome xml file to string list.
     return QString("");
 }
@@ -102,7 +104,7 @@ QString& QSlideModel::getSelection(int index) {
  *
  * @return the selection
  */
-QString& QSlideModel::getSelection(char option) {
+QString QSlideModel::getSelection(char option) {
     // @TODO read selection frome xml file to string list.
     return QString("");
 }
@@ -112,14 +114,14 @@ QString& QSlideModel::getSelection(char option) {
 /**
  * @brief index2Option translate index to option
  */
-static char QSlideModel::index2Option(int index) {
+char QSlideModel::index2Option(int index) {
     // @TODO finish the translation
     return '\0';
 }
 /**
  * @brief option2Index translate option to index
  */
-static int QSlideModel::option2Index(char option) {
+int QSlideModel::option2Index(char option) {
     // @TODO finish the translation
     return 0;
 }

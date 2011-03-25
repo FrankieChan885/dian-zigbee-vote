@@ -14,6 +14,8 @@
  */
 #include "dianvoteplayer.h"
 #include "../utilities/exceptions.h"
+#include "../utilities/slideview.h"
+#include "../utilities/slidemodel.h"
 
 #include <QDir>
 #include <QtUiTools/QUiLoader>
@@ -39,6 +41,13 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
     if (dianvoteWindow == 0) {
         throw new UiException(UiException::UI_FILE_NOTFOUND);
     }
+
+    // set the slide view and model.
+    QSlideView *slideView = new QSlideView;
+    QSlideModel *slideModel = new QSlideModel("just for test");
+    slideView->loadNewSlide(slideModel);
+    // set the view to this window's central widget.
+    dianvoteWindow->setCentralWidget(slideView);
 
     // set parent to the specific one.
     dianvoteWindow->setParent(parent);

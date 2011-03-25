@@ -36,7 +36,7 @@ public:
      * @param f
      *  the window style of QSlideWiget.
      */
-    QSlideView(QView * parent = 0, Qt::WindowFlags f = 0);
+    QSlideView(QWidget * parent = 0, Qt::WindowFlags f = 0);
     virtual ~QSlideView();
 
     /**
@@ -59,7 +59,7 @@ public:
     * @param sm the slide document that holding the topic content.
     */
     void setModel(QSlideModel *sm) {
-        slideModel = sd;
+        slideModel = sm;
     }
     /**
     * @brief getDocument get the slide document
@@ -87,7 +87,7 @@ private:
     /**
     * @brief the topic content string.
     */
-    QLabel *topicTilte;
+    QLabel *topicTitle;
     /**
     * @brief the selection content strings.
     * this strings are in ordered matching the Model's options.

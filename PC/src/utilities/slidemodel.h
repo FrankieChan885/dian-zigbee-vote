@@ -10,14 +10,15 @@
 #ifndef __SLIDEMODEL_H_
 #define __SLIDEMODEL_H_
 
-#include <QString>
-#include <QXMLStreamReader>
+#include <QtXml/QXmlStreamReader>
+
+class QString;
 
 /**
  * @brief QSlideModel holding the single topic content using XML stream, 
  * and provide a interface to access topic XML stream easy.
  */
-class QSlideModel
+class QSlideModel : public QObject
 {
     Q_OBJECT
 
@@ -61,13 +62,13 @@ public:
      *
      * @return the topic.
      */
-    QString& getTopic();
+    QString getTopic();
     /**
      * @brief getSelections get all the selections of this slide.
      *
      * @return the selections list
      */
-    QStringList& getSelections();
+    QStringList getSelections();
     /**
      * @brief getSelection get specific selection.
      *
@@ -75,7 +76,7 @@ public:
      *
      * @return the selection
      */
-    QString& getSelection(int index);
+    QString getSelection(int index);
     /**
      * @brief getSelection get specific selection.
      *
@@ -83,7 +84,7 @@ public:
      *
      * @return the selection
      */
-    QString& getSelection(char option);
+    QString getSelection(char option);
 
 
     /////////////////////// Static functions ///////////////////////

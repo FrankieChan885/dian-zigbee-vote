@@ -20,12 +20,13 @@
  * @param f
  *  the window style of QSlideWiget.
  */
-QSlideView::QSlideView(QView * parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
+QSlideView::QSlideView(QWidget * parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
 : QWidget(parent, f)
 , slideModel(0)
 , topicTitle(0)
 {
     selectionStrings.clear();
+    editArea = new QWidget(this);
 }
 
 QSlideView::~QSlideView() {
@@ -37,7 +38,7 @@ QSlideView::~QSlideView() {
  *
  * @param event
  */
-virtual void QSlideView::paintEvent(QPaintEvent * event) {
+void QSlideView::paintEvent(QPaintEvent * /*event*/) {
     // do nothing, all the styles are setting in the qss file
 }
 
@@ -52,9 +53,10 @@ void QSlideView::loadNewSlide(QSlideModel *sm) {
     // clear the original layouts.
     deleteLayouts();
 
+    setModel(sm);
+
     // set new layouts.
-    slideModel = sm;
-    topicTitle = new QLabel(sm->getTopic(), editArea);
+    topicTitle = new QLabel(slideModel->getTopic(), editArea);
     // set toptic title's property, type, to "title"
     // this property will deside the style of it set by qss file.
     topicTitle->setProperty("type", QString("title"));

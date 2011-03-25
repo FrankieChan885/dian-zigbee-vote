@@ -18,6 +18,10 @@ TEMPLATE     = app
 TARGET       = DianVotePlayer
 
 CONFIG      += qt warn_on uitools
+QT          += xml
+
+DEPENDPATH  += ../utilities
+INCLUDEPATH += ../utilities
 
 # Preprocess definitions
 unix {
@@ -27,9 +31,13 @@ unix {
 }
 
 # Input
-HEADERS     += dianvoteplayer.h
+HEADERS     += dianvoteplayer.h \
+                slideview.h \
+                slidemodel.h
 SOURCES     += main.cpp \
-				dianvoteplayer.cpp
+				dianvoteplayer.cpp \
+                slideview.cpp \
+                slidemodel.cpp
 
 
 # Output paths
