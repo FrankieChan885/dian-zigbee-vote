@@ -18,16 +18,17 @@
 #include <exception>
 #include <sstream>
 
-class UiException : public std::exception
+class DianVoteException : public std::exception
 {
 public:
-    enum UiExceptionType {
+    enum DianVoteExceptionType {
         UI_FILE_NOTFOUND = 0,
         UI_LOAD_FAILED,
-        QSS_FILE_NOTFOUND
+        QSS_FILE_NOTFOUND,
+        TOPICS_FILE_NOTFOUND
     };
 public:
-    UiException(enum UiExceptionType type) {
+    DianVoteException(enum DianVoteExceptionType type) {
         exceptionType = type;
     }
 
@@ -37,7 +38,7 @@ public:
         return ss.str().c_str();
     }
 private:
-    enum UiExceptionType exceptionType;
+    enum DianVoteExceptionType exceptionType;
 };
 
 #endif // __EXCEPTIONS_H_

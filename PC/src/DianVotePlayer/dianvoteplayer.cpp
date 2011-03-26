@@ -39,11 +39,11 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
     QFile file(uiFile);
     dianvoteWindow = (QMainWindow*) uiLoader.load(&file);
     if (dianvoteWindow == 0) {
-        throw new UiException(UiException::UI_FILE_NOTFOUND);
+        throw new DianVoteException(DianVoteException::UI_FILE_NOTFOUND);
     }
 
     // set the slide view and model.
-    QSlideModel *slideModel = new QSlideModel("just for test");
+    QSlideModel *slideModel = new QSlideModel("../userdata/one-topic.xml");
     QSlideView *slideView = new QSlideView;
     slideView->loadNewSlide(slideModel);
     // set the view to this window's central widget.
@@ -61,7 +61,7 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
         qss.close();
     }
     else {
-        throw new UiException(UiException::QSS_FILE_NOTFOUND);
+        throw new DianVoteException(DianVoteException::QSS_FILE_NOTFOUND);
     }
 }
 

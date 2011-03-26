@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     try {
         DianVotePlayer *w = new DianVotePlayer();
         w->setupUi(QDir::toNativeSeparators("res/dianvoteplayer.ui"), 0);
-    } catch (UiException *uie) {
+    } catch (DianVoteException *uie) {
         QMessageBox::critical(0, "error", uie->what());
         return 0;
     }
