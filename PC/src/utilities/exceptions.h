@@ -23,7 +23,8 @@ class UiException : public std::exception
 public:
     enum UiExceptionType {
         UI_FILE_NOTFOUND = 0,
-        UI_LOAD_FAILED = 1,
+        UI_LOAD_FAILED,
+        QSS_FILE_NOTFOUND
     };
 public:
     UiException(enum UiExceptionType type) {

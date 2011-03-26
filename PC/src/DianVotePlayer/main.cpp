@@ -20,13 +20,14 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <QDir>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     try {
         DianVotePlayer *w = new DianVotePlayer();
-        w->show();
+        w->setupUi(QDir::toNativeSeparators("res/dianvoteplayer.ui"), 0);
     } catch (UiException *uie) {
         QMessageBox::critical(0, "error", uie->what());
         return 0;

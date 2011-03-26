@@ -7,7 +7,8 @@
  * @version 1.0.0
  * @date 2011-03-18
  */
-#include <QWidget>
+#include <QFrame>
+#include <QVBoxLayout>
 #include <QPaintEvent>
 #include "slideview.h"
 #include "slidemodel.h"
@@ -21,12 +22,12 @@
  *  the window style of QSlideWiget.
  */
 QSlideView::QSlideView(QWidget * parent/* = 0*/, Qt::WindowFlags f/* = 0*/)
-: QWidget(parent, f)
+: QFrame(parent, f)
 , slideModel(0)
 , topicTitle(0)
 {
     selectionStrings.clear();
-    editArea = new QWidget(this);
+//    editArea = new QFrame(this);
 }
 
 QSlideView::~QSlideView() {
@@ -56,16 +57,22 @@ void QSlideView::loadNewSlide(QSlideModel *sm) {
     setModel(sm);
 
     // set new layouts.
-    topicTitle = new QLabel(slideModel->getTopic(), editArea);
+    QVBoxLayout *contentLayout = new QVBoxLayout;
+
+    topicTitle = new QLabel(slideModel->getTopic());
     // set toptic title's property, type, to "title"
     // this property will deside the style of it set by qss file.
     topicTitle->setProperty("type", QString("title"));
+    contentLayout->addWidget(topicTitle);
+
     foreach (QString sel, slideModel->getSelections()) {
-        selectionStrings.push_back(new QLabel(sel, editArea));
+        selectionStrings.push_back(new QLabel(sel));
         // set this label's type to "selection"
         selectionStrings.back()->setProperty("type", QString("selection"));
+        contentLayout->addWidget(selectionStrings.back());
     }
-    
+
+    setLayout(contentLayout);
 }
 
 /**

@@ -67,7 +67,7 @@ void QSlideModel::setSelection(char option, const QString& sel) {
 QString QSlideModel::getTopic() {
     // @TODO read topic frome xml file
     // now for test
-    return QString("中文标题, and English");
+    return QString::fromUtf8("中文标题, and English");
 }
 
 /**
@@ -79,8 +79,8 @@ QStringList QSlideModel::getSelections() {
     // @TODO read selections frome xml file to string list.
     // now for test
     static QStringList sels;
-    sels << QString("selection 1") << QString("选项 2") << QString("选项 sel 3")
-        << QString("这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？"
+    sels << QString::fromUtf8("selection 1") << QString::fromUtf8("选项 2") << QString::fromUtf8("选项 sel 3")
+        << QString::fromUtf8("这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？"
                 "不过我觉得它不会换行的。。。。到底是不是这样呢？");
 
     return sels;
@@ -95,7 +95,7 @@ QStringList QSlideModel::getSelections() {
  */
 QString QSlideModel::getSelection(int index) {
     // @TODO read selection frome xml file to string list.
-    return QString("");
+    return QString::fromUtf8("");
 }
 /**
  * @brief getSelection get specific selection.
@@ -106,7 +106,7 @@ QString QSlideModel::getSelection(int index) {
  */
 QString QSlideModel::getSelection(char option) {
     // @TODO read selection frome xml file to string list.
-    return QString("");
+    return QString::fromUtf8("");
 }
 
 

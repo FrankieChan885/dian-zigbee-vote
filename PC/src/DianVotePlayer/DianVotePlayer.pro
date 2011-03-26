@@ -8,6 +8,7 @@
 #      date        author      action
 #  ------------------------------------------------------------
 #      2011-03-15  tankery     created file
+#      2011-03-25  tankery     add slideview & slidemodel & resources
 #
 # Copyright (c) Tankery Chen 2011 @ Dian Group
 ######################################################################
@@ -38,9 +39,12 @@ SOURCES     += main.cpp \
 				dianvoteplayer.cpp \
                 slideview.cpp \
                 slidemodel.cpp
+RESOURCES   += DianVotePlayer.qrc
 
 
 # Output paths
 DESTDIR      = ./bin
 OBJECTS_DIR  = ./obj
 MOC_DIR      = ./moc
+RES_DIR      = ./res
+

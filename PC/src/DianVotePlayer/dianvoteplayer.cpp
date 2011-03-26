@@ -17,14 +17,14 @@
 #include "../utilities/slideview.h"
 #include "../utilities/slidemodel.h"
 
-#include <QDir>
-#include <QtUiTools/QUiLoader>
+#include <QApplication>
+#include <QLatin1String>
 #include <QFile>
+#include <QtUiTools/QUiLoader>
+#include <QVBoxLayout>
 
-DianVotePlayer::DianVotePlayer(QWidget *parent)
-    : QWidget(parent)
+DianVotePlayer::DianVotePlayer()
 {
-    setupUi(QDir::toNativeSeparators("res/dianvoteplayer.ui"), this);
 }
 
 DianVotePlayer::~DianVotePlayer()
@@ -43,12 +43,25 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
     }
 
     // set the slide view and model.
-    QSlideView *slideView = new QSlideView;
     QSlideModel *slideModel = new QSlideModel("just for test");
+    QSlideView *slideView = new QSlideView;
     slideView->loadNewSlide(slideModel);
     // set the view to this window's central widget.
     dianvoteWindow->setCentralWidget(slideView);
 
     // set parent to the specific one.
     dianvoteWindow->setParent(parent);
+
+    // show it!
+    dianvoteWindow->show();
+
+    QFile qss(":/skins/default.qss");
+    if (qss.open(QFile::ReadOnly)) {
+        qApp->setStyleSheet(QLatin1String(qss.readAll()));
+        qss.close();
+    }
+    else {
+        throw new UiException(UiException::QSS_FILE_NOTFOUND);
+    }
 }
+

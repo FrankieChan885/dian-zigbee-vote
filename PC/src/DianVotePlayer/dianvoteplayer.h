@@ -15,15 +15,14 @@
 #ifndef DIANVOTEPLAYER_H
 #define DIANVOTEPLAYER_H
 
-#include <QtGui/QWidget>
 #include <QtGui/QMainWindow>
 
-class DianVotePlayer : public QWidget
+class DianVotePlayer : public QObject
 {
     Q_OBJECT
 
 public:
-    DianVotePlayer(QWidget *parent = 0);
+    DianVotePlayer();
     ~DianVotePlayer();
 
     // setup the user interface using uiFile for the parent.

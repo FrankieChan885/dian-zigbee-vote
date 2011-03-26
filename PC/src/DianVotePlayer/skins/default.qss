@@ -1,0 +1,23 @@
+/**
+ *   this file defined the default style sheet of window.
+ */
+
+QSlideView {
+    padding-left    : 100px;
+    padding-top     : 100px;
+    padding-right   : 100px;
+    padding-bottom  : 100px;
+    background-image: url(:/images/default-background.png);
+    background-attachment: fixed;
+}
+
+QLabel[type = "title"] {
+    position    : top left;
+    font-family : "微软雅黑, 文泉驿正黑, AR PL UKai CN";
+    font-size   : 20px;
+}
+
+QLabel[type = "selection"] {
+    position: relative;
+}
+

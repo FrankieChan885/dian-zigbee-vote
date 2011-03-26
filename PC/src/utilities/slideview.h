@@ -10,7 +10,7 @@
 #ifndef __SLIDEVIEW_H_
 #define __SLIDEVIEW_H_
 
-#include <QWidget>
+#include <QFrame>
 #include <QLabel>
 #include <vector>
 
@@ -23,7 +23,7 @@ class QSlideModel;
  *  You can put this class in any parent view to let the parent desplaying
  *  the content of the topics.
  */
-class QSlideView : public QWidget
+class QSlideView : public QFrame
 {
 Q_OBJECT
 
@@ -96,7 +96,7 @@ private:
     /**
     * @brief editArea specific the space of showing things.
     */
-    QWidget *editArea;
+    QFrame *editArea;
 };
 
 #endif // __SLIDEVIEW_H_
