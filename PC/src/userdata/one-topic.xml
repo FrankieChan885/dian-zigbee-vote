@@ -18,7 +18,7 @@
         Selection 3.
     </selection>
     <selection option="C" point="3.5">
-        Selection 4....
+        "这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？不过我觉得它不会换行的。。。。到底是不是这样呢？"
         <vote id="45b0">
         <vote id="e4a0">
         <vote id="39a7">

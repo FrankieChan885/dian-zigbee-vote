@@ -7,17 +7,24 @@
  * @version 1.0.0.0
  * @date 2011-03-25
  */
+#include "slidemodel.h"
+#include "exceptions.h"
 #include <QString>
 #include <QStringList>
-#include <QtXml/QXmlStreamReader>
-#include "slidemodel.h"
+#include <QtXml/QDomDocument>
 
 /**
  * @brief QSlideModel initial the QSlideModel using XML stream.
  *
  */
-QSlideModel::QSlideModel(const QString& xmlStream) {
-    // @TODO add the QXMLStreamReader init code.
+QSlideModel::QSlideModel(const QString& xmlStream)
+{
+    QString errorStr("");
+    int line, column;
+    if (!topicContent.setContent(xmlStream, false,
+         &errorStr, &line, &column)) {
+        throw new XmlStreamException(errorStr.toStdString(), line, column);
+    }
 }
 
 QSlideModel::~QSlideModel() {
@@ -29,7 +36,9 @@ QSlideModel::~QSlideModel() {
  * @param t the topic
  */
 void QSlideModel::setTopic(const QString& t) {
-    // @TODO set topic to XML file
+    // set topic to XML file
+    topicContent.documentElement().firstChildElement(
+        tr("topic")).setNodeValue(t);
 }
 
 /**
@@ -38,7 +47,8 @@ void QSlideModel::setTopic(const QString& t) {
  * @param sels the selections list
  */
 void QSlideModel::setSelections(const QStringList& sels) {
-    // @TODO set selections to XML file
+    // @TODO remove selections first
+    // @TODO add selections to XML file
 }
 
 /**
@@ -65,37 +75,48 @@ void QSlideModel::setSelection(char option, const QString& sel) {
  * @return the topic.
  */
 QString QSlideModel::getTopic() {
-    // @TODO read topic frome xml file
-    // now for test
-    return QString::fromUtf8("中文标题, and English");
+    // read topic node from xml file
+    QDomElement topicNode = topicContent.documentElement().firstChildElement(tr("topic"));
+    // get text
+    return topicNode.text();
 }
 
 /**
- * @brief getSelections get all the selections of this slide.
- *
- * @return the selections list
- */
-QStringList QSlideModel::getSelections() {
-    // @TODO read selections frome xml file to string list.
-    // now for test
-    static QStringList sels;
-    sels << QString::fromUtf8("selection 1") << QString::fromUtf8("选项 2") << QString::fromUtf8("选项 sel 3")
-        << QString::fromUtf8("这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？"
-                "不过我觉得它不会换行的。。。。到底是不是这样呢？");
+* @brief getSelections get all the selections of this slide.
+*
+* @param sels [out] the selections list.
+*
+* @return the selections count.
+*/
+int QSlideModel::getSelections(QStringList& sels) {
+    // read selections frome xml file to string list.
+    int index= 0;
+    sels.clear();
+    QDomNodeList selectionNodes = topicContent.elementsByTagName(
+        tr("selection"));
+    for (index = 0; index < selectionNodes.size(); ++index) {
+        sels.push_back(selectionNodes.item(index).nodeValue());
+    }
 
-    return sels;
+    return index;
 }
 
 /**
- * @brief getSelection get specific selection.
- *
- * @param index the index of this selection
- *
- * @return the selection
- */
-QString QSlideModel::getSelection(int index) {
-    // @TODO read selection frome xml file to string list.
-    return QString::fromUtf8("");
+* @brief getSelection get specific selection.
+*
+* @param index the index of this selection.
+* @param content selection content.
+* @param point selection point.
+*/
+void QSlideModel::getSelection(int index, QString& content, float& point) {
+    // get selection nodes.
+    QDomNodeList selectionNodes = topicContent.elementsByTagName(
+        tr("selection"));
+    QDomNode node = selectionNodes.item(index);
+    // get content.
+    content = node.nodeValue();
+    // get point.
+    point = node.toElement().attributeNode(tr("point")).value().toFloat();
 }
 /**
  * @brief getSelection get specific selection.
@@ -104,19 +125,23 @@ QString QSlideModel::getSelection(int index) {
  *
  * @return the selection
  */
-QString QSlideModel::getSelection(char option) {
-    // @TODO read selection frome xml file to string list.
-    return QString::fromUtf8("");
+void QSlideModel::getSelection(char option, QString& content, float& point) {
+    // read selection frome xml file to string list.
+    int index = option2Index(option);
+    return getSelection(index, content, point);
 }
 
-
-/////////////////////// Static functions ///////////////////////
 /**
  * @brief index2Option translate index to option
  */
 char QSlideModel::index2Option(int index) {
-    // @TODO finish the translation
-    return '\0';
+    // translate the index to option
+    QDomNodeList selectionNodes = topicContent.elementsByTagName(
+        tr("selection"));
+    QDomElement element = selectionNodes.item(index).toElement();
+    QString optionStr = element.attributeNode(tr("option")).value();
+
+    return (*optionStr.data()).toAscii();
 }
 /**
  * @brief option2Index translate option to index
@@ -124,5 +149,11 @@ char QSlideModel::index2Option(int index) {
 int QSlideModel::option2Index(char option) {
     // @TODO finish the translation
     return 0;
+}
+
+/**
+* @brief randomOptions random the options in selections.
+*/
+void QSlideModel::randomOptions() {
 }
 

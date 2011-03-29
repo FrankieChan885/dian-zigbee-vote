@@ -65,7 +65,10 @@ void QSlideView::loadNewSlide(QSlideModel *sm) {
     topicTitle->setProperty("type", QString("title"));
     contentLayout->addWidget(topicTitle);
 
-    foreach (QString sel, slideModel->getSelections()) {
+    QStringList sels;
+    slideModel->getSelections(sels);
+
+    foreach (QString sel, sels) {
         selectionStrings.push_back(new QLabel(sel));
         // set this label's type to "selection"
         selectionStrings.back()->setProperty("type", QString("selection"));

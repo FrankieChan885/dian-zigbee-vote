@@ -17,6 +17,7 @@
 
 #include <exception>
 #include <sstream>
+#include <string>
 
 class DianVoteException : public std::exception
 {
@@ -34,11 +35,38 @@ public:
 
     virtual const char *what() const throw() {
         std::stringstream ss;
-        ss << "UI exception \'" << exceptionType << "\' happened..";
+        ss << "Exception \'" << exceptionType << "\' happened..";
         return ss.str().c_str();
     }
 private:
     enum DianVoteExceptionType exceptionType;
+};
+
+class XmlStreamException : public std::exception
+{
+public:
+    XmlStreamException(const std::string& errorStr, int line, int column)
+    : errorString(errorStr)
+    , errorLine(line)
+    , errorColumn(column)
+    {
+    }
+
+    virtual ~XmlStreamException() throw() {}
+
+    virtual const char *what() const throw() {
+        std::stringstream ss;
+        ss << "Exception \'XML stream error\' happened.." << std::endl;
+        ss << "line " << errorLine << ", column " << errorColumn <<
+            ": " << errorString << std::endl;
+
+        return ss.str().c_str();
+    }
+
+private:
+    std::string errorString;
+    int errorLine;
+    int errorColumn;
 };
 
 #endif // __EXCEPTIONS_H_

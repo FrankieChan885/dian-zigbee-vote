@@ -31,6 +31,9 @@ int main(int argc, char *argv[])
     } catch (DianVoteException *uie) {
         QMessageBox::critical(0, "error", uie->what());
         return 0;
+    } catch (XmlStreamException *xse) {
+        QMessageBox::critical(0, "error", xse->what());
+        return 0;
     }
     return a.exec();
 }

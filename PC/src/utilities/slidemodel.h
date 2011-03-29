@@ -10,7 +10,8 @@
 #ifndef __SLIDEMODEL_H_
 #define __SLIDEMODEL_H_
 
-#include <QtXml/QXmlStreamReader>
+#include <QObject>
+#include <QtXml/QDomDocument>
 
 class QString;
 
@@ -66,17 +67,19 @@ public:
     /**
      * @brief getSelections get all the selections of this slide.
      *
-     * @return the selections list
+     * @param sels [out] the selections list.
+     *
+     * @return the selections count.
      */
-    QStringList getSelections();
+    int getSelections(QStringList& sels);
     /**
      * @brief getSelection get specific selection.
      *
-     * @param index the index of this selection
-     *
-     * @return the selection
+     * @param index the index of this selection.
+     * @param content selection content.
+     * @param point selection point.
      */
-    QString getSelection(int index);
+    void getSelection(int index, QString& content, float& point);
     /**
      * @brief getSelection get specific selection.
      *
@@ -84,24 +87,26 @@ public:
      *
      * @return the selection
      */
-    QString getSelection(char option);
+    void getSelection(char option, QString& content, float& point);
 
-
-    /////////////////////// Static functions ///////////////////////
     /**
      * @brief index2Option translate index to option
      */
-    static char index2Option(int index);
+    char index2Option(int index);
     /**
      * @brief option2Index translate option to index
      */
-    static int option2Index(char option);
+    int option2Index(char option);
+    /**
+     * @brief randomOptions random the options in selections.
+     */
+    void randomOptions();
 
 private:
     /**
     * @brief store the content of current topic.
     */
-    QXmlStreamReader topicContent;
+    QDomDocument topicContent;
 };
 
 #endif // __SLIDEMODEL_H_
