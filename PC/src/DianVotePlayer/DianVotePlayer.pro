@@ -44,7 +44,7 @@ RESOURCES   += DianVotePlayer.qrc
 
 # Output paths
 DESTDIR      = ./bin
-OBJECTS_DIR  = ./obj
-MOC_DIR      = ./moc
-RES_DIR      = ./res
+OBJECTS_DIR  = ./temp
+MOC_DIR      = ./temp
+RES_DIR      = ./temp
 

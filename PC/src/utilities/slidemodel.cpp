@@ -78,7 +78,7 @@ QString QSlideModel::getTopic() {
     // read topic node from xml file
     QDomElement topicNode = topicContent.documentElement().firstChildElement(tr("topic"));
     // get text
-    return topicNode.text();
+    return QString::fromUtf8(topicNode.text().toLatin1().data());
 }
 
 /**
@@ -95,7 +95,8 @@ int QSlideModel::getSelections(QStringList& sels) {
     QDomNodeList selectionNodes = topicContent.elementsByTagName(
         tr("selection"));
     for (index = 0; index < selectionNodes.size(); ++index) {
-        sels.push_back(selectionNodes.item(index).nodeValue());
+        sels.push_back(QString::fromUtf8(selectionNodes.item(
+                index).toElement().text().toLatin1().data()));
     }
 
     return index;

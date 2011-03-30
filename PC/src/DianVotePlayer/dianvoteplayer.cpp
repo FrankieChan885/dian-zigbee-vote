@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QLatin1String>
 #include <QFile>
+#include <QDir>
 #include <QtUiTools/QUiLoader>
 #include <QVBoxLayout>
 
@@ -45,10 +46,11 @@ void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
     }
 
     // set the slide model.
-    QFile xmlf("one-topic.xml");
+    QFile xmlf(QDir::toNativeSeparators("userdata/one-topic.xml"));
     if (!xmlf.exists()) {
         throw new DianVoteException(DianVoteException::TOPICS_FILE_NOTFOUND);
     }
+    xmlf.open(QFile::ReadWrite);
     QSlideModel *slideModel = new QSlideModel(xmlf.readAll());
     xmlf.close();
 
