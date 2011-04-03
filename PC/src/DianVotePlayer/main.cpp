@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
     //set slide view
     QGraphicsView *view = new QGraphicsView(scene);
-    view->show();
+    view->showFullScreen();
 
     return a.exec();
 }

@@ -1,24 +1,26 @@
 <slide>
-    <topic>This is a English title.</topic>
+    <topic><![CDATA[<font size="36" color="green">This is a English title.</font>]]></topic>
     <selection option="A" point="0.5">
-        Selection 1.
+        <![CDATA[<font size="1" color="green">Selection 1.</font>]]>
         <vote id="e3f0"/>
         <vote id="49a7"/>
         <vote id="1501"/>
         <vote id="40df"/>
     </selection>
     <selection option="D" point="1.0">
-        选项2, 中文选项~~
+        <![CDATA[<font size="2" color="green">选项2, 中文选项~~</font>]]>
         <vote id="e380"/>
         <vote id="9a17"/>
         <vote id="45fa"/>
     </selection>
     <!-- this selection have no votes -->
     <selection option="B" point="1.2">
-        Selection 3.
+        <![CDATA[<font size="4" color="green">Selection 3.</font>]]>
     </selection>
     <selection option="C" point="3.5">
-        "这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？不过我觉得它不会换行的。。。。到底是不是这样呢？"
+        <![CDATA[<font size="8" color="green" font-family="文泉驿正黑, Sans">
+            "这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？不过我觉得它不会换行的。。。。到底是不是这样呢？"
+        </font>]]>
         <vote id="45b0"/>
         <vote id="e4a0"/>
         <vote id="39a7"/>

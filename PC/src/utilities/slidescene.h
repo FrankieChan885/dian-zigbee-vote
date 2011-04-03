@@ -16,6 +16,7 @@
 class QGraphicsTextItem;
 class QGraphicsItemGroup;
 class QSlideModel;
+class QBrush;
 
 /**
  * @brief 
@@ -78,7 +79,26 @@ private:
     * @brief the selection content strings.
     * this strings are in ordered matching the Model's options.
     */
-    QGraphicsItemGroup *selectionStrings;
+    QList<QGraphicsTextItem*> selectionStrings;
+
+    // the display been desided by those properties below.
+    /**
+    * @brief 
+    */
+    int sceneWidth;
+    int sceneHeight;
+    /**
+    * @brief those value showing the frame of content.
+    */
+    int titleLeft;
+    int titleTop;
+    int titleWidth;
+    int selectionsLeft;
+    int selectionsTop;
+    int selectionsWidth;
+    int selectionsSpace;
+
+    QBrush background;
 };
 
 #endif // __SLIDESCENE_H_

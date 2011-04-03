@@ -13,36 +13,32 @@
 #include "exceptions.h"
 
 #include <QGraphicsTextItem>
-#include <QGraphicsItemGroup>
+#include <QList>
+#include <QBrush>
 
 /**
  * @brief QSlideScene initial the view with parent
  */
 QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 : QGraphicsScene(parent)
-, slideModel(sm)
+, slideModel(0)
 , topicTitle(0)
-, selectionStrings(0)
+, sceneWidth(800)
+, sceneHeight(600)
+, titleLeft(100)
+, titleTop(50)
+, titleWidth(400)
+, selectionsLeft(150)
+, selectionsTop(150)
+, selectionsWidth(500)
+, selectionsSpace(20)
+, background(Qt::white)
 {
     // set size to 800x600
     setSceneRect(0, 0, 800, 600);
 
-    // if specific the model, create items using this model.
-    if (slideModel) {
-        // set topic title.
-        topicTitle = addText(slideModel->getTopic());
-
-        // set selection strings.
-        selectionStrings = createItemGroup(QList<QGraphicsItem*>());
-        QStringList sels;
-        slideModel->getSelections(sels);
-        foreach (QString sel, sels) {
-            selectionStrings->addToGroup(addText(sel));
-        }
-
-        // beauty this.
-        makeup();
-    }
+    // set model to update.
+    setModel(sm);
 }
 
 QSlideScene::~QSlideScene() {
@@ -64,8 +60,10 @@ QSlideScene::~QSlideScene() {
  */
 void QSlideScene::setModel(QSlideModel *sm) {
     slideModel = sm;
-    updateContent();
-    makeup();
+    if (slideModel) {
+        updateContent();
+        makeup();
+    }
 }
 
 /**
@@ -85,36 +83,33 @@ void QSlideScene::updateContent() {
     // update until this class has model.
     if (slideModel) {
         // set topic title.
-        if (topicTitle) {
-            topicTitle->setHtml(slideModel->getTopic());
+        if (topicTitle == 0) {
+            topicTitle = addText("");
         }
-        else {
-            topicTitle = addText(slideModel->getTopic());
-        }
+        topicTitle->setHtml(slideModel->getTopic());
 
         // set selection strings.
+        int i;      // done put in for, while also use this.
+        // I'm using the iterator first, but the position of iterator
+        // make me crazy, so I using int value instead.
         QStringList sels;
         slideModel->getSelections(sels);
-
-        // move iterator to first item.
-        QList<QGraphicsItem *>::iterator i =
-            selectionStrings->childItems().begin();
-        // loop in selection strings add modifiled item.
-        foreach (QString sel, sels) {
-            // if has existing item, reset the text.
-            if (i != selectionStrings->childItems().end()) {
-                ((QGraphicsTextItem *)*i)->setHtml(sel);
-            }
+        for (i = 0; i < sels.size(); ++i) {
+            QString sel;
+            sel = sels[i];
             // if no existing item, add one.
-            else {
-                selectionStrings->addToGroup(addText(sel));
+            if (i == selectionStrings.size()) {
+                selectionStrings.push_back(addText(""));
             }
-            // move to next item.
-            ++i;
-        } // foreach
+            selectionStrings[i]->setHtml(sel);
+        }
         // if there are more existing item, remove it.
-        while (i != selectionStrings->childItems().end()) {
-            selectionStrings->removeFromGroup(*i);
+        while (i < selectionStrings.size()) {
+            if (selectionStrings[i]) {
+                delete selectionStrings[i];
+            }
+            selectionStrings.removeAt(i);
+            ++i;
         }
     }
 }
@@ -124,19 +119,52 @@ void QSlideScene::updateContent() {
  *   topic title and selections, resize the texts, or adding some effects.
  */
 void QSlideScene::makeup() {
-    // @TODO place the topic title and selections at well place according
-    // the content.
+    // set background
+    setBackgroundBrush(background);
+
+    // place the topic title and selections at well place according
+    // to the content.
+    if (slideModel) {
+        // set topic title.
+        if (topicTitle) {
+            topicTitle->setTextWidth(titleWidth);
+            topicTitle->setPos(titleLeft, titleTop);
+        }
+
+        // set selection strings.
+        int i;      // done put in for, while also use this.
+        int selTop = selectionsTop;  // height of selection items.
+        // I'm using the iterator first, but the position of iterator
+        // make me crazy, so I using int value instead.
+        for (i = 0; i < selectionStrings.size(); ++i) {
+            // set width and content with font.
+            selectionStrings[i]->setTextWidth(selectionsWidth);
+            selectionStrings[i]->setPos(selectionsLeft, selTop);
+
+            // move selTop to next selection position.
+            selTop += selectionStrings[i]->sceneBoundingRect().height() +
+                selectionsSpace;
+        }
+    }
 }
 
 /**
  * @brief clearItems will delete all the items in current scene.
  */
 void QSlideScene::clearItems() {
+    // delete topic title.
     if (topicTitle) {
         delete topicTitle;
         topicTitle = 0;
     }
 
-    destroyItemGroup(selectionStrings);
+    // delete selections.
+    for (QList<QGraphicsTextItem*>::iterator i= selectionStrings.begin();
+        i != selectionStrings.end(); ++i) {
+        if (*i) {
+            delete *i;
+        }
+    }
+    selectionStrings.clear();
 }
 
