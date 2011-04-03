@@ -1,8 +1,8 @@
 /**
  * dianvoteplayer.cpp
  *
- * DianVotePlayer main window implementation file.
- * DianVotePlayer 类是该软件的播放主窗口。
+ * DianVoteEditor main window implementation file.
+ * DianVoteEditor 类是该软件的播放主窗口。
  *
  * Author: tankery.chen@gmail.com
  * Modified:
@@ -17,13 +17,13 @@
 
 #include <QtGui/QMainWindow>
 
-class DianVotePlayer : public QObject
+class DianVoteEditor : public QObject
 {
     Q_OBJECT
 
 public:
-    DianVotePlayer();
-    ~DianVotePlayer();
+    DianVoteEditor();
+    ~DianVoteEditor();
 
     // setup the user interface using uiFile for the parent.
     void setupUi(const QString& uiFile, QWidget *parent);

@@ -1,8 +1,8 @@
 /**
- * dianvoteplayer.h
+ * dianvoteeditor.h
  *
- * DianVotePlayer main window definition file.
- * DianVotePlayer 类是该软件的播放主窗口。
+ * DianVoteEditor main window definition file.
+ * DianVoteEditor 类是该软件的播放主窗口。
  *
  * Author: tankery.chen@gmail.com
  * Modified:
@@ -12,7 +12,7 @@
  *
  * Copyright (c) Tankery Chen 2011 @ Dian Group
  */
-#include "dianvoteplayer.h"
+#include "dianvoteeditor.h"
 #include "../utilities/exceptions.h"
 #include "../utilities/slideview.h"
 #include "../utilities/slidemodel.h"
@@ -24,17 +24,17 @@
 #include <QtUiTools/QUiLoader>
 #include <QVBoxLayout>
 
-DianVotePlayer::DianVotePlayer()
+DianVoteEditor::DianVoteEditor()
 {
 }
 
-DianVotePlayer::~DianVotePlayer()
+DianVoteEditor::~DianVoteEditor()
 {
 
 }
 
 // setup the user interface using uiFile for the parent.
-void DianVotePlayer::setupUi(const QString& uiFile, QWidget *parent)
+void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
 {
     QUiLoader uiLoader(this);
     QFile uif(uiFile);

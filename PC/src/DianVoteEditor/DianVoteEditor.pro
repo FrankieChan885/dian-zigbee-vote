@@ -1,7 +1,7 @@
 ######################################################################
-# dianvoteplayer.pro
+# dianvoteeditor.pro
 #
-# project file for DianVote Player.
+# project file for DianVote Editor.
 #
 # Author: tankery.chen@gmail.com
 # Modified:
@@ -14,9 +14,9 @@
 ######################################################################
 
 # basic configuration
-PROJECT      = DianVotePlayer
+PROJECT      = DianVoteEditor
 TEMPLATE     = app
-TARGET       = DianVotePlayer
+TARGET       = DianVoteEditor
 
 CONFIG      += qt warn_on uitools
 QT          += xml
@@ -32,14 +32,14 @@ unix {
 }
 
 # Input
-HEADERS     += dianvoteplayer.h \
+HEADERS     += dianvoteeditor.h \
                 slideview.h \
                 slidemodel.h
 SOURCES     += main.cpp \
-				dianvoteplayer.cpp \
+				dianvoteeditor.cpp \
                 slideview.cpp \
                 slidemodel.cpp
-RESOURCES   += DianVotePlayer.qrc
+RESOURCES   += DianVoteEditor.qrc
 
 
 # Output paths

@@ -54,26 +54,27 @@ public:
     void deleteLayouts();
 
     /**
-    * @brief setDocument set the document of this view.
+    * @brief setModel set the model of this view.
     *
-    * @param sm the slide document that holding the topic content.
+    * @param sm the slide model that holding the topic content.
     */
     void setModel(QSlideModel *sm) {
         slideModel = sm;
     }
     /**
-    * @brief getDocument get the slide document
+    * @brief getModel get the slide model
     *
-    * @return slide document
+    * @return slide model
     */
-    QSlideModel *getDocument() {
+    QSlideModel *getModel() {
         return slideModel;
     }
 
 protected:
     /**
     * @brief paintEvent doing all the painting jobs
-    *  it will drawing a title and drawing the selections with it's content and point.
+    *  it will drawing a title and drawing the selections with it's
+    *  content and point.
     *
     * @param event
     */
@@ -81,7 +82,7 @@ protected:
 
 private:
     /**
-    * @brief the slide document that holding the topic content.
+    * @brief the slide model that holding the topic content.
     */
     QSlideModel *slideModel;
     /**
