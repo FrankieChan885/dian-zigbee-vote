@@ -1,10 +1,11 @@
 /**
  * main.cpp
  *
- * DianVote Player 应用程序主文件。
- * 		DianVote Player 是用于题库播放的软件。
- * 	该软件将加载编辑器生成的文件，像 ppt 一样播放出来，并可以在播放过程中
- * 	投票和显示结果。
+ * The `DianVote Player' application's main file.
+ * 		DianVote Player is a software that showing the topic's slide.
+ *  This software will loading the file created by Eidtor, and display
+ *  it like the PPT app, the voting and displaying of vote result is
+ *  also available.
  *
  * Author: tankery.chen@gmail.com
  * Modified:
@@ -18,6 +19,7 @@
 #include "../utilities/slidescene.h"
 #include "../utilities/slidemodel.h"
 #include "../utilities/exceptions.h"
+#include "../utilities/hiddevice.h"
 
 #include <QApplication>
 #include <QMessageBox>
@@ -46,6 +48,8 @@ int main(int argc, char *argv[])
     //set slide view
     QGraphicsView *view = new QGraphicsView(scene);
     view->showFullScreen();
+
+    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, 2);
 
     return a.exec();
 }

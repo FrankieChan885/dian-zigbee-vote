@@ -28,14 +28,16 @@ unix {
 }
 
 # Input
-HEADERS     += slidescene.h\
+HEADERS     += slidescene.h \
                 slideview.h \
-                slidemodel.h
+                slidemodel.h \
+                hiddevice.h
 SOURCES     += main.cpp \
                 slidescene.cpp \
                 slideview.cpp \
-                slidemodel.cpp
-
+                slidemodel.cpp \
+                hiddevice.cpp
+LIBS        += -lhid
 
 # Output paths
 DESTDIR      = ./bin

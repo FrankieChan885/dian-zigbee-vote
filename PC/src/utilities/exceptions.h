@@ -69,4 +69,21 @@ private:
     int errorColumn;
 };
 
+class DianVoteStdException : public std::exception
+{
+public:
+    DianVoteStdException(const std::string& errorStr)
+    : errorString(errorStr)
+    { }
+
+    virtual ~DianVoteStdException() throw() {}
+
+    virtual const char *what() const throw() {
+        return errorString.c_str();
+    }
+
+private:
+    std::string errorString;
+};
+
 #endif // __EXCEPTIONS_H_
