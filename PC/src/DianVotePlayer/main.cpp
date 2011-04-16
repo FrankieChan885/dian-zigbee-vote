@@ -22,17 +22,25 @@
 #include "../utilities/hiddevice.h"
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QGraphicsView>
+#include <QImage>
+#include <QMatrix>
 #include <QFile>
 #include <QDir>
+#include <limits>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    static const QString& appPath = QCoreApplication::applicationDirPath();
+
+    QDir dir(appPath);
+
     // set the slide model.
-    QFile xmlf(QDir::toNativeSeparators("bin/userdata/one-topic.xml"));
+    QFile xmlf(dir.absoluteFilePath("userdata/one-topic.xml"));
     if (!xmlf.exists()) {
         QMessageBox::critical(0, "error", "no xml file...");
         return 0;
@@ -44,12 +52,28 @@ int main(int argc, char *argv[])
 
     // set the slide scene
     QSlideScene *scene = new QSlideScene(0, &model);
+    QPixmap pixmap(dir.absoluteFilePath("../../resources/images/default-background.png"));
+    scene->setBackgroundBrush(Qt::black);
+    scene->setBackgroundPixmap(pixmap);
 
     //set slide view
     QGraphicsView *view = new QGraphicsView(scene);
+
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    view->setFrameShape(QFrame::NoFrame);
+
+    // scale
+    double newScale = QApplication::desktop()->height() / scene->sceneRect().height();
+    QMatrix oldMatrix = view->matrix();
+    view->resetMatrix();
+    view->translate(oldMatrix.dx(), oldMatrix.dy());
+    view->scale(newScale, newScale);
+
     view->showFullScreen();
 
-    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, 0);
+    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, &a);
 
     return a.exec();
 }

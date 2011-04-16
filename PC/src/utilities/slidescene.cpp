@@ -8,13 +8,15 @@
 * @date 2011-04-01
 */
 
+#include <QGraphicsTextItem>
+#include <QGraphicsPixmapItem>
+#include <QList>
+
+#include <limits>
+
 #include "slidescene.h"
 #include "slidemodel.h"
 #include "exceptions.h"
-
-#include <QGraphicsTextItem>
-#include <QList>
-#include <QBrush>
 
 /**
  * @brief QSlideScene initial the view with parent
@@ -23,7 +25,7 @@ QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 : QGraphicsScene(parent)
 , slideModel(0)
 , topicTitle(0)
-, sceneWidth(800)
+, sceneWidth(800)   // set size to 800x600
 , sceneHeight(600)
 , titleLeft(100)
 , titleTop(50)
@@ -32,10 +34,12 @@ QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 , selectionsTop(150)
 , selectionsWidth(500)
 , selectionsSpace(20)
-, background(Qt::white)
+, backgroundPixmap(0)
 {
-    // set size to 800x600
-    setSceneRect(0, 0, 800, 600);
+    setSceneRect(0, 0, sceneWidth, sceneHeight);
+
+    // set default background.
+    setBackgroundBrush(Qt::black);
 
     // set model to update.
     setModel(sm);
@@ -119,9 +123,6 @@ void QSlideScene::updateContent() {
  *   topic title and selections, resize the texts, or adding some effects.
  */
 void QSlideScene::makeup() {
-    // set background
-    setBackgroundBrush(background);
-
     // place the topic title and selections at well place according
     // to the content.
     if (slideModel) {
@@ -149,6 +150,37 @@ void QSlideScene::makeup() {
 }
 
 /**
+ * @brief setBackground set the background pixmap in scene area.
+ *   this is not the same with QGraphicsScene::setBackgroundBrush, cauz
+ *   I using a max lower item to draw the background,
+ *   this make the background only showing in scene area.
+ *
+ * @param pixmap the background pixmap.
+ */
+void QSlideScene::setBackgroundPixmap(const QPixmap& pixmap) {
+    // if no pixmap, return.
+    if (pixmap.isNull()) {
+        return;
+    }
+    // set background pixmap.
+    if (backgroundPixmap == 0) {
+        backgroundPixmap = addPixmap(pixmap);
+    }
+    else {
+        backgroundPixmap->setPixmap(pixmap);
+    }
+
+    // set the background pixmap z value to the bottom of every items.
+    backgroundPixmap->setZValue(std::numeric_limits<qreal>::max()*-1);
+
+    backgroundPixmap->setPos(0, 0);
+
+    // scale
+    qreal newScale = this->height() / pixmap.height();
+    backgroundPixmap->setScale(newScale);
+}
+
+/**
  * @brief clearItems will delete all the items in current scene.
  */
 void QSlideScene::clearItems() {
@@ -166,5 +198,11 @@ void QSlideScene::clearItems() {
         }
     }
     selectionStrings.clear();
+
+    // delete background pixmap item.
+    if (backgroundPixmap) {
+        delete backgroundPixmap;
+        backgroundPixmap = 0;
+    }
 }
 

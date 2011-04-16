@@ -15,8 +15,9 @@
 
 class QGraphicsTextItem;
 class QGraphicsItemGroup;
+class QGraphicsPixmapItem;
 class QSlideModel;
-class QBrush;
+class QPixmap;
 
 /**
  * @brief 
@@ -62,6 +63,16 @@ public:
     void makeup();
 
     /**
+    * @brief setBackground set the background pixmap in scene area.
+    *   this is not the same with QGraphicsScene::setBackgroundBrush, cauz
+    *   I using a max lower item to draw the background,
+    *   this make the background only showing in scene area.
+    *
+    * @param pixmap the background pixmap.
+    */
+    void setBackgroundPixmap(const QPixmap& pixmap);
+
+    /**
     * @brief clearItems delete all items in current scene.
     */
     void clearItems();
@@ -81,6 +92,11 @@ private:
     */
     QList<QGraphicsTextItem*> selectionStrings;
 
+    /**
+    * @brief the background pixmap item.
+    */
+    QGraphicsPixmapItem *backgroundPixmap;
+
     // the display been desided by those properties below.
     /**
     * @brief 
@@ -97,8 +113,6 @@ private:
     int selectionsTop;
     int selectionsWidth;
     int selectionsSpace;
-
-    QBrush background;
 };
 
 #endif // __SLIDESCENE_H_

@@ -19,15 +19,19 @@
 #include "../utilities/exceptions.h"
 
 #include <QApplication>
+#include <QDesktopWidget>
 #include <QMessageBox>
 #include <QDir>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    QDir dir(QCoreApplication::applicationDirPath());
+
     try {
         DianVoteEditor *w = new DianVoteEditor();
-        w->setupUi(QDir::toNativeSeparators("res/dianvoteeditor.ui"), 0);
+        w->setupUi(dir.absoluteFilePath("res/dianvoteeditor.ui"), 0);
     } catch (DianVoteException *uie) {
         QMessageBox::critical(0, "error", uie->what());
         return 0;

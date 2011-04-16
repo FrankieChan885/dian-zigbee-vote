@@ -39,12 +39,10 @@ SOURCES     += main.cpp \
 				dianvoteeditor.cpp \
                 slideview.cpp \
                 slidemodel.cpp
-RESOURCES   += DianVoteEditor.qrc
 
 
 # Output paths
 DESTDIR      = ./bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
-RES_DIR      = ./temp
 
