@@ -38,11 +38,15 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
 {
     QUiLoader uiLoader(this);
     QFile uif(uiFile);
+    uif.open(QIODevice::ReadOnly);
+    if (!uif.isOpen()) {
+        throw new DianVoteException(DianVoteException::UI_FILE_NOTFOUND);
+    }
     dianvoteWindow = (QMainWindow*) uiLoader.load(&uif);
     uif.close();
 
     if (dianvoteWindow == 0) {
-        throw new DianVoteException(DianVoteException::UI_FILE_NOTFOUND);
+        throw new DianVoteException(DianVoteException::UI_LOAD_FAILED);
     }
 
     // set the slide model.
