@@ -18,8 +18,8 @@ extern "C" {
 
 typedef const unsigned int cuint;
 
-class QTimer;
 class QByteArray;
+class QHidListener;
 
 /**
 * @brief this class is inherited from QIODevice,
@@ -37,10 +37,10 @@ public:
     *
     * @param vid the device vendor ID.
     * @param pid the device product ID.
+    * @param interface the interface number.
     */
     QHidDevice(unsigned short vid, unsigned short pid,
-                unsigned short interface, unsigned short endpoint,
-                QObject *parent = 0);
+            unsigned short interface, QObject *parent = 0);
     ~QHidDevice();
     /**
     * @brief open will open a hid device.
@@ -56,6 +56,15 @@ public:
     * @return 
     */
     void close();
+
+    /**
+    * @brief startListening start listen the specific ep with data length.
+    *
+    * @param endpoint the endpoint number.
+    * @param dataLength is the specific length of received data.
+    */
+    void startListening(unsigned short endpoint, unsigned int dataLength);
+
     /**
     * @brief readData will read the data from the opened hid device.
     *
@@ -92,30 +101,20 @@ signals:
      */
     void readInterrupt(QByteArray inData);
 
-private slots:
-    /**
-    * @brief scanUSBPort scanning the usb port and store the data.
-    */
-    void scanUSBPort();
-
 private:
-    static cuint SCAN_WAIT_TIMES = 2;    // the usb scanning wait times (ms).
-    static cuint SCAN_TIME_SPACE = 8;    // the usb scanning interval (ms).
     static cuint FORCE_OPEN_TIMES = 3;
-    static cuint PACKET_LENGHT = 2;       // the received data packet lenght.
 
     unsigned short vendorID;
     unsigned short productID;
     unsigned short interfaceNum;
-    unsigned short endpointNum;
 
     HIDInterface *hid;
     /**
-    * @brief for usb scanning.
+    * @brief listen the hid data receiving.
     */
-    QTimer *scanTimer;
+    QHidListener *hidListener;
 
-}; // class RemoteCmder
+}; // class QHidDevice
 
 #endif // __HIDDEVICE_H_
 

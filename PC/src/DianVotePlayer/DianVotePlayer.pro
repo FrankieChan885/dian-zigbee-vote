@@ -31,12 +31,16 @@ unix {
 HEADERS     += slidescene.h \
                 slideview.h \
                 slidemodel.h \
-                hiddevice.h
+                hiddevice.h \
+                hidlistener.h
+
 SOURCES     += main.cpp \
                 slidescene.cpp \
                 slideview.cpp \
                 slidemodel.cpp \
-                hiddevice.cpp
+                hiddevice.cpp \
+                hidlistener.cpp
+
 LIBS        += -lhid
 
 # Output paths

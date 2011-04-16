@@ -10,23 +10,25 @@
 #include <QTimer>
 #include <QByteArray>
 #include <string>
-#include "../utilities/exceptions.h"
+#include <iostream>
+#include "exceptions.h"
+#include "hidlistener.h"
 
 /**
  * @brief QHidDevice constructor with vid and pid.
  *
  * @param vid the device vendor ID.
  * @param pid the device product ID.
+ * @param interface the interface number.
  */
 QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
-        unsigned short interface, unsigned short endpoint,
-        QObject *parent/* = 0*/)
+            unsigned short interface, QObject *parent/* = 0*/)
 : QIODevice(parent)
 , vendorID(vid)
 , productID(pid) 
 , interfaceNum(interface)
-, endpointNum(endpoint)
-, scanTimer(new QTimer(this))
+, hidListener(0)
+, hid(0)
 {
     // debug configuration.
     hid_set_debug(HID_DEBUG_NOTRACES);
@@ -46,14 +48,15 @@ QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
         throw new DianVoteStdException(
             std::string("hid_new_HIDInterface() failed, out of memory?"));
     }
-
-    // Connecting the timer timeout() signal to scanUSBPort() slot.
-    QObject::connect( scanTimer, SIGNAL(timeout()),
-            this, SLOT(scanUSBPort()) );
 }
 
 QHidDevice::~QHidDevice()
 {
+    // if device open, close it first.
+    if (isOpen()) {
+        close();
+    }
+
     // delete interface and clean up the hids.
     hid_delete_HIDInterface(&hid);
 
@@ -67,48 +70,85 @@ QHidDevice::~QHidDevice()
 /**
  * @brief open will open a hid device.
  *
+ * @param endpoint the endpoint number.
+ * @param dataLength is the specific length of received data.
  * @param mode open mode.
  *
  * @return if find and openned, return true, or return false.
  */
 bool QHidDevice::open(OpenMode mode) {
+    if (hid_is_opened(hid)) {
+        std::cerr << "Error in QHidDevice::open: device already open"
+            << std::endl;
+        return false;
+    }
+
     // construct the matcher struct.
     HIDInterfaceMatcher matcher = 
         { vendorID, productID, NULL, NULL, 0 };
 
     // force open it.
-    hid_return ret = hid_force_open(hid, endpointNum, &matcher,
+    hid_return ret = hid_force_open(hid, interfaceNum, &matcher,
             FORCE_OPEN_TIMES);
     if (ret != HID_RET_SUCCESS) {
+        // close and throw an error.
+        close();
         throw new DianVoteStdException(
                 std::string(hid_strerror(ret)));
 
         return false;
     }
 
-    // when open succed, start the timer.
-    scanTimer->start(SCAN_TIME_SPACE);
-
     return QIODevice::open(mode);
 }
 
 /**
  * @brief close close the hid device.
- *
- * @return 
  */
 void QHidDevice::close() {
-    hid_return ret = hid_close(hid);
-    if (ret != HID_RET_SUCCESS) {
-        throw new DianVoteStdException(
-                std::string(hid_strerror(ret)));
-        return;
+    // first clear the listener.
+    if (hidListener) {
+        QObject::disconnect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
+                this, SIGNAL(readInterrupt(QByteArray)));
+
+        // stop and wait listener exit.
+        hidListener->stop();
+        hidListener->wait();
+
+        // no need to delete the QObject's children...
     }
 
-    // when close succed, stop the timer.
-    scanTimer->stop();
+    // then close the hid device.
+    if (hid_is_opened(hid)) {
+        hid_return ret = hid_close(hid);
+        if (ret != HID_RET_SUCCESS) {
+            throw new DianVoteStdException(
+                    std::string(hid_strerror(ret)));
+            return;
+        }
+    }
 
     return;
+}
+
+/**
+ * @brief startListening start listen the specific ep with data length.
+ *
+ * @param endpoint the endpoint number.
+ * @param dataLength is the specific length of received data.
+ */
+void QHidDevice::startListening(unsigned short endpoint,
+        unsigned int dataLength)
+{
+    // new a listener.
+    hidListener = new QHidListener(hid, endpoint, dataLength, this);
+
+    // call readInterrupt if hid data received.
+    QObject::connect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
+        this, SIGNAL(readInterrupt(QByteArray)));
+
+    // start it.
+    hidListener->start();
 }
 
 /**
@@ -144,22 +184,6 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
  */
 QByteArray QHidDevice::readAll() {
     return QByteArray("");
-}
-
-/**
- * @brief scanUSBPort scanning the usb port and store the data.
- */
-void QHidDevice::scanUSBPort() {
-    char packet[PACKET_LENGHT];
-    hid_return ret = hid_interrupt_read(hid, endpointNum,
-            packet, PACKET_LENGHT, SCAN_WAIT_TIMES);
-    if (ret != HID_RET_SUCCESS) {
-        throw new DianVoteStdException(
-                std::string(hid_strerror(ret)));
-        return;
-    }
-
-    emit readInterrupt(QByteArray(packet, PACKET_LENGHT));
 }
 
 /* Copyright (C) 

@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
     QGraphicsView *view = new QGraphicsView(scene);
     view->showFullScreen();
 
-    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, 2);
+    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, 0);
 
     return a.exec();
 }

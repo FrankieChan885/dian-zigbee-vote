@@ -19,7 +19,14 @@ public:
     }
 
     bool start() {
-        return hidDevice->open(QIODevice::ReadOnly);
+        if (!hidDevice->open(QIODevice::ReadOnly)) {
+            return false;
+        }
+
+        // start listening the ep 3 with data length 2.
+        hidDevice->startListening(3, 2);
+
+        return true;
     }
 
 public slots:
