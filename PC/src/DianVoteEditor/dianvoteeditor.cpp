@@ -48,7 +48,8 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
         throw new DianVoteException(DianVoteException::UI_LOAD_FAILED);
     }
 
-    QDir dir(QCoreApplication::applicationDirPath());
+    QDir::setCurrent(QCoreApplication::applicationDirPath());
+    QDir dir(QDir::current());
 
     // set the slide model.
     QFile xmlf(dir.absoluteFilePath("userdata/one-topic.xml"));
@@ -71,7 +72,7 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
     // show it!
     dianvoteWindow->show();
 
-    QFile qss(dir.absoluteFilePath("../../resources/skins/default.qss"));
+    QFile qss(dir.absoluteFilePath("res/skins/default.qss"));
     if (qss.open(QFile::ReadOnly)) {
         qApp->setStyleSheet(QLatin1String(qss.readAll()));
         qss.close();

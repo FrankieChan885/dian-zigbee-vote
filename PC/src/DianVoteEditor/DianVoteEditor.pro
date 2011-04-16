@@ -42,7 +42,7 @@ SOURCES     += main.cpp \
 
 
 # Output paths
-DESTDIR      = ./bin
+DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
 

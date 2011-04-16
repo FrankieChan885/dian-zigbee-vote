@@ -35,9 +35,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    static const QString& appPath = QCoreApplication::applicationDirPath();
-
-    QDir dir(appPath);
+    QDir::setCurrent(QCoreApplication::applicationDirPath());
+    QDir dir(QDir::current());
 
     // set the slide model.
     QFile xmlf(dir.absoluteFilePath("userdata/one-topic.xml"));
@@ -52,7 +51,7 @@ int main(int argc, char *argv[])
 
     // set the slide scene
     QSlideScene *scene = new QSlideScene(0, &model);
-    QPixmap pixmap(dir.absoluteFilePath("../../resources/images/default-background.png"));
+    QPixmap pixmap(dir.absoluteFilePath("res/images/default-background.png"));
     scene->setBackgroundBrush(Qt::black);
     scene->setBackgroundPixmap(pixmap);
 
