@@ -33,16 +33,17 @@ unix {
 
 # Input
 HEADERS     += dianvoteeditor.h \
-                slideview.h \
-                slidemodel.h
+                slidescene.h \
+                slidemodel.h \
+    slideeditor.h
 SOURCES     += main.cpp \
 				dianvoteeditor.cpp \
-                slideview.cpp \
-                slidemodel.cpp
+                slidescene.cpp \
+                slidemodel.cpp \
+    slideeditor.cpp
 
 
 # Output paths
 DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
-

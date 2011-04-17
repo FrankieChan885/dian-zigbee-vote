@@ -28,7 +28,7 @@ public:
      * @brief QSlideModel initial the QSlideModel using XML stream.
      *
      */
-    QSlideModel(const QString& xmlStream);
+    QSlideModel(const QString& xmlStream, QObject *parent = 0);
     ~QSlideModel();
 
     /**

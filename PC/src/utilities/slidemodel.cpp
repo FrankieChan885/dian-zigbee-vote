@@ -17,7 +17,8 @@
  * @brief QSlideModel initial the QSlideModel using XML stream.
  *
  */
-QSlideModel::QSlideModel(const QString& xmlStream)
+QSlideModel::QSlideModel(const QString& xmlStream, QObject *parent)
+        : QObject(parent)
 {
     QString errorStr("");
     int line, column;

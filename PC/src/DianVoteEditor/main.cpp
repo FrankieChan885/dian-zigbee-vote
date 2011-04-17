@@ -1,10 +1,10 @@
 /**
  * main.cpp
  *
- * DianVote Editor 应用程序主文件。
- * 		DianVote Editor 是用于题库播放的软件。
- * 	该软件将加载编辑器生成的文件，像 ppt 一样播放出来，并可以在播放过程中
- * 	投票和显示结果。
+ * DianVote Editor Application's main file.
+ * 	    DianVote Editor is a software for topics editting.
+ *  This software will edit the file, and save it in an xml like file.
+ *  The xml like file can be load by DianVote Player for displaying.
  *
  * Author: tankery.chen@gmail.com
  * Modified:
@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
     try {
         DianVoteEditor *w = new DianVoteEditor();
         w->setupUi(dir.absoluteFilePath("res/dianvoteeditor.ui"), 0);
+        w->setStyle(dir.absoluteFilePath("res/skins/default.qss"));
+        w->show();
     } catch (DianVoteException *uie) {
         QMessageBox::critical(0, "error", uie->what());
         return 0;

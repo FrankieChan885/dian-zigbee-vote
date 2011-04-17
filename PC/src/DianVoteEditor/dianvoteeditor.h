@@ -2,7 +2,6 @@
  * dianvoteplayer.cpp
  *
  * DianVoteEditor main window implementation file.
- * DianVoteEditor 类是该软件的播放主窗口。
  *
  * Author: tankery.chen@gmail.com
  * Modified:
@@ -27,6 +26,11 @@ public:
 
     // setup the user interface using uiFile for the parent.
     void setupUi(const QString& uiFile, QWidget *parent);
+
+    // set application's style using style sheet.
+    void setStyle(const QString& qssFile);
+
+    void show();
 
 private:
     QMainWindow *dianvoteWindow;
