@@ -35,12 +35,14 @@ unix {
 HEADERS     += dianvoteeditor.h \
                 slidescene.h \
                 slidemodel.h \
-    slideeditor.h
+                slideeditor.h \
+                slidetextitem.h
 SOURCES     += main.cpp \
 				dianvoteeditor.cpp \
                 slidescene.cpp \
                 slidemodel.cpp \
-    slideeditor.cpp
+                slideeditor.cpp \
+                slidetextitem.cpp
 
 
 # Output paths

@@ -60,8 +60,9 @@ int main(int argc, char *argv[])
 
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     view->setFrameShape(QFrame::NoFrame);
+    // editing is not allowed.
+    view->setInteractive(false);
 
     // scale
     double newScale = QApplication::desktop()->height() / scene->sceneRect().height();

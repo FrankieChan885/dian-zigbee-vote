@@ -10,12 +10,14 @@
 
 #include <QGraphicsTextItem>
 #include <QGraphicsPixmapItem>
+#include <QTextCursor>
 #include <QList>
 
 #include <limits>
 
 #include "slidescene.h"
 #include "slidemodel.h"
+#include "slidetextitem.h"
 #include "exceptions.h"
 
 /**
@@ -88,7 +90,7 @@ void QSlideScene::updateContent() {
     if (slideModel) {
         // set topic title.
         if (topicTitle == 0) {
-            topicTitle = addText("");
+            topicTitle = addTextItem("");
         }
         topicTitle->setHtml(slideModel->getTopic());
 
@@ -103,7 +105,7 @@ void QSlideScene::updateContent() {
             sel = sels[i];
             // if no existing item, add one.
             if (i == selectionStrings.size()) {
-                selectionStrings.push_back(addText(""));
+                selectionStrings.push_back(addTextItem(""));
             }
             selectionStrings[i]->setHtml(sel);
         }
@@ -203,6 +205,27 @@ void QSlideScene::clearItems() {
     if (backgroundPixmap) {
         delete backgroundPixmap;
         backgroundPixmap = 0;
+    }
+}
+
+QGraphicsTextItem *QSlideScene::addTextItem(const QString &content)
+{
+    QGraphicsTextItem *item = new QSlideTextItem(content);
+    item->setTextInteractionFlags(Qt::TextEditorInteraction);
+    QObject::connect(item, SIGNAL(lostFocus(QGraphicsTextItem*)),
+                     this, SLOT(textItemLostFocus(QGraphicsTextItem*)));
+    addItem(item);
+    return item;
+}
+
+void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
+{
+    QTextCursor cursor = item->textCursor();
+    cursor.clearSelection();
+    item->setTextCursor(cursor);
+
+    if (item->toPlainText().isEmpty()) {
+        item->setHtml(defaultText);
     }
 }
 

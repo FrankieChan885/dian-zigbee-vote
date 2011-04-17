@@ -14,10 +14,13 @@
 #include <QGraphicsScene>
 
 class QGraphicsTextItem;
+class QSlideTextItem;
 class QGraphicsItemGroup;
 class QGraphicsPixmapItem;
 class QSlideModel;
 class QPixmap;
+
+static const QString defaultText = "<font color=\"red\" size=\"8\">No Content!!</font>";
 
 /**
  * @brief 
@@ -76,6 +79,11 @@ public:
     * @brief clearItems delete all items in current scene.
     */
     void clearItems();
+
+    QGraphicsTextItem *addTextItem(const QString &content);
+
+public slots:
+    void textItemLostFocus(QGraphicsTextItem *item);
 
 private:
     /**

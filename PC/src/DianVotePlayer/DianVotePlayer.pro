@@ -31,6 +31,7 @@ unix {
 HEADERS     += slidescene.h \
                 slideview.h \
                 slidemodel.h \
+                slidetextitem.h \
                 hiddevice.h \
                 hidlistener.h
 
@@ -38,6 +39,7 @@ SOURCES     += main.cpp \
                 slidescene.cpp \
                 slideview.cpp \
                 slidemodel.cpp \
+                slidetextitem.cpp \
                 hiddevice.cpp \
                 hidlistener.cpp
 
