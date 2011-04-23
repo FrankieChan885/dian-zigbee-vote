@@ -12,6 +12,7 @@
  * Copyright (c) Tankery Chen 2011 @ Dian Group
  */
 #include <QApplication>
+#include <QAction>
 #include <QLatin1String>
 #include <QFile>
 #include <QDir>
@@ -50,6 +51,8 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
         throw new DianVoteException(DianVoteException::UI_LOAD_FAILED);
     }
 
+    setupActions();
+
     QDir::setCurrent(QCoreApplication::applicationDirPath());
     QDir dir(QDir::current());
 
@@ -58,18 +61,29 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
     if (!xmlf.exists()) {
         throw new DianVoteException(DianVoteException::TOPICS_FILE_NOTFOUND);
     }
-    xmlf.open(QFile::ReadWrite);
+    xmlf.open(QFile::ReadOnly);
     QString xmls(xmlf.readAll());
     xmlf.close();
 
     // new a slide editor to main window.
-    QSlideEditor *slideEditor = new QSlideEditor(xmls, dianvoteWindow);
+    slideEditor = new QSlideEditor(xmls, dianvoteWindow);
+
+    slideEditor->setBackgroundPixmap(
+            dir.absoluteFilePath("res/images/default-background.png"));
 
     // set the view to this window's central widget.
     dianvoteWindow->setCentralWidget(slideEditor);
 
     // set parent to the specific one.
     dianvoteWindow->setParent(parent);
+}
+
+// setup the main window actions.
+void DianVoteEditor::setupActions()
+{
+    QAction *action = dianvoteWindow->findChild<QAction *>(tr("action_Quit"));
+    QObject::connect(action, SIGNAL(triggered()), dianvoteWindow, SLOT(close()));
+    QObject::connect(action, SIGNAL(triggered()), this, SLOT(onDestroy()));
 }
 
 // set application's style using style sheet.
@@ -89,5 +103,13 @@ void DianVoteEditor::show()
 {
     // show it!
     return dianvoteWindow->show();
+}
+
+void DianVoteEditor::onDestroy() {
+    qDebug("DianVoteEditor::onDestroy()");
+
+    QDir dir(QDir::current());
+    // set the slide model.
+    slideEditor->save(dir.absoluteFilePath("userdata/one-topic.xml"));
 }
 

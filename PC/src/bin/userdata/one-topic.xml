@@ -1,33 +1,48 @@
 <slide>
-    <topic><![CDATA[<font size="36" color="green">This is a English title.</font>]]></topic>
-    <selection option="A" point="0.5">
-        <![CDATA[<font size="1" color="yellow">Selection 1.</font>]]>
-        <vote id="e3f0"/>
-        <vote id="49a7"/>
-        <vote id="1501"/>
-        <vote id="40df"/>
-    </selection>
-    <selection option="D" point="1.0">
-        <![CDATA[<font size="2" color="blue">选项2, 中文选项~~</font>]]>
-        <vote id="e380"/>
-        <vote id="9a17"/>
-        <vote id="45fa"/>
-    </selection>
-    <!-- this selection have no votes -->
-    <selection option="B" point="1.2">
-        <![CDATA[<font size="4" color="green">Selection 3.</font>]]>
-    </selection>
-    <selection option="C" point="3.5">
-        <![CDATA[<font size="8" color="red" font-family="文泉驿正黑, Sans">
-            "这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？不过我觉得它不会换行的。。。。到底是不是这样呢？"
-        </font>]]>
-        <vote id="45b0"/>
-        <vote id="e4a0"/>
-        <vote id="39a7"/>
-        <vote id="0501"/>
-        <vote id="40da"/>
-        <vote id="49aa"/>
-        <vote id="1500"/>
-        <vote id="45df"/>
-    </selection>
+ <topic><![CDATA[    <body style=" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;">
+        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+            <span style=" font-family:'sans'; font-size:35pt; font-weight:8; color:#008000;">This is a English title.</span>
+        </p>
+    </body>
+]]></topic>
+ <selection option="A" point="0.5"><![CDATA[    <body style=" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;">
+        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+            <span style=" color:#ffff00;">Selection 1.</span>
+        </p>
+    </body>
+]]><vote id="e3f0"/>
+  <vote id="49a7"/>
+  <vote id="1501"/>
+  <vote id="40df"/>
+ </selection>
+ <selection option="D" point="1.0"><![CDATA[    <body style=" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;">
+        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+            <span style=" font-size:40pt; color:#0000ff;">选项2, 中文选项~~</span>
+        </p>
+    </body>
+]]><vote id="e380"/>
+  <vote id="9a17"/>
+  <vote id="45fa"/>
+ </selection>
+ <!-- this selection have no votes -->
+ <selection option="B" point="1.2"><![CDATA[    <body style=" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;">
+        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+            <span style=" font-size:30pt; color:#008000;">Selection 3.</span>
+        </p>
+    </body>
+]]></selection>
+ <selection option="C" point="3.5"><![CDATA[    <body style=" font-family:'Sans'; font-size:10pt; font-weight:400; font-style:normal;">
+        <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+            <span style=" font-size:20pt; color:#ff0000;">"这个是一个很长的选项，我想看看它会显示什么结果呢？如果太长了应该会换行？不过我觉得它不会换行的。。。。到底是不是这样呢？" </span>
+        </p>
+    </body>
+]]><vote id="45b0"/>
+  <vote id="e4a0"/>
+  <vote id="39a7"/>
+  <vote id="0501"/>
+  <vote id="40da"/>
+  <vote id="49aa"/>
+  <vote id="1500"/>
+  <vote id="45df"/>
+ </selection>
 </slide>

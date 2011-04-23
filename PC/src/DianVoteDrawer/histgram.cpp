@@ -7,7 +7,7 @@
 #include <qwt_plot_histogram.h>
 #include <qwt_column_symbol.h>
 #include <qwt_series_data.h>
-#include "Histgram.h"
+#include "histgram.h"
 
 Histogram::Histogram(const QString &title, const QColor &symbolColor):
     QwtPlotHistogram(title)

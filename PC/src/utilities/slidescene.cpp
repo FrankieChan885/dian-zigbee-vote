@@ -29,14 +29,14 @@ QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 , topicTitle(0)
 , sceneWidth(800)   // set size to 800x600
 , sceneHeight(600)
+, backgroundPixmap(0)
 , titleLeft(100)
 , titleTop(50)
-, titleWidth(400)
+, titleWidth(600)
 , selectionsLeft(150)
 , selectionsTop(150)
 , selectionsWidth(500)
 , selectionsSpace(20)
-, backgroundPixmap(0)
 {
     setSceneRect(0, 0, sceneWidth, sceneHeight);
 
@@ -84,41 +84,74 @@ QSlideModel *QSlideScene::model() {
 /**
  * @brief updateContent will update the content of this with model.
  *   this function will creating new selections if need.
+ *
+ * @param toFace the variable to specific the direction of data transfor.
  */
-void QSlideScene::updateContent() {
+void QSlideScene::updateContent(bool toFace) {
     // update until this class has model.
     if (slideModel) {
-        // set topic title.
-        if (topicTitle == 0) {
-            topicTitle = addTextItem("");
-        }
-        topicTitle->setHtml(slideModel->getTopic());
+        if (toFace) {
+            // set topic title.
+            if (topicTitle == 0) {
+                topicTitle = addTextItem("");
+            }
+            QString str = slideModel->getTopic();
+            topicTitle->setHtml(str);
 
-        // set selection strings.
-        int i;      // done put in for, while also use this.
-        // I'm using the iterator first, but the position of iterator
-        // make me crazy, so I using int value instead.
-        QStringList sels;
-        slideModel->getSelections(sels);
-        for (i = 0; i < sels.size(); ++i) {
-            QString sel;
-            sel = sels[i];
-            // if no existing item, add one.
-            if (i == selectionStrings.size()) {
-                selectionStrings.push_back(addTextItem(""));
+            // set selection strings.
+            // attention: the order of the selections can be random,
+            //      so, we only using the option to specific the selection.
+
+            int i;      // used in 'for', 'while' also use this.
+            // first iterate in slide model selections
+            for (i = 0; i < slideModel->selectionCount(); ++i) {
+                QString sel;
+                slideModel->getSelection(index2Option(i), sel);
+                // if no existing item, add one.
+                if (i == selectionStrings.size()) {
+                    selectionStrings.push_back(addTextItem(""));
+                }
+                selectionStrings[i]->setHtml(sel);
             }
-            selectionStrings[i]->setHtml(sel);
-        }
-        // if there are more existing item, remove it.
-        while (i < selectionStrings.size()) {
-            if (selectionStrings[i]) {
-                delete selectionStrings[i];
+            // if there are more existing item, remove it.
+            while (i < selectionStrings.size()) {
+                if (selectionStrings[i]) {
+                    delete selectionStrings[i];
+                }
+                selectionStrings.removeAt(i);
+                ++i;
             }
-            selectionStrings.removeAt(i);
-            ++i;
-        }
-    }
-}
+        } // if (toFace)
+        else {
+            if (topicTitle == 0)
+                return;
+
+            slideModel->setTopic(topicTitle->toHtml());
+
+            // set xml selection strings.
+            // attention: the order of the selections can be random,
+            //      so, we only using the option to specific the selection.
+
+            int i;      // used in 'for', 'while' also use this.
+            for (i = 0; i < selectionStrings.size(); ++i) {
+                // if no enough xml selection, add one.
+                if (i == selectionStrings.size()) {
+                    slideModel->addSelection(index2Option(i),
+                        selectionStrings.at(i)->toHtml(), 0.0f);
+                }
+                else {
+                    slideModel->setSelection(index2Option(i),
+                        selectionStrings.at(i)->toHtml());
+                }
+            }
+            // if there are more existing xml selection, remove it.
+            while (i < slideModel->selectionCount()) {
+                slideModel->removeSelection(index2Option(i));
+                ++i;
+            }
+        } // if (toFace) else
+    } // if (slideModel)
+} // void QSlideScene::updateContent(bool toFace)
 
 /**
  * @brief makeup will beautify the scene. For example, ordering the
@@ -218,6 +251,13 @@ QGraphicsTextItem *QSlideScene::addTextItem(const QString &content)
     return item;
 }
 
+/**
+ * @brief get slide content.
+ */
+QString QSlideScene::getContent() {
+    return slideModel->getContent();
+}
+
 void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
 {
     QTextCursor cursor = item->textCursor();
@@ -227,5 +267,36 @@ void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
     if (item->toPlainText().isEmpty()) {
         item->setHtml(defaultText);
     }
+
+    // do makeup.
+    updateContent(false);
+    updateContent();
+    makeup();
 }
+
+/**
+ * @brief index2Option translate the selections index to
+ *      it's option.
+ */
+char QSlideScene::index2Option(int index) {
+    return ('A' + index);
+}
+
+/* Copyright (C) 
+* 2011 - Tankery Chen @ Dian Group
+* This program is free software; you can redistribute it and/or
+* modify it under the terms of the GNU General Public License
+* as published by the Free Software Foundation; either version 2
+* of the License, or (at your option) any later version.
+* 
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+* 
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+* 
+*/
 

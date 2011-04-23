@@ -20,7 +20,7 @@ class QGraphicsPixmapItem;
 class QSlideModel;
 class QPixmap;
 
-static const QString defaultText = "<font color=\"red\" size=\"8\">No Content!!</font>";
+static const QString defaultText = "NAN";
 
 /**
  * @brief 
@@ -56,8 +56,10 @@ public:
     /**
      * @brief updateContent will update the content of this with model.
      *   this function will creating new selections if need.
+     *
+     * @param toFace the variable to specific the direction of data transfor.
      */
-    void updateContent();
+    void updateContent(bool toFace = true);
 
     /**
     * @brief makeup will beautify the scene. For example, ordering the
@@ -82,10 +84,20 @@ public:
 
     QGraphicsTextItem *addTextItem(const QString &content);
 
+    /**
+     * @brief get slide content.
+     */
+    QString getContent();
+
 public slots:
     void textItemLostFocus(QGraphicsTextItem *item);
 
 private:
+    /**
+     * @brief index2Option translate the selections index to
+     *      it's option.
+     */
+    char index2Option(int index);
     /**
     * @brief the slide model that holding the topic content.
     */
@@ -100,17 +112,17 @@ private:
     */
     QList<QGraphicsTextItem*> selectionStrings;
 
-    /**
-    * @brief the background pixmap item.
-    */
-    QGraphicsPixmapItem *backgroundPixmap;
-
     // the display been desided by those properties below.
     /**
     * @brief 
     */
     int sceneWidth;
     int sceneHeight;
+    /**
+    * @brief the background pixmap item.
+    */
+    QGraphicsPixmapItem *backgroundPixmap;
+
     /**
     * @brief those value showing the frame of content.
     */

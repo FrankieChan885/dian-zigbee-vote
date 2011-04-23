@@ -43,9 +43,11 @@ SOURCES     += main.cpp \
                 slidemodel.cpp \
                 slideeditor.cpp \
                 slidetextitem.cpp
+RESOURCES   += DianVoteEditor.qrc
 
 
 # Output paths
 DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
+RES_DIR      = ./temp

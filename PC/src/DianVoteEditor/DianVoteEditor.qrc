@@ -1,0 +1,10 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>res/pointer.png</file>
+    <file>res/bold.png</file>
+    <file>res/italic.png</file>
+    <file>res/underline.png</file>
+    <file>res/delete.png</file>
+</qresource>
+</RCC>
+

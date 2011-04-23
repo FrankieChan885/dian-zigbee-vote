@@ -16,6 +16,8 @@
 
 #include <QtGui/QMainWindow>
 
+class QSlideEditor;
+
 class DianVoteEditor : public QObject
 {
     Q_OBJECT
@@ -27,13 +29,20 @@ public:
     // setup the user interface using uiFile for the parent.
     void setupUi(const QString& uiFile, QWidget *parent);
 
+    // setup the main window actions.
+    void setupActions();
+
     // set application's style using style sheet.
     void setStyle(const QString& qssFile);
 
     void show();
 
+public slots:
+    void onDestroy();
+
 private:
     QMainWindow *dianvoteWindow;
+    QSlideEditor *slideEditor;
 };
 
 #endif // DIANVOTEPLAYER_H
