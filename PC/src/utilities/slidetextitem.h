@@ -27,12 +27,15 @@ public:
 
 protected:
     void focusOutEvent(QFocusEvent *event);
+    void focusInEvent(QFocusEvent *event);
+//    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
 
 signals:
     void lostFocus(QGraphicsTextItem *item);
+    void getFocus(QGraphicsTextItem *item);
+//    void hoverMoved(QGraphicsTextItem *item);
 
 public slots:
-
 };
 
 #endif // SLIDETEXTITEM_H

@@ -7,6 +7,7 @@
 */
 
 #include <QString>
+//#include <QGraphicsSceneHoverEvent>
 #include "slidetextitem.h"
 
 QSlideTextItem::QSlideTextItem(QGraphicsItem *parent)
@@ -19,11 +20,21 @@ QSlideTextItem::QSlideTextItem(const QString &text, QGraphicsItem *parent)
 {
 }
 
+void QSlideTextItem::focusInEvent(QFocusEvent *event)
+{
+    emit getFocus(this);
+    QGraphicsTextItem::focusInEvent(event);
+}
+
 void QSlideTextItem::focusOutEvent(QFocusEvent *event)
 {
     emit lostFocus(this);
     QGraphicsTextItem::focusOutEvent(event);
 }
+
+//void QSlideTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
+//    emit hoverMoved(this);
+//}
 
 /* Copyright (C) 
 * 2011 - Tankery Chen @ Dian Group

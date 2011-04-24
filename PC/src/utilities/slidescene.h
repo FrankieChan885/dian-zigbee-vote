@@ -19,6 +19,7 @@ class QGraphicsItemGroup;
 class QGraphicsPixmapItem;
 class QSlideModel;
 class QPixmap;
+class QSlideFontEditor;
 
 static const QString defaultText = "NAN";
 
@@ -91,6 +92,8 @@ public:
 
 public slots:
     void textItemLostFocus(QGraphicsTextItem *item);
+    void textItemGetFocus(QGraphicsTextItem *item);
+//    void textItemHoverMoved(QGraphicsTextItem *item);
 
 private:
     /**
@@ -133,6 +136,8 @@ private:
     int selectionsTop;
     int selectionsWidth;
     int selectionsSpace;
+
+    QSlideFontEditor *fontEditor;
 };
 
 #endif // __SLIDESCENE_H_

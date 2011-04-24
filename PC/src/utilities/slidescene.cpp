@@ -18,6 +18,7 @@
 #include "slidescene.h"
 #include "slidemodel.h"
 #include "slidetextitem.h"
+#include "slidefonteditor.h"
 #include "exceptions.h"
 
 /**
@@ -37,6 +38,7 @@ QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 , selectionsTop(150)
 , selectionsWidth(500)
 , selectionsSpace(20)
+, fontEditor(0)
 {
     setSceneRect(0, 0, sceneWidth, sceneHeight);
 
@@ -245,8 +247,13 @@ QGraphicsTextItem *QSlideScene::addTextItem(const QString &content)
 {
     QGraphicsTextItem *item = new QSlideTextItem(content);
     item->setTextInteractionFlags(Qt::TextEditorInteraction);
+
+    // connect text item focus event to slots.
+    QObject::connect(item, SIGNAL(getFocus(QGraphicsTextItem*)),
+                     this, SLOT(textItemGetFocus(QGraphicsTextItem*)));
     QObject::connect(item, SIGNAL(lostFocus(QGraphicsTextItem*)),
                      this, SLOT(textItemLostFocus(QGraphicsTextItem*)));
+
     addItem(item);
     return item;
 }
@@ -258,21 +265,53 @@ QString QSlideScene::getContent() {
     return slideModel->getContent();
 }
 
+void QSlideScene::textItemGetFocus(QGraphicsTextItem *item)
+{
+    // create and font editor around new item.
+    if (fontEditor == 0) {
+        fontEditor = new QSlideFontEditor(item, qobject_cast<QWidget *>(parent()),
+                                          Qt::SplashScreen |
+                                          Qt::WindowStaysOnTopHint);
+//        QObject::connect(qgraphicsitem_cast<QSlideTextItem*>(item),
+//                         SIGNAL(hoverMoved(QGraphicsTextItem *)), this,
+//                         SLOT(textItemHoverMoved(QGraphicsTextItem *)));
+    }
+    QWidget *container = qobject_cast<QWidget *>(parent());
+    fontEditor->move(container->mapToGlobal(container->pos()));
+    fontEditor->show();
+}
+
 void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
 {
+    // destroy the font editor if not active.
+    // font editor active means there are some work need to
+    // doing in editor like drop down the combo box list.
+    if (fontEditor && !fontEditor->isActiveWindow()) {
+        fontEditor->close();
+        delete fontEditor;
+        fontEditor = 0;
+    }
+
+    // clear the cursor selection.
     QTextCursor cursor = item->textCursor();
     cursor.clearSelection();
     item->setTextCursor(cursor);
 
-    if (item->toPlainText().isEmpty()) {
-        item->setHtml(defaultText);
-    }
+//    if (item->toPlainText().isEmpty()) {
+//        item->setHtml(defaultText);
+//    }
 
     // do makeup.
     updateContent(false);
     updateContent();
     makeup();
 }
+
+//void QSlideScene::textItemHoverMoved(QGraphicsTextItem *item)
+//{
+//    fontEditor->move(item->cursor().pos());
+//    fontEditor->update();
+//}
 
 /**
  * @brief index2Option translate the selections index to
