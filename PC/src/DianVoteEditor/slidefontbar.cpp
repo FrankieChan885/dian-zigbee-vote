@@ -1,52 +1,85 @@
 /**
-* @file slidefonteditor.cpp
-* @brief the QSlideFontEditor implementation file.
+* @file slidefontbar.cpp
+* @brief the QSlideFontBar implementation file.
 * @author Tankery Chen @ Dian Group
 * @version 1.0.0
 * @date 2011-04-23
 */
 #include <QtGui>
 
-#include "slidefonteditor.h"
+#include "slidefontbar.h"
 
-QSlideFontEditor::QSlideFontEditor(QGraphicsTextItem *text, QWidget *parent,
-                                   Qt::WindowFlags f)
-        : QFrame(parent, f)
-        , textItem(text)
+QSlideFontBar::QSlideFontBar(QWidget *parent)
+        : QObject(parent)
 {
     createCombos();
-    createButtons();
-    mergeWidgets();
-    initializeFont();
+    createActions();
+}
+
+/**
+ * @brief add the font, color toolbar or menubar to main window.
+ */
+QToolBar *QSlideFontBar::addToolBar(const QString& title) {
+    QToolBar * ToolBar = new QToolBar(title.isEmpty() ?
+                                      tr("font") : title);
+    ToolBar->addWidget(fontCombo);
+    ToolBar->addWidget(fontSizeCombo);
+    ToolBar->addAction(boldAction);
+    ToolBar->addAction(italicAction);
+    ToolBar->addAction(underlineAction);
+    ToolBar->addWidget(fontColorToolButton);
+
+    return ToolBar;
+}
+QMenu *QSlideFontBar::addMenu(const QString& title) {
+    QMenu *menu = new QMenu(title.isEmpty() ?
+                                      tr("font") : title);
+    menu->addAction(boldAction);
+    menu->addAction(italicAction);
+    menu->addAction(underlineAction);
+    // TODO: add font size and font family menu actions..
+
+    return menu;
+}
+
+/**
+* @brief set font to font bar
+*/
+void QSlideFontBar::setFont(const QFont &font) {
+    boldAction->setChecked(font.weight() == QFont::Bold);
+    italicAction->setChecked(font.italic());
+    underlineAction->setChecked(font.underline());
+    fontSizeCombo->setEditText(QString().setNum(font.pointSize()));
+    fontCombo->setCurrentFont(font);
 }
 
 /**
 * @brief this function create the buttons in this widget.
 *       and thanks for QT Nokia, cause this is copied from theirs.
 */
-void QSlideFontEditor::createButtons() {
-    boldButton = new QPushButton(this);
-    boldButton->setToolTip(tr("Bold"));
-    boldButton->setCheckable(true);
-    boldButton->setIcon(QIcon(":/res/bold.png"));
-    boldButton->setShortcut(tr("Ctrl+B"));
-    connect(boldButton, SIGNAL(clicked()),
+void QSlideFontBar::createActions() {
+    boldAction = new QAction(this);
+    boldAction->setToolTip(tr("Bold"));
+    boldAction->setCheckable(true);
+    boldAction->setIcon(QIcon(":/res/bold.png"));
+    boldAction->setShortcut(tr("Ctrl+B"));
+    connect(boldAction, SIGNAL(triggered()),
             this, SLOT(handleFontChange()));
 
-    italicButton = new QPushButton(this);
-    italicButton->setToolTip(tr("Italic"));
-    italicButton->setCheckable(true);
-    italicButton->setIcon(QIcon(":/res/italic.png"));
-    italicButton->setShortcut(tr("Ctrl+I"));
-    connect(italicButton, SIGNAL(clicked()),
+    italicAction = new QAction(this);
+    italicAction->setToolTip(tr("Italic"));
+    italicAction->setCheckable(true);
+    italicAction->setIcon(QIcon(":/res/italic.png"));
+    italicAction->setShortcut(tr("Ctrl+I"));
+    connect(italicAction, SIGNAL(triggered()),
             this, SLOT(handleFontChange()));
 
-    underlineButton = new QPushButton(this);
-    underlineButton->setCheckable(true);
-    underlineButton->setIcon(QIcon(":/res/underline.png"));
-    underlineButton->setToolTip(tr("Underline"));
-    underlineButton->setShortcut(tr("Ctrl+U"));
-    connect(underlineButton, SIGNAL(clicked()),
+    underlineAction = new QAction(this);
+    underlineAction->setCheckable(true);
+    underlineAction->setIcon(QIcon(":/res/underline.png"));
+    underlineAction->setToolTip(tr("Underline"));
+    underlineAction->setShortcut(tr("Ctrl+U"));
+    connect(underlineAction, SIGNAL(triggered()),
             this, SLOT(handleFontChange()));
 }
 
@@ -54,7 +87,7 @@ void QSlideFontEditor::createButtons() {
 * @brief this function create the combo box in this widget.
 *       and thanks for QT Nokia, cause this is copied from theirs.
 */
-void QSlideFontEditor::createCombos() {
+void QSlideFontBar::createCombos() {
     fontCombo = new QFontComboBox();
     connect(fontCombo, SIGNAL(currentFontChanged(QFont)),
             this, SLOT(currentFontChanged(QFont)));
@@ -72,96 +105,64 @@ void QSlideFontEditor::createCombos() {
     fontColorToolButton->setPopupMode(QToolButton::MenuButtonPopup);
     fontColorToolButton->setMenu(createColorMenu(SLOT(textColorChanged()),
                                                  Qt::black));
-    textAction = fontColorToolButton->menu()->defaultAction();
+    colorAction = fontColorToolButton->menu()->defaultAction();
     fontColorToolButton->setIcon(createColorToolButtonIcon(
     ":/res/text.png", Qt::black));
     fontColorToolButton->setAutoFillBackground(true);
     connect(fontColorToolButton, SIGNAL(clicked()),
-            this, SLOT(textButtonTriggered()));
-}
-
-void QSlideFontEditor::mergeWidgets() {
-    QHBoxLayout *buttonLayout = new QHBoxLayout;
-    buttonLayout->addWidget(boldButton);
-    buttonLayout->addWidget(underlineButton);
-    buttonLayout->addWidget(italicButton);
-    buttonLayout->addWidget(fontColorToolButton);
-    buttonLayout->addWidget(fontSizeCombo);
-
-    QHBoxLayout *comboLayout = new QHBoxLayout;
-    comboLayout->addWidget(fontCombo);
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addLayout(buttonLayout);
-    layout->addLayout(comboLayout);
-
-    setLayout(layout);
-}
-
-/**
-* @brief initialize the font from text item's current font.
-*/
-void QSlideFontEditor::initializeFont() {
-    QFont font = textItem->font();
-    qDebug(font.toString().toAscii().data());
-
-    boldButton->setChecked(font.weight() == QFont::Bold);
-    italicButton->setChecked(font.italic());
-    underlineButton->setChecked(font.underline());
-    fontSizeCombo->setEditText(QString().setNum(font.pointSize()));
-    fontCombo->setCurrentFont(font);
+            this, SLOT(textActionTriggered()));
 }
 
 /**
  * @brief when font combo box selected an font, this
  *      function will be call.
  */
-void QSlideFontEditor::currentFontChanged(const QFont &) {
+void QSlideFontBar::currentFontChanged(const QFont &) {
     handleFontChange();
 }
 
 /**
  * @brief this is the font size edit function.
  */
-void QSlideFontEditor::fontSizeChanged(const QString &) {
+void QSlideFontBar::fontSizeChanged(const QString &) {
     handleFontChange();
 }
 
 /**
  * @brief this is the actual font edit function.
  */
-void QSlideFontEditor::handleFontChange() {
+void QSlideFontBar::handleFontChange() {
     QFont font = fontCombo->currentFont();
     font.setPointSize(fontSizeCombo->currentText().toInt());
-    font.setWeight(boldButton->isChecked() ? QFont::Bold : QFont::Normal);
-    font.setItalic(italicButton->isChecked());
-    font.setUnderline(underlineButton->isChecked());
+    font.setWeight(boldAction->isChecked() ? QFont::Bold : QFont::Normal);
+    font.setItalic(italicAction->isChecked());
+    font.setUnderline(underlineAction->isChecked());
 
-    textItem->setFont(font);
+    emit fontChanged(font);
 }
 
 /**
  * @brief this is the font color edit function.
  *       and thanks for QT Nokia, cause this is copied from qtdemo.
  */
-void QSlideFontEditor::textColorChanged() {
-    textAction = qobject_cast<QAction *>(sender());
+void QSlideFontBar::textColorChanged() {
+    colorAction = qobject_cast<QAction *>(sender());
     fontColorToolButton->setIcon(createColorToolButtonIcon(
                 ":/res/text.png",
-                qVariantValue<QColor>(textAction->data())));
-    textButtonTriggered();
+                qVariantValue<QColor>(colorAction->data())));
+    textActionTriggered();
 }
-void QSlideFontEditor::textButtonTriggered()
+
+void QSlideFontBar::textActionTriggered()
 {
-    textItem->setDefaultTextColor(qVariantValue<QColor>(textAction->data()));
-    textItem->update();
+    emit colorChanged(qVariantValue<QColor>(colorAction->data()));
 }
 
 /**
 * @brief this function create the color menu for color tool button.
 *       and thanks for QT Nokia, cause this is copied from qtdemo.
 */
-QMenu *QSlideFontEditor::createColorMenu(const char *slot, QColor defaultColor)
+QMenu *QSlideFontBar::createColorMenu(const char *slot, QColor defaultColor)
 {
     QList<QColor> colors;
     colors << Qt::black << Qt::white << Qt::gray << Qt::red << Qt::green
@@ -170,7 +171,7 @@ QMenu *QSlideFontEditor::createColorMenu(const char *slot, QColor defaultColor)
     names << tr("black") << tr("white") << tr("gray") << tr("red") << tr("green")
             << tr("blue") << tr("yellow");
 
-    QMenu *colorMenu = new QMenu(this);
+    QMenu *colorMenu = new QMenu(fontColorToolButton);
     for (int i = 0; i < colors.count(); ++i) {
         QAction *action = new QAction(names.at(i), this);
         action->setIcon(createColorIcon(colors.at(i)));
@@ -190,7 +191,7 @@ QMenu *QSlideFontEditor::createColorMenu(const char *slot, QColor defaultColor)
 * @brief this function create the color icon for color tool button.
 *       and thanks for QT Nokia, cause this is copied from qtdemo.
 */
-QIcon QSlideFontEditor::createColorToolButtonIcon(const QString &imageFile,
+QIcon QSlideFontBar::createColorToolButtonIcon(const QString &imageFile,
                         QColor color)
 {
     QPixmap pixmap(50, 80);
@@ -209,7 +210,7 @@ QIcon QSlideFontEditor::createColorToolButtonIcon(const QString &imageFile,
 * @brief this function create the color icon for color menu.
 *       and thanks for QT Nokia, cause this is copied from qtdemo.
 */
-QIcon QSlideFontEditor::createColorIcon(QColor color)
+QIcon QSlideFontBar::createColorIcon(QColor color)
 {
     QPixmap pixmap(20, 20);
     pixmap.fill(color);

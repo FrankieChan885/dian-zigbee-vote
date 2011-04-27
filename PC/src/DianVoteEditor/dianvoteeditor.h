@@ -19,6 +19,7 @@
 class QFile;
 class QSlideScene;
 class QStandardItemModel;
+class QModelIndex;
 
 class DianVoteEditor : public QObject
 {
@@ -52,6 +53,9 @@ public slots:
     void newSlide();
     // open a slide.
     void openSlide();
+
+    // slide list clicked
+    void slideListClicked(const QModelIndex &);
 
 private:
     /**

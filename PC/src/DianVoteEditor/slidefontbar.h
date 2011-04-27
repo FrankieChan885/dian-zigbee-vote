@@ -1,38 +1,59 @@
 /**
-* @file slidefonteditor.h
-* @brief the QSlideFontEditor definition file.
+* @file slidefontbar.h
+* @brief the QSlideFontBar definition file.
 * @author Tankery Chen @ Dian Group
 * @version 1.0.0
-* @date 2011-04-23
+* @date 2011-04-27
 */
-#ifndef SLIDEFONTEDITOR_H
-#define SLIDEFONTEDITOR_H
+#ifndef __SLIDEFONTBAR_H_
+#define __SLIDEFONTBAR_H_
 
-#include <QFrame>
 #include <QIcon>
+#include <QWidget>
 
-class QPushButton;
+class QToolBar;
 class QToolButton;
 class QComboBox;
 class QFontComboBox;
-class QGraphicsTextItem;
+class QFont;
 class QAction;
 class QColor;
 class QString;
 class QMenu;
 
-class QSlideFontEditor : public QFrame
+/**
+* @brief this class is a manager of text font (including color).
+*       the action of bar will be created in constructer.
+*       after instantiated this class, you can use \getFontToolBar
+*       and other similar function to get the toolbar or menubar
+*       with the defined font & color actions.
+*/
+class QSlideFontBar : public QObject
 {
     Q_OBJECT
 public:
-    QSlideFontEditor(QGraphicsTextItem *text, QWidget *parent = 0,
-                     Qt::WindowFlags f = 0);
+    QSlideFontBar(QWidget *parent = 0);
+
+    /**
+     * @brief add the font, color toolbar or menubar to main window.
+     */
+    QToolBar *addToolBar(const QString& title = QString());
+    QMenu *addMenu(const QString& title = QString());
+
+    /**
+    * @brief set font to font bar
+    */
+    void setFont(const QFont &font);
 
 signals:
     /**
      * @brief emit when any font property have changed.
      */
-    void fontChanged();
+    void fontChanged(const QFont &font);
+    /**
+     * @brief emit when any color property have changed.
+     */
+    void colorChanged(const QColor &color);
 
 public slots:
     /**
@@ -52,33 +73,28 @@ public slots:
      * @brief this is the font color edit function.
      */
     void textColorChanged();
-    void textButtonTriggered();
+    void textActionTriggered();
+
+private:
+    void createActions();
+    void createCombos();
 
     QMenu *createColorMenu(const char *slot, QColor defaultColor);
     QIcon createColorToolButtonIcon(const QString &imageFile,
                         QColor color);
     QIcon createColorIcon(QColor color);
 
-private:
-    void createButtons();
-    void createCombos();
-    void mergeWidgets();
-    /// initialize the font by text item.
-    void initializeFont();
-
-    QPushButton *boldButton;
-    QPushButton *underlineButton;
-    QPushButton *italicButton;
+    QAction *boldAction;
+    QAction *underlineAction;
+    QAction *italicAction;
     QToolButton *fontColorToolButton;
-    QAction *textAction;
+    QAction *colorAction;
 
     QFontComboBox *fontCombo;
     QComboBox *fontSizeCombo;
-
-    QGraphicsTextItem *textItem;
 };
 
-#endif // SLIDEFONTEDITOR_H
+#endif // __SLIDEFONTBAR_H_
 
 /* Copyright (C) 
 * 2011 - Tankery Chen @ Dian Group

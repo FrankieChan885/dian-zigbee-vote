@@ -11,6 +11,7 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsPixmapItem>
 #include <QTextCursor>
+#include <QWidget>
 #include <QList>
 
 #include <limits>
@@ -18,7 +19,6 @@
 #include "slidescene.h"
 #include "slidemodel.h"
 #include "slidetextitem.h"
-#include "slidefonteditor.h"
 #include "exceptions.h"
 
 /**
@@ -38,7 +38,6 @@ QSlideScene::QSlideScene(QWidget * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 , selectionsTop(150)
 , selectionsWidth(500)
 , selectionsSpace(20)
-, fontEditor(0)
 {
     setSceneRect(0, 0, sceneWidth, sceneHeight);
 
@@ -287,62 +286,6 @@ QString QSlideScene::getContent() {
 QString QSlideScene::getTitle() {
     return topicTitle->toPlainText();
 }
-
-void QSlideScene::textItemSelectedChange(QGraphicsTextItem *item,
-                                         bool isSelected) {
-    if (isSelected) {
-        // if has text item selected, create an new fon editor.
-        if (qgraphicsitem_cast<QSlideTextItem *>(item)) {
-            // create and font editor around new item.
-            if (fontEditor == 0) {
-                fontEditor = new QSlideFontEditor(item, qobject_cast<QWidget *>(parent()),
-                                                  Qt::ToolTip |
-                                                  Qt::WindowStaysOnTopHint);
-            }
-            QWidget *container = qobject_cast<QWidget *>(parent());
-            if (container) {
-                fontEditor->move(container->mapToGlobal(container->pos()));
-            }
-            fontEditor->show();
-        }
-    } // if (isSelected)
-    else {
-        // destroy the old font editor first.
-        if (fontEditor) {
-            fontEditor->close();
-            delete fontEditor;
-            fontEditor = 0;
-        }
-
-        // do makeup.
-        updateContent(false);
-        updateContent();
-        makeup();
-    } // if (isSelected) else
-}
-
-void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
-{
-    // clear the cursor selection.
-    QTextCursor cursor = item->textCursor();
-    cursor.clearSelection();
-    item->setTextCursor(cursor);
-
-    //    if (item->toPlainText().isEmpty()) {
-    //        item->setHtml(defaultText);
-    //    }
-
-    // do makeup.
-    updateContent(false);
-    updateContent();
-    makeup();
-}
-
-//void QSlideScene::textItemHoverMoved(QGraphicsTextItem *item)
-//{
-//    fontEditor->move(item->cursor().pos());
-//    fontEditor->update();
-//}
 
 /**
  * @brief index2Option translate the selections index to

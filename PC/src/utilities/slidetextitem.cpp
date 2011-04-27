@@ -48,6 +48,14 @@ void QSlideTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
+void QSlideTextItem::changeColor(const QColor &color) {
+    this->setDefaultTextColor(color);
+}
+
+void QSlideTextItem::changeFont(const QFont &font) {
+    this->setFont(font);
+}
+
 /* Copyright (C) 
 * 2011 - Tankery Chen @ Dian Group
 * This program is free software; you can redistribute it and/or

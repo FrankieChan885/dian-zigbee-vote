@@ -36,13 +36,15 @@ HEADERS     += dianvoteeditor.h \
                 slidescene.h \
                 slidemodel.h \
                 slidetextitem.h \
-                slidefonteditor.h
+                slideeditorscene.h \
+                slidefontbar.h
 SOURCES     += main.cpp \
-				dianvoteeditor.cpp \
                 slidescene.cpp \
                 slidemodel.cpp \
                 slidetextitem.cpp \
-                slidefonteditor.cpp
+                slideeditorscene.cpp \
+                dianvoteeditor.cpp \
+                slidefontbar.cpp
 RESOURCES   += DianVoteEditor.qrc
 
 

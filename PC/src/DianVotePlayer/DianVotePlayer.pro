@@ -29,7 +29,7 @@ unix {
 
 # Input
 HEADERS     += slidescene.h \
-                slideview.h \
+                slideplayerscene.h \
                 slidemodel.h \
                 slidetextitem.h \
                 hiddevice.h \
@@ -37,7 +37,7 @@ HEADERS     += slidescene.h \
 
 SOURCES     += main.cpp \
                 slidescene.cpp \
-                slideview.cpp \
+                slideplayerscene.cpp \
                 slidemodel.cpp \
                 slidetextitem.cpp \
                 hiddevice.cpp \

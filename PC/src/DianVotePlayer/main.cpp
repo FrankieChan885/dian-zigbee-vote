@@ -16,10 +16,10 @@
  *
  * Copyright (c) Tankery Chen 2011 @ Dian Group
  */
-#include "../utilities/slidescene.h"
 #include "../utilities/slidemodel.h"
 #include "../utilities/exceptions.h"
 #include "../utilities/hiddevice.h"
+#include "slideplayerscene.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 
 
     // set the slide scene
-    QSlideScene *scene = new QSlideScene(0, &model);
+    QSlidePlayerScene *scene = new QSlidePlayerScene(0, &model);
     QPixmap pixmap(dir.absoluteFilePath("res/images/default-background.png"));
     scene->setBackgroundBrush(Qt::black);
     scene->setBackgroundPixmap(pixmap);

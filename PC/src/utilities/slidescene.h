@@ -15,13 +15,9 @@
 
 class QGraphicsTextItem;
 class QSlideTextItem;
-class QGraphicsItemGroup;
 class QGraphicsPixmapItem;
 class QSlideModel;
 class QPixmap;
-class QSlideFontEditor;
-
-static const QString defaultText = "NAN";
 
 /**
  * @brief 
@@ -96,14 +92,9 @@ public:
     QString getTitle();
 
 public slots:
-    void textItemLostFocus(QGraphicsTextItem *item);
-    /**
-    * @brief if the item is selected, isSelected will be true,
-    *   else if the item is lost select,
-    *   isSelected will be false.
-    */
-    void textItemSelectedChange(QGraphicsTextItem *item,
-                                bool isSelected);
+    virtual void textItemLostFocus(QGraphicsTextItem *item) = 0;
+    virtual void textItemSelectedChange(QGraphicsTextItem *item,
+                                bool isSelected) = 0;
 
 private:
     /**
@@ -146,8 +137,6 @@ private:
     int selectionsTop;
     int selectionsWidth;
     int selectionsSpace;
-
-    QSlideFontEditor *fontEditor;
 };
 
 #endif // __SLIDESCENE_H_

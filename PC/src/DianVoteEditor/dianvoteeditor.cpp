@@ -13,11 +13,12 @@
  */
 #include <QtGui>
 #include <QUiLoader>
+#include <QModelIndex>
 
-#include "dianvoteeditor.h"
 #include "../utilities/exceptions.h"
 #include "../utilities/slidemodel.h"
-#include "../utilities/slidescene.h"
+#include "slideeditorscene.h"
+#include "dianvoteeditor.h"
 
 DianVoteEditor::DianVoteEditor()
         : dianvoteWindow(0)
@@ -69,22 +70,12 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
     // set the view to this window's central widget.
     dianvoteWindow->setCentralWidget(view);
 
-    // set the list view with model slidesListModel.
-    slidesListModel = new QStandardItemModel(dianvoteWindow);
-    updateSlideList();
-    QListView *listView = dianvoteWindow->
-                          findChild<QListView*>(tr("slideListView"));
-    if (listView) {
-        listView->setModel(slidesListModel);
-    }
-    else {
-        qDebug("listView not found...");
-    }
-
     // set size.
     dianvoteWindow->setGeometry(50, 50, 800, 600);
     // set parent to the specific one.
     dianvoteWindow->setParent(parent);
+
+    updateSlideList();
 }
 
 // setup the main window actions.
@@ -137,20 +128,23 @@ void DianVoteEditor::setupActions()
 
 // Update the slide list by slideScenes.
 void DianVoteEditor::updateSlideList() {
-    if (slidesListModel == 0)
+    if (slidesListModel == 0) {
         slidesListModel = new QStandardItemModel(dianvoteWindow);
+    }
     // clear list.
     slidesListModel->clear();
     // append all slides title to slide list.
     foreach (QSlideScene *scene, slideScenes) {
         slidesListModel->appendRow(new QStandardItem(
-                scene->getTitle()));
+                scene->model()->getPlainTopic()));
     }
     // update list view.
     QListView *listView = dianvoteWindow->
                           findChild<QListView*>(tr("slideListView"));
     if (listView) {
         listView->setModel(slidesListModel);
+        QObject::connect(listView, SIGNAL(clicked(QModelIndex)),
+                         this, SLOT(slideListClicked(QModelIndex)));
     }
     else {
         qDebug("listView not found...");
@@ -206,7 +200,7 @@ void DianVoteEditor::fileProcessing(QFile &xmlFile, bool isSplit) {
                 QTextStream slideStream(&oneSlide);
                 nodes.at(i).save(slideStream, 1);
                 model = new QSlideModel(oneSlide);
-                scene = new QSlideScene(dianvoteWindow, model);
+                scene = new QSlideEditorScene(dianvoteWindow, model);
                 slideScenes.append(scene);
             }
         } // if (isSpliy)
@@ -263,7 +257,7 @@ void DianVoteEditor::newSlide() {
     // then, new a slide scene.
     // set the slide scene with gray surround the white.
     QSlideModel *model = QSlideModel::createModel(dianvoteWindow);
-    currentSlideScene = new QSlideScene(dianvoteWindow, model);
+    currentSlideScene = new QSlideEditorScene(dianvoteWindow, model);
     QPixmap pixmap(QSize(800, 600));
     pixmap.fill(Qt::white);
     currentSlideScene->setBackgroundPixmap(pixmap);
@@ -303,4 +297,10 @@ void DianVoteEditor::openSlide() {
 
     // update slide list..
     updateSlideList();
+}
+
+void DianVoteEditor::slideListClicked(const QModelIndex & index) {
+        currentSlideScene = slideScenes.at(index.row());
+        qobject_cast<QGraphicsView*>(dianvoteWindow->centralWidget())->
+                setScene(slideScenes.at(index.row()));
 }

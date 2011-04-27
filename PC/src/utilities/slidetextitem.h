@@ -11,6 +11,8 @@
 #include <QGraphicsTextItem>
 
 class QString;
+class QFont;
+class QColor;
 
 /**
  * @brief this class inherit frome QGraphicsTextItem,
@@ -35,6 +37,8 @@ signals:
     void selectedChange(QGraphicsTextItem *item, bool isSelected);
 
 public slots:
+    void changeFont(const QFont &font);
+    void changeColor(const QColor &color);
 };
 
 #endif // SLIDETEXTITEM_H
