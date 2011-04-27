@@ -29,6 +29,7 @@ public:
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void focusInEvent(QFocusEvent *event);
     void focusOutEvent(QFocusEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 

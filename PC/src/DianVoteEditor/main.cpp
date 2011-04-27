@@ -29,8 +29,11 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // set encode translate codec.
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("Utf8"));
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Utf8"));
+    // the locale must be set to the locale codec, or you can't use your
+    // wide char input method well.
+    QTextCodec::setCodecForLocale(QTextCodec::codecForLocale());
+    QTextCodec::setCodecForTr(QTextCodec::codecForName("Utf8"));
 
     QDir dir(QCoreApplication::applicationDirPath());
 

@@ -31,6 +31,11 @@ QVariant QSlideTextItem::itemChange(GraphicsItemChange change,
     return value;
 }
 
+void QSlideTextItem::focusInEvent(QFocusEvent *event)
+{
+    QGraphicsTextItem::focusInEvent(event);
+}
+
 void QSlideTextItem::focusOutEvent(QFocusEvent *event)
 {
     setTextInteractionFlags(Qt::NoTextInteraction);

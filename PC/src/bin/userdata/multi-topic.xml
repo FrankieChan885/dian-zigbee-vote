@@ -1,0 +1,16 @@
+<dianvote>
+ <slide>
+  <topic color="#ff0000" font="文泉驿点阵正黑,28,-1,5,75,0,0,0,0,0">The 中文 slide</topic>
+  <selection option="A" point="0.5" color="#ff0000" font="Purisa,20,-1,5,75,0,0,0,0,0">Selection 1..</selection>
+  <selection option="D" point="1.0" color="#00ff00" font="AR PL UMing CN,20,-1,5,75,0,0,0,0,0">选项2, 中文选项~~</selection>
+  <selection option="B" point="1.2" color="#0000ff" font="Courier 10 Pitch,14,-1,5,50,1,1,0,0,0">Selection 3.</selection>
+  <selection option="C" point="3.5" color="#a0a0a4" font="AR PL UKai CN,24,-1,5,75,0,0,0,0,0">选项4,中文输入也有字体。。</selection>
+ </slide>
+ <slide>
+  <topic color="#000000" font="文泉驿等宽正黑,24,-1,5,75,0,0,0,0,0">另一份主题~~</topic>
+  <selection option="B" point="0.5" color="#0000ff" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">Selection 1..</selection>
+  <selection option="D" point="1.0" color="#ffff00" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">选项2, 中文选项~~</selection>
+  <selection option="C" point="1.2" color="#ff0000" font="Courier 10 Pitch,20,-1,5,50,0,0,0,0,0">Selection 3.</selection>
+  <selection option="A" point="3.5" color="#00ff00" font="Courier 10 Pitch,20,-1,5,75,0,0,0,0,0">选项4,中文输入也有字体。。</selection>
+ </slide>
+</dianvote>

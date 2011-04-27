@@ -1,0 +1,16 @@
+<dianvote>
+ <slide>
+  <topic color="#a0a0a4" font="Courier 10 Pitch,28,-1,5,50,0,0,0,0,0">单击此处添加标题</topic>
+  <selection option="A" point="0.5" color="#ff0000" font="Purisa,20,-1,5,75,0,0,0,0,0">Selection A</selection>
+  <selection option="D" point="1.0" color="#00ff00" font="AR PL UMing CN,20,-1,5,75,0,0,0,0,0">选项D</selection>
+  <selection option="B" point="1.2" color="#0000ff" font="Courier 10 Pitch,14,-1,5,50,1,1,0,0,0">Selection B</selection>
+  <selection option="C" point="3.5" color="#000000" font="AR PL UKai CN,24,-1,5,50,1,0,0,0,0">选项C</selection>
+ </slide>
+ <slide>
+  <topic color="#000000" font="文泉驿等宽正黑,24,-1,5,75,0,0,0,0,0">第二张主题</topic>
+  <selection option="B" point="0.5" color="#0000ff" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">Selection B</selection>
+  <selection option="D" point="1.0" color="#ffff00" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">选项2, 中文选项~~</selection>
+  <selection option="C" point="1.2" color="#ff0000" font="Courier 10 Pitch,20,-1,5,50,0,0,0,0,0">Selection C</selection>
+  <selection option="A" point="3.5" color="#00ff00" font="Courier 10 Pitch,20,-1,5,75,0,0,0,0,0">选项A</selection>
+ </slide>
+</dianvote>
