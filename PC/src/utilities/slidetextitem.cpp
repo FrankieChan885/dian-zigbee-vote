@@ -13,28 +13,40 @@
 QSlideTextItem::QSlideTextItem(QGraphicsItem *parent)
         : QGraphicsTextItem(parent)
 {
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
 QSlideTextItem::QSlideTextItem(const QString &text, QGraphicsItem *parent)
         : QGraphicsTextItem(text, parent)
 {
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
-void QSlideTextItem::focusInEvent(QFocusEvent *event)
+QVariant QSlideTextItem::itemChange(GraphicsItemChange change,
+                     const QVariant &value)
 {
-    emit getFocus(this);
-    QGraphicsTextItem::focusInEvent(event);
+    // if selected change and this item is selected, emit selected.
+    if (change == QGraphicsItem::ItemSelectedHasChanged)
+        emit selectedChange(this, value.toBool());
+    return value;
 }
 
 void QSlideTextItem::focusOutEvent(QFocusEvent *event)
 {
+    setTextInteractionFlags(Qt::NoTextInteraction);
     emit lostFocus(this);
     QGraphicsTextItem::focusOutEvent(event);
 }
 
-//void QSlideTextItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
-//    emit hoverMoved(this);
-//}
+/**
+* @brief double click make the text item editable.
+*/
+void QSlideTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    if (textInteractionFlags() == Qt::NoTextInteraction)
+        setTextInteractionFlags(Qt::TextEditorInteraction);
+    QGraphicsTextItem::mouseDoubleClickEvent(event);
+}
 
 /* Copyright (C) 
 * 2011 - Tankery Chen @ Dian Group

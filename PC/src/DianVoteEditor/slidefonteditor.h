@@ -15,7 +15,7 @@ class QPushButton;
 class QToolButton;
 class QComboBox;
 class QFontComboBox;
-class QSlideTextItem;
+class QGraphicsTextItem;
 class QAction;
 class QColor;
 class QString;
@@ -25,7 +25,7 @@ class QSlideFontEditor : public QFrame
 {
     Q_OBJECT
 public:
-    QSlideFontEditor(QObject *text, QWidget *parent = 0,
+    QSlideFontEditor(QGraphicsTextItem *text, QWidget *parent = 0,
                      Qt::WindowFlags f = 0);
 
 signals:
@@ -63,6 +63,8 @@ private:
     void createButtons();
     void createCombos();
     void mergeWidgets();
+    /// initialize the font by text item.
+    void initializeFont();
 
     QPushButton *boldButton;
     QPushButton *underlineButton;
@@ -73,7 +75,7 @@ private:
     QFontComboBox *fontCombo;
     QComboBox *fontSizeCombo;
 
-    QSlideTextItem *textItem;
+    QGraphicsTextItem *textItem;
 };
 
 #endif // SLIDEFONTEDITOR_H

@@ -35,14 +35,12 @@ unix {
 HEADERS     += dianvoteeditor.h \
                 slidescene.h \
                 slidemodel.h \
-                slideeditor.h \
                 slidetextitem.h \
                 slidefonteditor.h
 SOURCES     += main.cpp \
 				dianvoteeditor.cpp \
                 slidescene.cpp \
                 slidemodel.cpp \
-                slideeditor.cpp \
                 slidetextitem.cpp \
                 slidefonteditor.cpp
 RESOURCES   += DianVoteEditor.qrc

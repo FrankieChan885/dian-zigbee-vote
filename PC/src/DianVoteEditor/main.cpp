@@ -22,10 +22,15 @@
 #include <QDesktopWidget>
 #include <QMessageBox>
 #include <QDir>
+#include <QTextCodec>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    // set encode translate codec.
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("Utf8"));
+    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Utf8"));
 
     QDir dir(QCoreApplication::applicationDirPath());
 

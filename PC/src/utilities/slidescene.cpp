@@ -24,11 +24,11 @@
 /**
  * @brief QSlideScene initial the view with parent
  */
-QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
+QSlideScene::QSlideScene(QWidget * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 : QGraphicsScene(parent)
 , slideModel(0)
 , topicTitle(0)
-, sceneWidth(800)   // set size to 800x600
+, sceneWidth(800)   // set default size to 800x600
 , sceneHeight(600)
 , backgroundPixmap(0)
 , titleLeft(100)
@@ -43,10 +43,14 @@ QSlideScene::QSlideScene(QObject * parent/* = 0*/, QSlideModel *sm/* = 0*/)
     setSceneRect(0, 0, sceneWidth, sceneHeight);
 
     // set default background.
-    setBackgroundBrush(Qt::black);
+    setBackgroundBrush(Qt::darkGray);
+    QPixmap pixmap(QSize(800, 600));
+    pixmap.fill(Qt::white);
+    setBackgroundPixmap(pixmap);
 
-    // set model to update.
-    setModel(sm);
+    // if specific the slide model, set model to update.
+    if (sm)
+        setModel(sm);
 }
 
 QSlideScene::~QSlideScene() {
@@ -97,8 +101,13 @@ void QSlideScene::updateContent(bool toFace) {
             if (topicTitle == 0) {
                 topicTitle = addTextItem("");
             }
-            QString str = slideModel->getTopic();
-            topicTitle->setHtml(str);
+            QString str;
+            QFont font;
+            QColor color;
+            slideModel->getTopic(str, font, color);
+            topicTitle->setPlainText(str);
+            topicTitle->setFont(font);
+            topicTitle->setDefaultTextColor(color);
 
             // set selection strings.
             // attention: the order of the selections can be random,
@@ -108,12 +117,16 @@ void QSlideScene::updateContent(bool toFace) {
             // first iterate in slide model selections
             for (i = 0; i < slideModel->selectionCount(); ++i) {
                 QString sel;
-                slideModel->getSelection(index2Option(i), sel);
+                QFont font;
+                QColor color;
+                slideModel->getSelection(index2Option(i), sel, font, color);
                 // if no existing item, add one.
                 if (i == selectionStrings.size()) {
                     selectionStrings.push_back(addTextItem(""));
                 }
-                selectionStrings[i]->setHtml(sel);
+                selectionStrings[i]->setPlainText(sel);
+                selectionStrings[i]->setFont(font);
+                selectionStrings[i]->setDefaultTextColor(color);
             }
             // if there are more existing item, remove it.
             while (i < selectionStrings.size()) {
@@ -128,7 +141,8 @@ void QSlideScene::updateContent(bool toFace) {
             if (topicTitle == 0)
                 return;
 
-            slideModel->setTopic(topicTitle->toHtml());
+            slideModel->setTopic(topicTitle->toPlainText(),
+                                 topicTitle->font(), topicTitle->defaultTextColor());
 
             // set xml selection strings.
             // attention: the order of the selections can be random,
@@ -139,11 +153,13 @@ void QSlideScene::updateContent(bool toFace) {
                 // if no enough xml selection, add one.
                 if (i == selectionStrings.size()) {
                     slideModel->addSelection(index2Option(i),
-                        selectionStrings.at(i)->toHtml(), 0.0f);
+                        selectionStrings[i]->toPlainText(),
+                        selectionStrings[i]->font(), selectionStrings[i]->defaultTextColor(), 0.0f);
                 }
                 else {
                     slideModel->setSelection(index2Option(i),
-                        selectionStrings.at(i)->toHtml());
+                        selectionStrings[i]->toPlainText(),
+                        selectionStrings[i]->font(), selectionStrings[i]->defaultTextColor());
                 }
             }
             // if there are more existing xml selection, remove it.
@@ -246,13 +262,13 @@ void QSlideScene::clearItems() {
 QGraphicsTextItem *QSlideScene::addTextItem(const QString &content)
 {
     QGraphicsTextItem *item = new QSlideTextItem(content);
-    item->setTextInteractionFlags(Qt::TextEditorInteraction);
+    item->setTextInteractionFlags(Qt::NoTextInteraction);
 
     // connect text item focus event to slots.
-    QObject::connect(item, SIGNAL(getFocus(QGraphicsTextItem*)),
-                     this, SLOT(textItemGetFocus(QGraphicsTextItem*)));
     QObject::connect(item, SIGNAL(lostFocus(QGraphicsTextItem*)),
                      this, SLOT(textItemLostFocus(QGraphicsTextItem*)));
+    QObject::connect(item, SIGNAL(selectedChange(QGraphicsTextItem*, bool)),
+                     this, SLOT(textItemSelectedChange(QGraphicsTextItem*, bool)));
 
     addItem(item);
     return item;
@@ -265,41 +281,56 @@ QString QSlideScene::getContent() {
     return slideModel->getContent();
 }
 
-void QSlideScene::textItemGetFocus(QGraphicsTextItem *item)
-{
-    // create and font editor around new item.
-    if (fontEditor == 0) {
-        fontEditor = new QSlideFontEditor(item, qobject_cast<QWidget *>(parent()),
-                                          Qt::SplashScreen |
-                                          Qt::WindowStaysOnTopHint);
-//        QObject::connect(qgraphicsitem_cast<QSlideTextItem*>(item),
-//                         SIGNAL(hoverMoved(QGraphicsTextItem *)), this,
-//                         SLOT(textItemHoverMoved(QGraphicsTextItem *)));
-    }
-    QWidget *container = qobject_cast<QWidget *>(parent());
-    fontEditor->move(container->mapToGlobal(container->pos()));
-    fontEditor->show();
+/**
+ * @brief get slide title.
+ */
+QString QSlideScene::getTitle() {
+    return topicTitle->toPlainText();
+}
+
+void QSlideScene::textItemSelectedChange(QGraphicsTextItem *item,
+                                         bool isSelected) {
+    if (isSelected) {
+        // if has text item selected, create an new fon editor.
+        if (qgraphicsitem_cast<QSlideTextItem *>(item)) {
+            // create and font editor around new item.
+            if (fontEditor == 0) {
+                fontEditor = new QSlideFontEditor(item, qobject_cast<QWidget *>(parent()),
+                                                  Qt::ToolTip |
+                                                  Qt::WindowStaysOnTopHint);
+            }
+            QWidget *container = qobject_cast<QWidget *>(parent());
+            if (container) {
+                fontEditor->move(container->mapToGlobal(container->pos()));
+            }
+            fontEditor->show();
+        }
+    } // if (isSelected)
+    else {
+        // destroy the old font editor first.
+        if (fontEditor) {
+            fontEditor->close();
+            delete fontEditor;
+            fontEditor = 0;
+        }
+
+        // do makeup.
+        updateContent(false);
+        updateContent();
+        makeup();
+    } // if (isSelected) else
 }
 
 void QSlideScene::textItemLostFocus(QGraphicsTextItem *item)
 {
-    // destroy the font editor if not active.
-    // font editor active means there are some work need to
-    // doing in editor like drop down the combo box list.
-    if (fontEditor && !fontEditor->isActiveWindow()) {
-        fontEditor->close();
-        delete fontEditor;
-        fontEditor = 0;
-    }
-
     // clear the cursor selection.
     QTextCursor cursor = item->textCursor();
     cursor.clearSelection();
     item->setTextCursor(cursor);
 
-//    if (item->toPlainText().isEmpty()) {
-//        item->setHtml(defaultText);
-//    }
+    //    if (item->toPlainText().isEmpty()) {
+    //        item->setHtml(defaultText);
+    //    }
 
     // do makeup.
     updateContent(false);

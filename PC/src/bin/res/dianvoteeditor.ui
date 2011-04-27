@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>697</width>
-    <height>411</height>
+    <width>293</width>
+    <height>293</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>DianVoteEditor</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout_4"/>
@@ -21,7 +21,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>697</width>
+     <width>293</width>
      <height>23</height>
     </rect>
    </property>
@@ -55,6 +55,7 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
+    <addaction name="actionSet_Background"/>
    </widget>
    <widget class="QMenu" name="menu_Tools">
     <property name="title">
@@ -95,7 +96,7 @@
     <enum>TopToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>false</bool>
+    <bool>true</bool>
    </attribute>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
@@ -105,10 +106,7 @@
    <widget class="QWidget" name="dockWidgetContents">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QComboBox" name="listStyle"/>
-     </item>
-     <item>
-      <widget class="QListView" name="listView"/>
+      <widget class="QListView" name="slideListView"/>
      </item>
     </layout>
    </widget>
@@ -236,6 +234,11 @@
   <action name="action_Aboutwe">
    <property name="text">
     <string>&amp;About we</string>
+   </property>
+  </action>
+  <action name="actionSet_Background">
+   <property name="text">
+    <string>&amp;Set Background...</string>
    </property>
   </action>
  </widget>

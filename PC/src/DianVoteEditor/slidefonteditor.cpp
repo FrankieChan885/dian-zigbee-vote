@@ -8,16 +8,16 @@
 #include <QtGui>
 
 #include "slidefonteditor.h"
-#include "slidetextitem.h"
 
-QSlideFontEditor::QSlideFontEditor(QObject *text, QWidget *parent,
+QSlideFontEditor::QSlideFontEditor(QGraphicsTextItem *text, QWidget *parent,
                                    Qt::WindowFlags f)
         : QFrame(parent, f)
+        , textItem(text)
 {
-    textItem = qobject_cast<QSlideTextItem *>(text);
     createCombos();
     createButtons();
     mergeWidgets();
+    initializeFont();
 }
 
 /**
@@ -99,6 +99,20 @@ void QSlideFontEditor::mergeWidgets() {
 }
 
 /**
+* @brief initialize the font from text item's current font.
+*/
+void QSlideFontEditor::initializeFont() {
+    QFont font = textItem->font();
+    qDebug(font.toString().toAscii().data());
+
+    boldButton->setChecked(font.weight() == QFont::Bold);
+    italicButton->setChecked(font.italic());
+    underlineButton->setChecked(font.underline());
+    fontSizeCombo->setEditText(QString().setNum(font.pointSize()));
+    fontCombo->setCurrentFont(font);
+}
+
+/**
  * @brief when font combo box selected an font, this
  *      function will be call.
  */
@@ -124,7 +138,6 @@ void QSlideFontEditor::handleFontChange() {
     font.setUnderline(underlineButton->isChecked());
 
     textItem->setFont(font);
-    textItem->update();
 }
 
 /**
@@ -151,10 +164,11 @@ void QSlideFontEditor::textButtonTriggered()
 QMenu *QSlideFontEditor::createColorMenu(const char *slot, QColor defaultColor)
 {
     QList<QColor> colors;
-    colors << Qt::black << Qt::white << Qt::red << Qt::blue << Qt::yellow;
+    colors << Qt::black << Qt::white << Qt::gray << Qt::red << Qt::green
+            << Qt::blue << Qt::yellow;
     QStringList names;
-    names << tr("black") << tr("white") << tr("red") << tr("blue")
-          << tr("yellow");
+    names << tr("black") << tr("white") << tr("gray") << tr("red") << tr("green")
+            << tr("blue") << tr("yellow");
 
     QMenu *colorMenu = new QMenu(this);
     for (int i = 0; i < colors.count(); ++i) {

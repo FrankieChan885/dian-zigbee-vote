@@ -15,6 +15,7 @@
 #include <QtXml/QDomDocument>
 
 class QFont;
+class QColor;
 class QString;
 
 /**
@@ -45,19 +46,29 @@ public:
      * @return the topic content.
      */
     QString getContent();
+    /**
+     * @brief get the model's root node.
+     */
+    QDomNode *getNode();
 
     /**
      * @brief setTopic set the topic (title) of slide
      *
      * @param t the topic
      */
-    void setTopic(const QString& t);
+    void setTopic(const QString& t, const QFont& f, const QColor& c);
     /**
-     * @brief getTopic get the topic of this slide.
+     * @brief getPlainTopic get the topic of this slide.
      *
      * @return the topic.
      */
-    QString getTopic();
+    QString getPlainTopic();
+    /**
+     * @brief getTopic get the topic of this slide.
+     *
+     * @param t the topic content.
+     */
+    void getTopic(QString& t, QFont& f, QColor& c);
 
     /**
      * @brief addSelection add a selection with content and point.
@@ -66,7 +77,7 @@ public:
      * @param point selection point.
      */
     bool addSelection(const char option,
-                      const QString& content, const float& point);
+                      const QString& content, const QFont& f, const QColor& c, const float& point);
     /**
      * @brief removeSelection remove a specific selection.
      */
@@ -86,28 +97,22 @@ public:
      */
     QDomNode getSelectionNode(char option);
     /**
-     * @brief setSelections using a string list to set all selections.
-     *
-     * @param sels the selections list
-     */
-    void setSelections(const QStringList& sels);
-    /**
      * @brief setSelection set specific selection.
      *
      * @param index the index of this selection.
      * @param content selection content.
      * @param point selection point.
      */
-    void setSelection(int index, const QString& content,
+    void setSelection(int index, const QString& content, const QFont& f, const QColor& c,
                       const float& point);
     /**
      * @brief this is a overload function.
      */
-    void setSelection(int index, const QString& content);
+    void setSelection(int index, const QString& content, const QFont& f, const QColor& c);
     /**
      * @brief setSelectionContent set the selection content.
      */
-    void setSelectionContent(QDomNode& selNode, const QString& content);
+    void setSelectionContent(QDomNode& selNode, const QString& content, const QFont& f, const QColor& c);
     /**
      * @brief setSelectionPoint set the selection point.
      */
@@ -119,21 +124,13 @@ public:
      * @param content selection content.
      * @param point selection point.
      */
-    void setSelection(char option, const QString& content,
+    void setSelection(char option, const QString& content, const QFont& f, const QColor& c,
                       const float& point);
     /**
      * @brief this is a overload function.
      */
-    void setSelection(char option, const QString& content);
+    void setSelection(char option, const QString& content, const QFont& f, const QColor& c);
 
-    /**
-     * @brief getSelections get all the selections of this slide.
-     *
-     * @param sels [out] the selections list.
-     *
-     * @return the selections count.
-     */
-    int getSelections(QStringList& sels);
     /**
      * @brief getSelection get specific selection.
      *
@@ -141,7 +138,7 @@ public:
      * @param content selection content.
      * @param point selection point.
      */
-    void getSelection(int index, QString& content, float& point);
+    void getSelection(int index, QString& content, QFont& f, QColor& c, float& point);
     /**
      * @brief getSelection get specific selection.
      *
@@ -149,15 +146,15 @@ public:
      *
      * @return the selection
      */
-    void getSelection(char option, QString& content, float& point);
+    void getSelection(char option, QString& content, QFont& f, QColor& c, float& point);
     /**
      * @brief getSelection get specific selection with NO point.
      */
-    void getSelection(int index, QString& content);
+    void getSelection(int index, QString& content, QFont& f, QColor& c);
     /**
      * @brief getSelection get specific selection with NO point.
      */
-    void getSelection(char option, QString& content);
+    void getSelection(char option, QString& content, QFont& f, QColor& c);
 
     /**
      * @brief index2Option translate index to option
@@ -176,11 +173,11 @@ public:
      */
     int selectionCount();
 
+/// static public functions
+public:
+    static QSlideModel *createModel(QObject *parent);
+
 private:
-    /**
-    * @brief simplify the xml stream.
-    */
-    QString simplifyXml(const QString& fullXml);
     /**
     * @brief store the content of current topic.
     */

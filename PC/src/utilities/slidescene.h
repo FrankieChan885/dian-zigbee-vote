@@ -37,7 +37,7 @@ public:
     /**
     * @brief QSlideScene initial the view with parent
     */
-    QSlideScene(QObject * parent = 0, QSlideModel *sm = 0);
+    QSlideScene(QWidget * parent = 0, QSlideModel *sm = 0);
     virtual ~QSlideScene();
 
     /**
@@ -90,10 +90,20 @@ public:
      */
     QString getContent();
 
+    /**
+     * @brief get slide title.
+     */
+    QString getTitle();
+
 public slots:
     void textItemLostFocus(QGraphicsTextItem *item);
-    void textItemGetFocus(QGraphicsTextItem *item);
-//    void textItemHoverMoved(QGraphicsTextItem *item);
+    /**
+    * @brief if the item is selected, isSelected will be true,
+    *   else if the item is lost select,
+    *   isSelected will be false.
+    */
+    void textItemSelectedChange(QGraphicsTextItem *item,
+                                bool isSelected);
 
 private:
     /**

@@ -26,14 +26,13 @@ public:
     QSlideTextItem(const QString & text, QGraphicsItem *parent = 0);
 
 protected:
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void focusOutEvent(QFocusEvent *event);
-    void focusInEvent(QFocusEvent *event);
-//    void hoverMoveEvent(QGraphicsSceneHoverEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
     void lostFocus(QGraphicsTextItem *item);
-    void getFocus(QGraphicsTextItem *item);
-//    void hoverMoved(QGraphicsTextItem *item);
+    void selectedChange(QGraphicsTextItem *item, bool isSelected);
 
 public slots:
 };

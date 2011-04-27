@@ -16,7 +16,9 @@
 
 #include <QtGui/QMainWindow>
 
-class QSlideEditor;
+class QFile;
+class QSlideScene;
+class QStandardItemModel;
 
 class DianVoteEditor : public QObject
 {
@@ -32,17 +34,40 @@ public:
     // setup the main window actions.
     void setupActions();
 
+    // update the slide list by slideScenes.
+    void updateSlideList();
+
     // set application's style using style sheet.
     void setStyle(const QString& qssFile);
 
     void show();
 
+    // clean the resources.
+    void clean();
+
 public slots:
-    void onDestroy();
+    // save the slide.
+    void saveSlide();
+    // new a slide scene and append the title to list model.
+    void newSlide();
+    // open a slide.
+    void openSlide();
 
 private:
+    /**
+    * @brief manage the file processing.
+    * @param isSplit split the file to many slide or merge
+    *       merge many slides to a file.
+    */
+    void fileProcessing(QFile &xmlFile, bool isSplit);
+
     QMainWindow *dianvoteWindow;
-    QSlideEditor *slideEditor;
+
+    // slideScenes store all slides.
+    QList<QSlideScene *> slideScenes;
+    QSlideScene *currentSlideScene;
+    // slidesListModel store all slides' outline with list.
+    QStandardItemModel *slidesListModel;
 };
 
 #endif // DIANVOTEPLAYER_H
