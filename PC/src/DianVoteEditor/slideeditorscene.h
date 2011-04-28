@@ -16,8 +16,6 @@
 class QGraphicsTextItem;
 class QToolBar;
 
-static const QString defaultText = "NAN";
-
 /**
  * @brief 
  *  QSlideEditorScene is a view that shows slide with topics in content.\n

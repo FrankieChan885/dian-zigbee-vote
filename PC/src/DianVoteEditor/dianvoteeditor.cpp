@@ -74,8 +74,6 @@ void DianVoteEditor::setupUi(const QString& uiFile, QWidget *parent)
     dianvoteWindow->setGeometry(50, 50, 800, 600);
     // set parent to the specific one.
     dianvoteWindow->setParent(parent);
-
-    updateSlideList();
 }
 
 // setup the main window actions.
@@ -256,13 +254,20 @@ void DianVoteEditor::newSlide() {
 
     // then, new a slide scene.
     // set the slide scene with gray surround the white.
-    QSlideModel *model = QSlideModel::createModel(dianvoteWindow);
+    QFile file(":/slidetemplate/default.xml");
+    file.open(QIODevice::ReadOnly);
+
+    QSlideModel *model = file.isOpen() ?
+                         new QSlideModel(file.readAll(), dianvoteWindow) :
+                         QSlideModel::createModel(dianvoteWindow);
     currentSlideScene = new QSlideEditorScene(dianvoteWindow, model);
     QPixmap pixmap(QSize(800, 600));
     pixmap.fill(Qt::white);
     currentSlideScene->setBackgroundPixmap(pixmap);
     currentSlideScene->setBackgroundBrush(Qt::darkGray);
     slideScenes.append(currentSlideScene);
+
+    updateSlideList();
 }
 
 void DianVoteEditor::openSlide() {

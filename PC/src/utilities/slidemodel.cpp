@@ -206,6 +206,7 @@ bool QSlideModel::addSelection(const char option,
  */
 void QSlideModel::removeSelection(const int index) {
     topicContent.removeChild(getSelectionNode(index));
+    map4IndexOption.remove(index);
 }
 
 /**
@@ -213,7 +214,7 @@ void QSlideModel::removeSelection(const int index) {
  *      remove a specific selection.
  */
 void QSlideModel::removeSelection(const char option) {
-    topicContent.removeChild(getSelectionNode(option));
+    removeSelection(option2Index(option));
 }
 
 

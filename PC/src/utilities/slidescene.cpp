@@ -13,6 +13,7 @@
 #include <QTextCursor>
 #include <QWidget>
 #include <QList>
+#include <QKeyEvent>
 
 #include <limits>
 
@@ -28,6 +29,7 @@ QSlideScene::QSlideScene(QWidget * parent/* = 0*/, QSlideModel *sm/* = 0*/)
 : QGraphicsScene(parent)
 , slideModel(0)
 , topicTitle(0)
+, newSelection(0)
 , sceneWidth(800)   // set default size to 800x600
 , sceneHeight(600)
 , backgroundPixmap(0)
@@ -135,6 +137,12 @@ void QSlideScene::updateContent(bool toFace) {
                 selectionStrings.removeAt(i);
                 ++i;
             }
+            // if the count of text item less than 5, user can insert an new one.
+            if (i < MAX_SELECTION_COUNT && newSelection == 0) {
+                newSelection = addTextItem(tr(DEFAULT_NEW_SELECTION_TEXT));
+                newSelection->setFont(QFont(tr("Sans"), 20, 50, false));
+                newSelection->setDefaultTextColor(Qt::gray);
+            }
         } // if (toFace)
         else {
             if (topicTitle == 0)
@@ -142,6 +150,11 @@ void QSlideScene::updateContent(bool toFace) {
 
             slideModel->setTopic(topicTitle->toPlainText(),
                                  topicTitle->font(), topicTitle->defaultTextColor());
+
+            // judge if the newSelection is been modified, if so, add to selectionStrings.
+            if (newSelection->toPlainText() != tr(DEFAULT_NEW_SELECTION_TEXT)) {
+                selectionStrings.push_back(newSelection);
+            }
 
             // set xml selection strings.
             // attention: the order of the selections can be random,
@@ -185,8 +198,9 @@ void QSlideScene::makeup() {
         }
 
         // set selection strings.
-        int i;      // done put in for, while also use this.
-        int selTop = selectionsTop;  // height of selection items.
+        int i;      // used in `for'.
+        // this is the the top position for each selection.
+        int selTop = selectionsTop;
         // I'm using the iterator first, but the position of iterator
         // make me crazy, so I using int value instead.
         for (i = 0; i < selectionStrings.size(); ++i) {
@@ -197,6 +211,11 @@ void QSlideScene::makeup() {
             // move selTop to next selection position.
             selTop += selectionStrings[i]->sceneBoundingRect().height() +
                 selectionsSpace;
+        }
+        // set width and content for new selection.
+        if (newSelection) {
+            newSelection->setTextWidth(selectionsWidth);
+            newSelection->setPos(selectionsLeft, selTop);
         }
     }
 }
@@ -247,9 +266,16 @@ void QSlideScene::clearItems() {
         i != selectionStrings.end(); ++i) {
         if (*i) {
             delete *i;
+            *i = 0;
         }
     }
     selectionStrings.clear();
+
+    // delete new selection.
+    if (newSelection) {
+        delete newSelection;
+        newSelection = 0;
+    }
 
     // delete background pixmap item.
     if (backgroundPixmap) {
@@ -285,6 +311,34 @@ QString QSlideScene::getContent() {
  */
 QString QSlideScene::getTitle() {
     return topicTitle->toPlainText();
+}
+
+/**
+* the `del' key should delete the selected item.
+*/
+void QSlideScene::keyPressEvent(QKeyEvent *event) {
+    qDebug("key pressed");
+    if (event->matches(QKeySequence::Delete)) {
+        qDebug("del key pressed");
+        foreach (QGraphicsItem *item, selectedItems()) {
+            if (item) {
+                // find item in selectionStrings.
+                foreach (QGraphicsTextItem *textItem, selectionStrings) {
+                    if (qgraphicsitem_cast<QGraphicsTextItem *>(item) ==
+                        textItem) {
+                        selectionStrings.removeOne(textItem);
+                        delete textItem;
+                        textItem = 0;
+                        updateContent(false);
+                        updateContent(true);
+                        makeup();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    QGraphicsScene::keyPressEvent(event);
 }
 
 /**

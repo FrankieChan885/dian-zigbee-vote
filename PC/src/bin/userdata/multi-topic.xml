@@ -10,7 +10,13 @@
   <topic color="#000000" font="文泉驿等宽正黑,24,-1,5,75,0,0,0,0,0">另一份主题~~</topic>
   <selection option="B" point="0.5" color="#0000ff" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">Selection 1..</selection>
   <selection option="D" point="1.0" color="#ffff00" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">选项2, 中文选项~~</selection>
+  <selection option="E" point="2.0" color="#00ffff" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">选项E, 求显示~~</selection>
   <selection option="C" point="1.2" color="#ff0000" font="Courier 10 Pitch,20,-1,5,50,0,0,0,0,0">Selection 3.</selection>
   <selection option="A" point="3.5" color="#00ff00" font="Courier 10 Pitch,20,-1,5,75,0,0,0,0,0">选项4,中文输入也有字体。。</selection>
+ </slide>
+ <slide>
+  <topic color="#000000" font="文泉驿等宽正黑,24,-1,5,75,0,0,0,0,0">2个选项的主题~~</topic>
+  <selection option="B" point="0.5" color="#0000ff" font="Courier 10 Pitch,20,-1,5,75,1,0,0,0,0">Selection B..</selection>
+  <selection option="A" point="3.5" color="#00ff00" font="Courier 10 Pitch,20,-1,5,75,0,0,0,0,0">选项A,中文可以很好支持。。</selection>
  </slide>
 </dianvote>

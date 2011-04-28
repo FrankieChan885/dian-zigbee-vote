@@ -4,7 +4,7 @@
 *   effects.
 *
 * @author Tankery Chen @ Dian Group
-* @email tankery.chen@gmail.com
+*           tankery.chen@gmail.com
 * @version 1.0.0
 * @date 2011-03-31
 */
@@ -18,6 +18,11 @@ class QSlideTextItem;
 class QGraphicsPixmapItem;
 class QSlideModel;
 class QPixmap;
+
+/**
+* @brief this will be appeared in new Selection when initialized.
+*/
+#define DEFAULT_NEW_SELECTION_TEXT "Double click to add a new selection."
 
 /**
  * @brief 
@@ -96,12 +101,19 @@ public slots:
     virtual void textItemSelectedChange(QGraphicsTextItem *item,
                                 bool isSelected) = 0;
 
+protected:
+    /**
+    * the `del' key should delete the selected item.
+    */
+    void keyPressEvent(QKeyEvent *event);
+
 private:
     /**
      * @brief index2Option translate the selections index to
      *      it's option.
      */
     char index2Option(int index);
+
     /**
     * @brief the slide model that holding the topic content.
     */
@@ -116,9 +128,24 @@ private:
     */
     QList<QGraphicsTextItem*> selectionStrings;
 
+    /**
+    * @brief the new selection content strings.
+    *  this item only appeared when selection count less
+    *  than max count.
+    *
+    *  this item will be add to selectionStrings if been modified,
+    *  else, been removed.
+    */
+    QGraphicsTextItem *newSelection;
+
+    /**
+    * @brief the max selection count in a single slide.
+    */
+    static const int MAX_SELECTION_COUNT = 5;
+
     // the display been desided by those properties below.
     /**
-    * @brief 
+    * @brief the scene geamory.
     */
     int sceneWidth;
     int sceneHeight;
