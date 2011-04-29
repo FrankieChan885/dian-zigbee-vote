@@ -175,7 +175,7 @@ public:
 
 /// static public functions
 public:
-    static QSlideModel *createModel(QObject *parent);
+    static QSlideModel *createModel(QObject *parent = 0);
 
 private:
     /**

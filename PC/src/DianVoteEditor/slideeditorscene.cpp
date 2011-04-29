@@ -21,10 +21,18 @@
 /**
  * @brief QSlideEditorScene initial the view with parent
  */
-QSlideEditorScene::QSlideEditorScene(QWidget * parent/* = 0*/, QSlideModel *sm/* = 0*/)
-: QSlideScene(parent, sm)
+QSlideEditorScene::QSlideEditorScene(QSlideModel *sm/* = 0*/, QWidget * parent/* = 0*/)
+: QSlideScene(sm, parent)
 , fontBar(0)
 {
+}
+
+QSlideEditorScene::~QSlideEditorScene() {
+    if (fontBar) {
+        delete fontBar;
+        fontBar = 0;
+    }
+    qDebug("slid editor scene is deleted...");
 }
 
 void QSlideEditorScene::textItemSelectedChange(QGraphicsTextItem *item,

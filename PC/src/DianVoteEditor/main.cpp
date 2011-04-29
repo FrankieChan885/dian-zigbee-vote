@@ -26,7 +26,10 @@
 
 int main(int argc, char *argv[])
 {
+    Q_INIT_RESOURCE(DianVoteEditor);
     QApplication a(argc, argv);
+    a.setApplicationName("DianVote Editor");
+    a.setOrganizationName("Dian Group");
 
     // set encode translate codec.
     QTextCodec::setCodecForCStrings(QTextCodec::codecForName("Utf8"));
@@ -38,8 +41,8 @@ int main(int argc, char *argv[])
     QDir dir(QCoreApplication::applicationDirPath());
 
     try {
-        DianVoteEditor *w = new DianVoteEditor();
-        w->setupUi(dir.absoluteFilePath("res/dianvoteeditor.ui"), 0);
+        DianVoteEditor *w = new DianVoteEditor;
+        w->setupUi(dir.absoluteFilePath("res/dianvoteeditor.ui"));
         w->setStyle(dir.absoluteFilePath("res/skins/default.qss"));
         w->show();
     } catch (DianVoteException *uie) {

@@ -38,7 +38,7 @@ public:
     /**
     * @brief QSlideScene initial the view with parent
     */
-    QSlideScene(QWidget * parent = 0, QSlideModel *sm = 0);
+    QSlideScene(QSlideModel *sm = 0, QWidget * parent = 0);
     virtual ~QSlideScene();
 
     /**
@@ -95,6 +95,12 @@ public:
      * @brief get slide title.
      */
     QString getTitle();
+
+signals:
+    /**
+    * @brief this signal will be emit when text item been modified.
+    */
+    void itemsModified();
 
 public slots:
     virtual void textItemLostFocus(QGraphicsTextItem *item) = 0;

@@ -31,7 +31,9 @@ public:
     /**
     * @brief QSlideEditorScene initial the view with parent
     */
-    QSlideEditorScene(QWidget * parent = 0, QSlideModel *sm = 0);
+    QSlideEditorScene(QSlideModel *sm = 0, QWidget * parent = 0);
+
+    ~QSlideEditorScene();
 
     QGraphicsTextItem *addTextItem(const QString &content);
 

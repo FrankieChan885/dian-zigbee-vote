@@ -11,6 +11,7 @@
 #include <QGraphicsTextItem>
 #include <QGraphicsPixmapItem>
 #include <QTextCursor>
+#include <QTextDocument>
 #include <QWidget>
 #include <QList>
 #include <QKeyEvent>
@@ -25,7 +26,7 @@
 /**
  * @brief QSlideScene initial the view with parent
  */
-QSlideScene::QSlideScene(QWidget * parent/* = 0*/, QSlideModel *sm/* = 0*/)
+QSlideScene::QSlideScene(QSlideModel *sm/* = 0*/, QWidget * parent/* = 0*/)
 : QGraphicsScene(parent)
 , slideModel(0)
 , topicTitle(0)
@@ -63,6 +64,7 @@ QSlideScene::~QSlideScene() {
         delete slideModel;
         slideModel = 0;
     }
+    qDebug("slide scene deleted");
 }
 
 /**
@@ -294,6 +296,9 @@ QGraphicsTextItem *QSlideScene::addTextItem(const QString &content)
                      this, SLOT(textItemLostFocus(QGraphicsTextItem*)));
     QObject::connect(item, SIGNAL(selectedChange(QGraphicsTextItem*, bool)),
                      this, SLOT(textItemSelectedChange(QGraphicsTextItem*, bool)));
+    QTextDocument * doc = item->document();
+    QObject::connect(doc, SIGNAL(contentsChanged()),
+                     this, SIGNAL(itemsModified()));
 
     addItem(item);
     return item;

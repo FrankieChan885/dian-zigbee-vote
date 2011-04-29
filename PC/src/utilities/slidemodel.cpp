@@ -44,12 +44,13 @@ QSlideModel::QSlideModel(const QString& xmlStream, QObject *parent)
 }
 
 QSlideModel::~QSlideModel() {
+    qDebug("slide model deleted");
 }
 
 /**
 * @brief this function create the slide model with a default value.
 */
-QSlideModel *QSlideModel::createModel(QObject *parent) {
+QSlideModel *QSlideModel::createModel(QObject *parent/* = 0*/) {
     // create an empty dom document with root node <slide/>
     QDomDocument newSlide;
     QDomNode rootNode = newSlide.createElement(tr("slide"));
