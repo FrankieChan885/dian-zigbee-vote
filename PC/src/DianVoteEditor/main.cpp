@@ -26,7 +26,7 @@
 
 int main(int argc, char *argv[])
 {
-    Q_INIT_RESOURCE(DianVoteEditor);
+    //Q_INIT_RESOURCE(DianVoteEditor);
     QApplication a(argc, argv);
     a.setApplicationName("DianVote Editor");
     a.setOrganizationName("Dian Group");

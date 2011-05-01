@@ -22,6 +22,7 @@ public:
         if (!hidDevice->open(QIODevice::ReadOnly)) {
             return false;
         }
+        qDebug("TestHidDevice::start: hidDevice opened...");
 
         // start listening the ep 3 with data length 2.
         hidDevice->startListening(3, 2);

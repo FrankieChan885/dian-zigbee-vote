@@ -26,6 +26,7 @@ INCLUDEPATH += hidapi-0.6.0/hidapi
 unix:QMAKE_CC += `pkg-config libusb-1.0 --cflags`
 unix:QMAKE_CXX += `pkg-config libusb-1.0 --cflags`
 unix:QMAKE_LIBS += `pkg-config libusb-1.0 libudev --libs`
+win32:LIBS    += -lsetupapi
 
 # Input
 HEADERS         += hidapi.h

@@ -112,12 +112,12 @@ bool QHidDevice::open(OpenMode mode) {
     // Open the device using the VID, PID,
     // and optionally the Serial number.
     hid = hid_open(vendorID, productID, NULL);
-    if (hid == NULL) {
-        // close and throw an error.
-        close();
-        std::wstring ws(hid_error(hid));
-        throw new DianVoteStdException(
-                std::string(ws.begin(), ws.end()));
+    qDebug("QHidDevice::open: hid opened...");
+
+	if (hid == NULL) {
+		qDebug("QHidDevice::open: hid opend failed...");
+		throw new DianVoteStdException(
+				std::string("QHidDevice::open: hid opend failed..."));
 
         return false;
     }
