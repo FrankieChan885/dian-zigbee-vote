@@ -13,11 +13,19 @@
 #include "hidlistener.h"
 #include "exceptions.h"
 
-QHidListener::QHidListener(HIDInterface *hid, unsigned short endpoint,
+QHidListener::QHidListener(
+#ifdef USE_LIBHID
+        HIDInterface *hid,
+        unsigned short endpoint,
+#else // #ifdef USE_LIBHID
+        hid_device *hid,
+#endif // #ifdef USE_LIBHID
         unsigned int length, QObject *parent/* = 0*/)
 : QThread(parent)
 , hidInterface(hid)
+#ifdef USE_LIBHID
 , endpointNum(endpoint)
+#endif // #ifdef USE_LIBHID
 , dataLength(length)
 , needStop(false)
 {
@@ -37,6 +45,7 @@ void QHidListener::exec()
 {
     char *packet = new char[dataLength];
 
+#ifdef USE_LIBHID
     while (!needStop) {
         hid_return ret = hid_interrupt_read(hidInterface, endpointNum,
                 packet, dataLength, INT_WAIT_TIME);
@@ -50,6 +59,23 @@ void QHidListener::exec()
                     std::string(hid_strerror(ret)));
         }
     }
+#else // #ifdef USE_LIBHID
+    // don't blocking, or the read can't stop unless data recieved.
+    hid_set_nonblocking(hidInterface, 1);
+
+    while (!needStop) {
+        int ret = hid_read(hidInterface,
+                           (unsigned char *) packet, dataLength);
+        if (ret > 0) {
+            emit hidDataReceived(QByteArray(packet, dataLength));
+        }
+        else if (ret < 0) {
+            std::wstring ws(hid_error(hidInterface));
+            throw new DianVoteStdException(
+                    std::string(ws.begin(), ws.end()));
+        }
+    }
+#endif // #ifdef USE_LIBHID
 
     delete packet;
 }

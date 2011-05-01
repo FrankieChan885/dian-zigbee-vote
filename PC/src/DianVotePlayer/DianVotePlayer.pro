@@ -18,7 +18,9 @@ CONFIG      += qt warn_on
 QT          += xml
 
 DEPENDPATH  += ../utilities
+DEPENDPATH  += ../lib
 INCLUDEPATH += ../utilities
+INCLUDEPATH += ../include
 
 # Preprocess definitions
 unix {

@@ -8,11 +8,16 @@
 #ifndef __HISLISTENER_H_
 #define __HISLISTENER_H_
 
-extern "C" {
-#define HAVE_STDBOOL_H
-#include <hid.h>
-}
 #include <QThread>
+
+extern "C" {
+#ifdef USE_LIBHID
+#define HAVE_STDBOOL_H
+#include "hid.h"
+#else // #ifdef USE_LIBHID
+#include "hidapi.h"
+#endif // #ifdef USE_LIBHID
+}
 
 class QByteArray;
 
@@ -21,8 +26,13 @@ class QHidListener : public QThread
     Q_OBJECT
 
 public:
+#ifdef USE_LIBHID
     QHidListener(HIDInterface *hid, unsigned short endpoint,
         unsigned int length, QObject *parent = 0);
+#else // #ifdef USE_LIBHID
+    QHidListener(hid_device *hid, unsigned int length,
+                  QObject *parent = 0);
+#endif // #ifdef USE_LIBHID
     ~QHidListener();
 
     /**
@@ -42,7 +52,11 @@ protected:
 
 private:
     static const int INT_WAIT_TIME = 100;
+#ifdef USE_LIBHID
     HIDInterface* hidInterface;
+#else // #ifdef USE_LIBHID
+    hid_device *hidInterface;
+#endif // #ifdef USE_LIBHID
     unsigned short endpointNum;
     unsigned int dataLength;        // the received data packet lenght.
     bool needStop;

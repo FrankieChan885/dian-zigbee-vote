@@ -1,7 +1,7 @@
 /**
 * @file hiddevice.h
 * @brief class `QHidDevice' definition file.
-*   using libhid to communicate with hid device.
+*   using libhid or hidapi to communicate with hid device.
 * @author Tankery Chen @ Dian Group
 * @version 1.0.0
 * @date 2011-04-04
@@ -9,12 +9,17 @@
 #ifndef __HIDDEVICE_H_
 #define __HIDDEVICE_H_
 
-extern "C" {
-#define HAVE_STDBOOL_H
-#include <hid.h>
-}
 #include <QIODevice>
 #include <queue>
+
+extern "C" {
+#ifdef USE_LIBHID
+#define HAVE_STDBOOL_H
+#include "hid.h"
+#else // #ifdef USE_LIBHID
+#include "hidapi.h"
+#endif // #ifdef USE_LIBHID
+}
 
 typedef const unsigned int cuint;
 
@@ -40,7 +45,10 @@ public:
     * @param interface the interface number.
     */
     QHidDevice(unsigned short vid, unsigned short pid,
-            unsigned short interface, QObject *parent = 0);
+#ifdef USE_LIBHID
+            unsigned short interface,
+#endif // #ifdef USE_LIBHID
+            QObject *parent = 0);
     ~QHidDevice();
     /**
     * @brief open will open a hid device.
@@ -106,9 +114,13 @@ private:
 
     unsigned short vendorID;
     unsigned short productID;
+#ifdef USE_LIBHID
     unsigned short interfaceNum;
 
     HIDInterface *hid;
+#else
+    hid_device *hid;
+#endif
     /**
     * @brief listen the hid data receiving.
     */

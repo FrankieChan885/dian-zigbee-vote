@@ -22,14 +22,20 @@
  * @param interface the interface number.
  */
 QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
-            unsigned short interface, QObject *parent/* = 0*/)
+#ifdef USE_LIBHID
+            unsigned short interface,
+#endif // #ifdef USE_LIBHID
+            QObject *parent/* = 0*/)
 : QIODevice(parent)
 , vendorID(vid)
 , productID(pid) 
+#ifdef USE_LIBHID
 , interfaceNum(interface)
+#endif // #ifdef USE_LIBHID
 , hidListener(0)
 , hid(0)
 {
+#ifdef USE_LIBHID
     // debug configuration.
     hid_set_debug(HID_DEBUG_NOTRACES);
     hid_set_debug_stream(stderr);
@@ -48,6 +54,7 @@ QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
         throw new DianVoteStdException(
             std::string("hid_new_HIDInterface() failed, out of memory?"));
     }
+#endif // #ifdef USE_LIBHID
 }
 
 QHidDevice::~QHidDevice()
@@ -57,6 +64,7 @@ QHidDevice::~QHidDevice()
         close();
     }
 
+#ifdef USE_LIBHID
     // delete interface and clean up the hids.
     hid_delete_HIDInterface(&hid);
 
@@ -65,6 +73,7 @@ QHidDevice::~QHidDevice()
         throw new DianVoteStdException(
             std::string(hid_strerror(ret)));
     }
+#endif // #ifdef USE_LIBHID
 }
 
 /**
@@ -77,6 +86,7 @@ QHidDevice::~QHidDevice()
  * @return if find and openned, return true, or return false.
  */
 bool QHidDevice::open(OpenMode mode) {
+#ifdef USE_LIBHID
     if (hid_is_opened(hid)) {
         std::cerr << "Error in QHidDevice::open: device already open"
             << std::endl;
@@ -98,6 +108,20 @@ bool QHidDevice::open(OpenMode mode) {
 
         return false;
     }
+#else // #ifdef USE_LIBHID
+    // Open the device using the VID, PID,
+    // and optionally the Serial number.
+    hid = hid_open(vendorID, productID, NULL);
+    if (hid == NULL) {
+        // close and throw an error.
+        close();
+        std::wstring ws(hid_error(hid));
+        throw new DianVoteStdException(
+                std::string(ws.begin(), ws.end()));
+
+        return false;
+    }
+#endif // #ifdef USE_LIBHID
 
     return QIODevice::open(mode);
 }
@@ -119,6 +143,7 @@ void QHidDevice::close() {
     }
 
     // then close the hid device.
+#ifdef USE_LIBHID
     if (hid_is_opened(hid)) {
         hid_return ret = hid_close(hid);
         if (ret != HID_RET_SUCCESS) {
@@ -126,7 +151,12 @@ void QHidDevice::close() {
                     std::string(hid_strerror(ret)));
             return;
         }
+#else // #ifdef USE_LIBHID
+
+    if (hid != 0) {
+        hid_close(hid);
     }
+#endif // #ifdef USE_LIBHID
 
     return;
 }
@@ -141,7 +171,11 @@ void QHidDevice::startListening(unsigned short endpoint,
         unsigned int dataLength)
 {
     // new a listener.
-    hidListener = new QHidListener(hid, endpoint, dataLength, this);
+    hidListener = new QHidListener(hid,
+#ifdef USE_LIBHID
+        endpoint,
+#endif // #ifdef USE_LIBHID
+        dataLength, this);
 
     // call readInterrupt if hid data received.
     QObject::connect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
