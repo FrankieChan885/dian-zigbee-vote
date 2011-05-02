@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     try {
 #ifdef USE_LIBHID
-    QHidDevice *device = new QHidDevice(0x0451, 0x16a9, 2, &a);
+    QHidDevice *device = new QHidDevice(0x0451, 0x16a9, 0, &a);
 #else
     QHidDevice *device = new QHidDevice(0x0451, 0x16a9, &a);
     qDebug("main(): hid device created...");

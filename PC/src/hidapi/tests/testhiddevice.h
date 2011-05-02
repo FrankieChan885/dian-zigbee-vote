@@ -1,6 +1,7 @@
 #include <QMessageBox>
 #include <QByteArray>
-#include "../utilities/hiddevice.h"
+#include <cstdio>
+#include "hiddevice.h"
 
 class TestHidDevice : public QObject
 {
@@ -24,15 +25,19 @@ public:
         }
         qDebug("TestHidDevice::start: hidDevice opened...");
 
-        // start listening the ep 3 with data length 2.
-        hidDevice->startListening(3, 2);
+        // start listening the ep 0 with data length 5.
+        hidDevice->startListening(0, 5);
 
         return true;
     }
 
 public slots:
     void showInData(QByteArray ba) {
-        QMessageBox::information(0, "test", ba);
+//        QMessageBox::information(0, "test", ba);
+        for (int i = 0; i < 5; i++) {
+            printf("%x\t", (unsigned char) ba.at(i));
+        }
+        printf("\n");
     }
 
 private:
