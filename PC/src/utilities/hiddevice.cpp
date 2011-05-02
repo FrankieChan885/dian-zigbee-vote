@@ -151,6 +151,7 @@ void QHidDevice::close() {
                     std::string(hid_strerror(ret)));
             return;
         }
+    }
 #else // #ifdef USE_LIBHID
 
     if (hid != 0) {

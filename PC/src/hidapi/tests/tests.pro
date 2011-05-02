@@ -9,7 +9,12 @@ DEPENDPATH  += ../../utilities
 INCLUDEPATH += ../../utilities \
                 ../hidapi-0.6.0/hidapi
 
+# using hidapi
 LIBS += -L../lib -lhidapi
+
+# not using libhid
+# LIBS += -lhid
+# DEFINES += USE_LIBHID
 
 # Input
 HEADERS += testhiddevice.h \

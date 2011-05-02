@@ -25,8 +25,8 @@ public:
         }
         qDebug("TestHidDevice::start: hidDevice opened...");
 
-        // start listening the ep 0 with data length 5.
-        hidDevice->startListening(0, 5);
+        // start listening the ep 1 with data length 5.
+        hidDevice->startListening(1, 5);
 
         return true;
     }
