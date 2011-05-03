@@ -34,10 +34,13 @@ public:
 public slots:
     void showInData(QByteArray ba) {
 //        QMessageBox::information(0, "test", ba);
-        for (int i = 0; i < 5; i++) {
-            printf("%x\t", (unsigned char) ba.at(i));
+        printf("remote: ");
+        // print remote ID:
+        for (int i = 0; i < 4; i++) {
+            printf("%02x", (unsigned char) ba.at(i));
         }
-        printf("\n");
+        // print remote cmd
+        printf("\t%02x\n", (unsigned char) ba.at(4));
     }
 
 private:
