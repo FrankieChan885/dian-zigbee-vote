@@ -8,6 +8,8 @@ TARGET =
 DEPENDPATH  += ../../utilities
 INCLUDEPATH += ../../utilities \
                 ../hidapi-0.6.0/hidapi
+                
+CONFIG      += console
 
 # using hidapi
 LIBS += -L../lib -lhidapi

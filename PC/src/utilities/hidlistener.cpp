@@ -44,6 +44,7 @@ void QHidListener::run() {
 void QHidListener::exec()
 {
     char *packet = new char[dataLength];
+    qDebug("QHidListener::exec(): started listening...");
 
 #ifdef USE_LIBHID
     while (!needStop) {
@@ -61,7 +62,7 @@ void QHidListener::exec()
     }
 #else // #ifdef USE_LIBHID
     // don't blocking, or the read can't stop unless data recieved.
-    hid_set_nonblocking(hidInterface, 1);
+	hid_set_nonblocking(hidInterface, 1);
 
     while (!needStop) {
         int ret = hid_read(hidInterface,
@@ -70,14 +71,14 @@ void QHidListener::exec()
             emit hidDataReceived(QByteArray(packet, dataLength));
         }
         else if (ret < 0) {
-            std::wstring ws(hid_error(hidInterface));
-            throw new DianVoteStdException(
-                    std::string(ws.begin(), ws.end()));
+            qDebug("QHidListener::exec(): hid read failed...");
+            usleep(100);
+			//break;
         }
     }
 #endif // #ifdef USE_LIBHID
 
-    delete packet;
+    delete [] packet;
 }
 
 /**

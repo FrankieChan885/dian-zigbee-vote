@@ -23,10 +23,10 @@ public:
         if (!hidDevice->open(QIODevice::ReadOnly)) {
             return false;
         }
-        qDebug("TestHidDevice::start: hidDevice opened...");
+        qDebug("TestHidDevice::start(): hidDevice opened...");
 
         // start listening the ep 1 with data length 5.
-        hidDevice->startListening(1, 5);
+        hidDevice->startListening(1, 6);
 
         return true;
     }
@@ -35,6 +35,10 @@ public slots:
     void showInData(QByteArray ba) {
 //        QMessageBox::information(0, "test", ba);
         printf("remote: ");
+        if (ba.size() < 5) {
+            printf("\n");
+            return;
+        }
         // print remote ID:
         for (int i = 0; i < 4; i++) {
             printf("%02x", (unsigned char) ba.at(i));
