@@ -34,7 +34,8 @@ public:
 public slots:
     void showInData(QByteArray ba) {
 //        QMessageBox::information(0, "test", ba);
-        printf("remote: ");
+        static int count = 0;
+        printf("%04d: remote: ", count++);
         if (ba.size() < 5) {
             printf("\n");
             return;
