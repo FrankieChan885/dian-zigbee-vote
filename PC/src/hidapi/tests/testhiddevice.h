@@ -25,6 +25,9 @@ public:
         }
         qDebug("TestHidDevice::start(): hidDevice opened...");
 
+        char remoteCtrl = 0x01;
+        hidDevice->writeData(&remoteCtrl, 1);
+
         // start listening the ep 1 with data length 5.
         hidDevice->startListening(1, 6);
 

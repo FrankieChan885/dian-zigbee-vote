@@ -207,10 +207,27 @@ qint64 QHidDevice::readData(char* data, qint64 len) {
  * @param len the data length.
  *
  * @return the number of bytes that were actually written,
- *   or -1 if an error occurred.
+ *   or -1 on error.
  */
 qint64 QHidDevice::writeData(const char* data, qint64 len) {
+#ifdef USE_LIBHID
     return -1;
+#else // #ifdef USE_LIBHID
+ 	// send control command.
+    unsigned char buf[len + 1];
+    // must contain a report ID. if single report, set it 0.
+    buf[0] = 0;
+    memcpy(buf+1, data, len);
+ 	int res = hid_write(hid, buf, sizeof(buf));
+ 	if (res < 0) {
+        qDebug("QHidDevice::writeData(): Unable to write()...");
+ 		qDebug("Error: %ls", hid_error(hid));
+ 	}
+    else {
+        qDebug("QHidDevice::writeData(): %d data writed...", res);
+    }
+    return res;
+#endif // #ifdef USE_LIBHID
 }
 
 /**
