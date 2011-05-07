@@ -858,7 +858,8 @@ int HID_API_EXPORT hid_write(hid_device *dev, const unsigned char *data, size_t 
 
 
 	if (dev->output_endpoint <= 0) {
-		/* No interrput out endpoint. Use the Control Endpoint */
+                /* No interrput out endpoint. Use the Control Endpoint */
+                printf("using control endpoint\n");
 		res = libusb_control_transfer(dev->device_handle,
 			LIBUSB_REQUEST_TYPE_CLASS|LIBUSB_RECIPIENT_INTERFACE|LIBUSB_ENDPOINT_OUT,
 			0x09/*HID Set_Report*/,
@@ -877,7 +878,8 @@ int HID_API_EXPORT hid_write(hid_device *dev, const unsigned char *data, size_t 
 	}
 	else {
 		/* Use the interrupt out endpoint */
-		int actual_length;
+                printf("using interrupt endpoint\n");
+                int actual_length;
 		res = libusb_interrupt_transfer(dev->device_handle,
 			dev->output_endpoint,
 			(unsigned char*)data,

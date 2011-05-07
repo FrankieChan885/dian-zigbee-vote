@@ -221,7 +221,6 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
  	int res = hid_write(hid, buf, sizeof(buf));
  	if (res < 0) {
         qDebug("QHidDevice::writeData(): Unable to write()...");
- 		qDebug("Error: %ls", hid_error(hid));
  	}
     else {
         qDebug("QHidDevice::writeData(): %d data writed...", res);
