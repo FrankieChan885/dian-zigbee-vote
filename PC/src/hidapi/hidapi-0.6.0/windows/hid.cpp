@@ -519,7 +519,8 @@ int HID_API_EXPORT HID_API_CALL hid_write(hid_device *dev, const unsigned char *
 }
 
 
-int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, size_t length)
+int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, size_t length,
+                                         unsigned int timeout)
 {
 	DWORD bytes_read;
 	BOOL res;
@@ -533,7 +534,8 @@ int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, s
 
 	// Limit the data to be returned. This ensures we get
 	// only one report returned per call to hid_read().
-	length = (length < dev->input_report_length)? length: dev->input_report_length;
+	length = (length < dev->input_report_length)?
+                length: dev->input_report_length;
 
 	res = ReadFile(dev->device_handle, data, length, &bytes_read, &ol);
 	
@@ -549,7 +551,7 @@ int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, s
 
 	if (!dev->blocking) {
 		// See if there is any data yet.
-		res = WaitForSingleObject(ev, 0);
+		res = WaitForSingleObject(ev, timeout);
 		CloseHandle(ev);
 		if (res != WAIT_OBJECT_0) {
 			// There was no data. Cancel this read and return.

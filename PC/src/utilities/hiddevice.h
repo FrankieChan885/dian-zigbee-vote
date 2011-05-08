@@ -71,7 +71,11 @@ public:
     * @param endpoint the endpoint number.
     * @param dataLength is the specific length of received data.
     */
-    void startListening(unsigned short endpoint, unsigned int dataLength);
+    void startListening(
+#ifdef USE_LIBHID
+        unsigned short endpoint,
+#endif // #ifdef USE_LIBHID
+        unsigned int dataLength);
 
     /**
     * @brief readData will read the data from the opened hid device.

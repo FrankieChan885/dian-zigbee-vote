@@ -25,13 +25,18 @@ public:
         }
         qDebug("TestHidDevice::start(): hidDevice opened...");
 
-        char remoteCtrl[5] = {0xff, 0xff, 0xff, 0xff};
+        char remoteCtrl[5] = {0xff, 0xff, 0xff, 0xff, 0x00};
         printf("remote control code: ");
         scanf("%d", remoteCtrl + 4);
         hidDevice->writeData(remoteCtrl, 5);
 
-        // start listening the ep 1 with data length 5.
+        // start listening the endpoint 1 with data length 5
+        // (in windows length should be 6, I don't know why).
+#ifdef USE_LIBHID
         hidDevice->startListening(1, 6);
+#else
+        hidDevice->startListening(6);
+#endif // #ifdef USE_LIBHID
 
         return true;
     }

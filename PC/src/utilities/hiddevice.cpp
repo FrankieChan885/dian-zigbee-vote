@@ -168,7 +168,10 @@ void QHidDevice::close() {
  * @param endpoint the endpoint number.
  * @param dataLength is the specific length of received data.
  */
-void QHidDevice::startListening(unsigned short endpoint,
+void QHidDevice::startListening(
+#ifdef USE_LIBHID
+                                unsigned short endpoint,
+#endif // #ifdef USE_LIBHID
         unsigned int dataLength)
 {
     // new a listener.
@@ -214,7 +217,7 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
     return -1;
 #else // #ifdef USE_LIBHID
  	// send control command.
-    unsigned char buf[len + 1];
+    unsigned char *buf = new unsigned char[len + 1];
     // must contain a report ID. if single report, set it 0.
     buf[0] = 0;
     memcpy(buf+1, data, len);
@@ -225,6 +228,7 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
     else {
         qDebug("QHidDevice::writeData(): %d data writed...", res);
     }
+    delete [] buf;
     return res;
 #endif // #ifdef USE_LIBHID
 }

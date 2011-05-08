@@ -61,12 +61,13 @@ void QHidListener::exec()
         }
     }
 #else // #ifdef USE_LIBHID
-    // don't blocking, or the read can't stop unless data recieved.
+    // don't blocking, or the read can't stop unless data received.
 	hid_set_nonblocking(hidInterface, 1);
 
     while (!needStop) {
         int ret = hid_read(hidInterface,
-                           (unsigned char *) packet, dataLength);
+                           (unsigned char *) packet, dataLength,
+                           INT_WAIT_TIME);
         if (ret > 0) {
             emit hidDataReceived(QByteArray(packet, dataLength));
         }

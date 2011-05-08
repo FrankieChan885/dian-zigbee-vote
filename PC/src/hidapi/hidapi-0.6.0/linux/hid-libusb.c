@@ -913,13 +913,13 @@ static int return_data(hid_device *dev, unsigned char *data, size_t length)
 }
 
 
-int HID_API_EXPORT hid_read(hid_device *dev, unsigned char *data, size_t length)
+int HID_API_EXPORT hid_read(hid_device *dev, unsigned char *data, size_t length, unsigned int timeout)
 {
 	int bytes_read = -1;
 
 #if 0
 	int transferred;
-	int res = libusb_interrupt_transfer(dev->device_handle, dev->input_endpoint, data, length, &transferred, 5000);
+	int res = libusb_interrupt_transfer(dev->device_handle, dev->input_endpoint, data, length, &transferred, timeout);
 	LOG("transferred: %d\n", transferred);
 	return transferred;
 #endif
