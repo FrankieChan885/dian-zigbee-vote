@@ -12,7 +12,7 @@ INCLUDEPATH += ../../utilities \
 CONFIG      += console
 
 # using hidapi
-LIBS += -L../lib -lhidapi
+LIBS += -L../../bin -lhidapi
 
 # not using libhid
 # LIBS += -lhid
@@ -25,3 +25,10 @@ HEADERS += testhiddevice.h \
 SOURCES += testhiddevice.cpp \
                 hiddevice.cpp \
                 hidlistener.cpp
+				
+# Output paths
+DESTDIR      = ../../bin
+OBJECTS_DIR  = ./temp
+MOC_DIR      = ./temp
+RCC_DIR      = ./temp
+UI_DIR       = ./temp

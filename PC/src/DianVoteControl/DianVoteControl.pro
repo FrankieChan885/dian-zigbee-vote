@@ -37,16 +37,17 @@ HEADERS  += dianvotecontrol.h \
     hidcontrol.h
 
 # using hidapi
-LIBS += -L../hidapi/lib -lhidapi
+LIBS += -L../bin -lhidapi
 
 FORMS    += dianvotecontrol.ui \
     dianvotedrawer.ui
+
+RESOURCES += \
+    DianVoteDrawer.qrc
 
 # Output paths
 DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
-RES_DIR      = ./temp
-
-RESOURCES += \
-    DianVoteDrawer.qrc
+RCC_DIR      = ./temp
+UI_DIR       = ./temp

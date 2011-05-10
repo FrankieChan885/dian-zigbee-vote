@@ -52,4 +52,5 @@ RESOURCES   += DianVoteEditor.qrc
 DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
-RES_DIR      = ./temp
+RCC_DIR      = ./temp
+UI_DIR      = ./temp
