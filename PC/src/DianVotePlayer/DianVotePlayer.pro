@@ -45,7 +45,7 @@ SOURCES     += main.cpp \
                 hiddevice.cpp \
                 hidlistener.cpp
 
-LIBS        += -L../hidapi/lib -lhidapi
+LIBS        += -L../bin -lhidapi
 
 # Output paths
 DESTDIR      = ../bin

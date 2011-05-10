@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     drawbase.cpp \
     hidlistener.cpp \
     hiddevice.cpp \
-    hidcontrol.cpp
+    hidcontrol.cpp \
+    stopwatch.cpp
 
 HEADERS  += dianvotecontrol.h \
     drawhistgram.h \
@@ -32,7 +33,8 @@ HEADERS  += dianvotecontrol.h \
     drawbase.h \
     hidlistener.h \
     hiddevice.h \
-    hidcontrol.h
+    hidcontrol.h \
+    stopwatch.h
 
 win32:SOURCES += qtwin.cpp
 win32:HEADERS += qtwin.h

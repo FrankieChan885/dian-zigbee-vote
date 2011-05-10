@@ -5,6 +5,10 @@
 #include <QByteArray>
 #include "dianvotedrawer.h"
 
+class StopWatch;
+class QSpacerItem;
+class QSequentialAnimationGroup;
+class QPropertyAnimation;
 class QPushButton;
 class HidControl;
 
@@ -56,11 +60,14 @@ protected:
     void mousePressEvent(QMouseEvent *event);
 
 private:
+    QList< RevData* > *log;     // 数据接收的log
+
     Ui::DianVoteControl *ui;
     DianVoteDrawer *drawer;
     HidControl *hidControl;
-    QList< RevData* > *log;     // 数据接收的log
+    StopWatch *stopWatch;
 
+    // buttons
     QPushButton *pbStart;
     QPushButton *pbAuto;
     QPushButton *pbResult;
@@ -71,8 +78,13 @@ private:
 
     QPoint dragPosition;
 
+    QSequentialAnimationGroup *animationGroup;
+    QPropertyAnimation *resizeAnimation;
+    QPropertyAnimation *showStopWatchAnimation;
+
 private:
     void LoadStyleSheet(const QString &sheetname);
+    void ShowStopWatch();
 };
 
 #endif // DIANVOTECONTROL_H

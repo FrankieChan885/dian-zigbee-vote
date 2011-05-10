@@ -2,16 +2,22 @@
 #include <QTimer>
 #include <QFile>
 #include <QDir>
+#include <QSequentialAnimationGroup>
+#include <QPropertyAnimation>
+#include <QByteArray>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QMessageBox>
-#ifdef WIN32
-#include "qtwin.h"
-#endif
-#include "dianvotecontrol.h"
+#include <QSpacerItem>
 #include "ui_dianvotecontrol.h"
+#include "dianvotecontrol.h"
 #include "exceptions.h"
 #include "hidcontrol.h"
+#include "stopwatch.h"
+
+#ifdef WIN32
+    #include "qtwin.h"
+#endif
 
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
@@ -20,15 +26,15 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     ui->setupUi(this);
 
     pbStart = new QPushButton(this);
-    ui->mainLayout->addWidget(pbStart, 0, 0);
+    ui->buttonLayout->addWidget(pbStart, 0, 0);
     pbAuto = new QPushButton(this);
-    ui->mainLayout->addWidget(pbAuto, 0, 1);
+    ui->buttonLayout->addWidget(pbAuto, 0, 1);
     pbResult = new QPushButton(this);
-    ui->mainLayout->addWidget(pbResult, 0, 2);
+    ui->buttonLayout->addWidget(pbResult, 0, 2);
     pbOption = new QPushButton(this);
-    ui->mainLayout->addWidget(pbOption, 0, 3);
+    ui->buttonLayout->addWidget(pbOption, 0, 3);
     pbClose = new QPushButton(this);
-    ui->mainLayout->addWidget(pbClose, 0, 4);
+    ui->buttonLayout->addWidget(pbClose, 0, 4);
 
     connect(pbClose, SIGNAL(clicked()), this, SLOT(close()));
     connect(pbStart, SIGNAL(clicked()), this, SLOT(DoShowResults()));
@@ -112,6 +118,7 @@ void DianVoteControl::DoShowResults()
 
     // 开始接收数据
     VoteStart();
+    ShowStopWatch();
     drawer->show();
 }
 
@@ -139,9 +146,10 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
 
 void DianVoteControl::LoadStyleSheet(const QString &sheetName)
 {
-    QDir dir;
-    QString cd = dir.absolutePath();
-    QFile file(cd + "/res/skins/" + sheetName.toLower() + ".qss");
+    QDir dir(QCoreApplication::applicationDirPath());
+    dir.setCurrent(QCoreApplication::applicationDirPath());
+    QString qss = "res/skins/" + sheetName.toLower() + ".qss";
+    QFile file(dir.absoluteFilePath(qss));
     if (!file.open(QFile::ReadOnly))
     {
         QMessageBox::critical(0, "error", sheetName + " Not Find. Use Default Style");
@@ -150,6 +158,28 @@ void DianVoteControl::LoadStyleSheet(const QString &sheetName)
     QString styleSheet = QLatin1String(file.readAll());
 
     qApp->setStyleSheet(styleSheet);
+}
+
+void DianVoteControl::ShowStopWatch()
+{
+    animationGroup = new QSequentialAnimationGroup(this);
+
+    resizeAnimation = new QPropertyAnimation(this, "geometry");
+    resizeAnimation->setDuration(1500);
+    resizeAnimation->setStartValue(QRect(0, 0, width(), 50));
+    resizeAnimation->setEndValue(QRect(0, 0, width(), 80));
+
+    stopWatch = new StopWatch(this);
+    ui->stopWatchLayout->addWidget(stopWatch);
+
+    showStopWatchAnimation = new QPropertyAnimation(stopWatch, "geometry");
+    showStopWatchAnimation->setDuration(1500);
+    showStopWatchAnimation->setStartValue(QRect(0, height(), width(), height()));
+    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), 2 * height()));
+
+    animationGroup->addAnimation(resizeAnimation);
+    animationGroup->addAnimation(showStopWatchAnimation);
+    animationGroup->start();
 }
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)

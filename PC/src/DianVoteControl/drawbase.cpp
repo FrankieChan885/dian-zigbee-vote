@@ -52,6 +52,11 @@ void DrawBase::SetVoterNums(int nums)
 
 void DrawBase::HandleData(int index)
 {
+    if (index < 0 || index > drawData->length())
+    {
+        // 这里应该把错误记录写到错误的log文件中
+        return;
+    }
     (*drawData)[index]->voterNum++;
     update();
 
