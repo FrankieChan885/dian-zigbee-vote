@@ -34,6 +34,6 @@ unix:SOURCES    += hid-libusb.c
 win32:SOURCES   += hid.cpp
 
 # Output paths
-DESTDIR      = ./lib
+DESTDIR      = ../bin
 OBJECTS_DIR  = ./temp
 

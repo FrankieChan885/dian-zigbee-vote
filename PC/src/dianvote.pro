@@ -11,6 +11,8 @@
 
 TEMPLATE    = subdirs
 CONFIG     += ordered
-SUBDIRS    +=   ./DianVoteEditor \
-                ./DianVoteDrawer
-
+SUBDIRS    +=   ./DianVoteDrawer \
+                ./DianVoteEditor \
+                ./hidapi \
+                ./DianVoteControl \
+                ./DianVotePlayer
