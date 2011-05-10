@@ -221,7 +221,9 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
     // must contain a report ID. if single report, set it 0.
     buf[0] = 0;
     memcpy(buf+1, data, len);
- 	int res = hid_write(hid, buf, sizeof(buf));
+    // note!! don't using sizeof(buf) as buf's length!
+    // it will be the pointer length, 4.
+ 	int res = hid_write(hid, buf, len + 1);
  	if (res < 0) {
         qDebug("QHidDevice::writeData(): Unable to write()...");
  	}

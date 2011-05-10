@@ -451,10 +451,11 @@ HID_API_EXPORT hid_device * HID_API_CALL hid_open_path(const char *path)
 	// Open a handle to the device
 	dev->device_handle = CreateFileA(path,
 			GENERIC_WRITE |GENERIC_READ,
-			0x0, /*share mode*/
+			FILE_SHARE_READ | FILE_SHARE_WRITE, /*share mode*/
 			NULL,
 			OPEN_EXISTING,
-			FILE_FLAG_OVERLAPPED,//FILE_ATTRIBUTE_NORMAL,
+			FILE_FLAG_OVERLAPPED,
+			/* FILE_ATTRIBUTE_NORMAL, */
 			0);
 
 	// Check validity of write_handle.

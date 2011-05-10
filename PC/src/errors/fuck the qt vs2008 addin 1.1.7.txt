@@ -1,0 +1,7 @@
+这个插件真是蛋疼，各种bug，比如对UI文件的翻译指令会生成如下的命令：
+Rem IncrediBuild_OutputFile .\temp\ui_dianvotecontrol.h$(QTDIR)\bin\uic.exe dianvotecontrol.ui -o temp\ui_dianvotecontrol.h
+QT真是不错，帮你加个REM，但是，它居然不让$(QTDIR)新起一行！！！
+于是你惊喜的发现output window中已经出现“UIC dianvotecontrol.ui”字样，但是却死也找不到生成的 ui_dianvotecontrol.h
+还好我聪明，才发现这个bug！
+
+另外，在pro文件中的子目录工程有二级目录时，编译多次会提示unresolved symbol，典型的链接错误，原因不明，升级到1.1.9后错误消失。。。。

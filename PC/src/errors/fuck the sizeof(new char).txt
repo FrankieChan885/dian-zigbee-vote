@@ -1,0 +1,10 @@
+len = 5;
+unsigned char *buf = new unsigned char[len + 1];
+sizeof(buf) == ????????????
+你知道等于多少嘛？
+等于4！！
+不是0，不是-1，不是6，是4！
+神奇的Windows，神奇的VS。
+Linux下就没这种问题。。
+
+经过一些思考，4应该是指针长度，但是Linux下。。。我不懂了。。看看去。。
