@@ -1,5 +1,4 @@
 #include <QtGui/QApplication>
-#include <windows.h>
 #include "dianvotecontrol.h"
 
 int main(int argc, char *argv[])

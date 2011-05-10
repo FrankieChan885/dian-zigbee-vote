@@ -5,7 +5,9 @@
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QMessageBox>
+#ifdef WIN32
 #include "qtwin.h"
+#endif
 #include "dianvotecontrol.h"
 #include "ui_dianvotecontrol.h"
 #include "exceptions.h"
@@ -98,10 +100,12 @@ void DianVoteControl::DoShowResults()
 {
     drawer = new DianVoteDrawer();
     // ¿ªÆôaeroÐ§¹û
+#ifdef WIN32
     if (QtWin::isCompositionEnabled()) {
         QtWin::extendFrameIntoClientArea(drawer);
         drawer->setContentsMargins(0, 0, 0, 0);
     }
+#endif // #ifdef WIN32
 
     drawer->setAttribute(Qt::WA_DeleteOnClose);
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));

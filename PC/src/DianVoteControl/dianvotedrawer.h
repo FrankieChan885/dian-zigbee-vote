@@ -2,7 +2,6 @@
 #define DIANVOTEDRAWER_H
 
 #include <QWidget>
-#include <windows.h>
 #include "drawhistgram.h"
 
 namespace Ui {
@@ -16,9 +15,6 @@ class DianVoteDrawer : public QWidget
 
 public:
     DianVoteDrawer(QWidget *parent = 0);
-
-//    static bool EnumUserWindowsCB(HWND hwnd, LPARAM lParam);
-//    HWND FindDesktopIconWnd();
 
 public:
 
