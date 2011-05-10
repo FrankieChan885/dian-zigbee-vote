@@ -4,16 +4,15 @@
 #include <QWidget>
 #include <QByteArray>
 #include "dianvotedrawer.h"
-#include "hiddevice.h"
 
 class QPushButton;
+class HidControl;
 
-#define DEVICE_ID_LENGTH 4 + 1      // 手持设备ID号长度
 #define MAP_VALUE   4               // 手持端按键到选项名索引的映射关系
 
 typedef struct _RevData
 {
-    char devID[DEVICE_ID_LENGTH];   // 手持端ID
+    quint32 id;   // 手持端ID
     char key;   // 手持端按键的编号
     QString *revTime;
 }RevData;
@@ -49,7 +48,7 @@ public slots:
     //-----display part-----//
 
     //-----data pre-process part-----//
-    void ParseData(QByteArray data);
+    void ParseData(quint32 id, quint8 option);
     //-----data pre-process part-----//
 
 protected:
@@ -59,7 +58,7 @@ protected:
 private:
     Ui::DianVoteControl *ui;
     DianVoteDrawer *drawer;
-    QHidDevice *device;
+    HidControl *hidControl;
     QList< RevData* > *log;     // 数据接收的log
 
     QPushButton *pbStart;

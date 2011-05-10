@@ -9,7 +9,7 @@
 
 QSlidePlayerScene::QSlidePlayerScene(QWidget * parent/* = 0*/,
                                      QSlideModel *sm/* = 0*/)
-    :QSlideScene(parent, sm)
+    :QSlideScene(sm, parent)
 {
 }
 

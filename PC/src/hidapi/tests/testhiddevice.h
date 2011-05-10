@@ -43,7 +43,6 @@ public:
 
 public slots:
     void showInData(QByteArray ba) {
-//        QMessageBox::information(0, "test", ba);
         static int count = 0;
         printf("%04d: remote: ", count++);
         if (ba.size() < 5) {
@@ -51,9 +50,11 @@ public slots:
             return;
         }
         // print remote ID:
-        for (int i = 0; i < 4; i++) {
-            printf("%02x", (unsigned char) ba.at(i));
-        }
+        quint16 id1 = *((quint16*) ba.data());
+        quint16 id2 = *((quint16*) ba.data() + 1);
+        printf("%04x-", id1);
+        printf("%04x", id2);
+
         // print remote cmd
         printf("\t%02x\n", (unsigned char) ba.at(4));
     }

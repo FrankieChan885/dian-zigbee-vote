@@ -9,6 +9,7 @@
 #include "dianvotecontrol.h"
 #include "ui_dianvotecontrol.h"
 #include "exceptions.h"
+#include "hidcontrol.h"
 
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
@@ -57,10 +58,11 @@ void DianVoteControl::VoteStart()
 {
     try
     {
-        device = new QHidDevice(0x0451, 0x16a9, this);
-        connect(device, SIGNAL(readInterrupt(QByteArray)), this, SLOT(ParseData(QByteArray)));
-        device->open(QIODevice::ReadOnly);
-        device->startListening(1, 6);
+        hidControl = new HidControl(this);
+        connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                this, SLOT(ParseData(quint32, quint8)));
+        // start all remote.
+        hidControl->start();
     }
     catch(DianVoteStdException *e)
     {
@@ -114,20 +116,14 @@ void DianVoteControl::DoShowStatics()
 
 }
 
-void DianVoteControl::ParseData(QByteArray data)
+void DianVoteControl::ParseData(quint32 id, quint8 option)
 {
-    int i = 0;
-
     RevData *rd = new RevData;
-    rd->key = data.at(data.length() - 1);       // 取出最后一个字节
+    rd->key = option;       // 取出最后一个字节
     emit updateGraph((int)rd->key - MAP_VALUE);  // 更新数据
 
-    // 取出ID
-    for (i = 0; i < DEVICE_ID_LENGTH - 1; i++)
-    {
-        rd->devID[i] = data.at(i);
-    }
-    rd->devID[i] = '\0';
+	// 取出ID
+	rd->id = id;
 
     // 接收时间
     QString *time;

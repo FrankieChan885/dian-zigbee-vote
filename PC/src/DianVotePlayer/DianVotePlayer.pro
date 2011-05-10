@@ -18,9 +18,9 @@ CONFIG      += qt warn_on
 QT          += xml
 
 DEPENDPATH  += ../utilities
-DEPENDPATH  += ../lib
+DEPENDPATH  += ../hidapi/lib
 INCLUDEPATH += ../utilities
-INCLUDEPATH += ../include
+INCLUDEPATH += ../hidapi/hidapi-0.6.0/hidapi
 
 # Preprocess definitions
 unix {
@@ -45,7 +45,7 @@ SOURCES     += main.cpp \
                 hiddevice.cpp \
                 hidlistener.cpp
 
-LIBS        += -lhid
+LIBS        += -L../hidapi/lib -lhidapi
 
 # Output paths
 DESTDIR      = ../bin

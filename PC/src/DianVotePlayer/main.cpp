@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     QDir dir(QDir::current());
 
     // set the slide model.
-    QFile xmlf(dir.absoluteFilePath("userdata/one-topic.xml"));
+    QFile xmlf(dir.absoluteFilePath("userdata/test.xml"));
     if (!xmlf.exists()) {
         QMessageBox::critical(0, "error", "no xml file...");
         return 0;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
     view->showFullScreen();
 
-    QHidDevice * test = new QHidDevice(0x55, 0x32, 1, &a);
+    QHidDevice * test = new QHidDevice(0x55, 0x32, &a);
 
     return a.exec();
 }

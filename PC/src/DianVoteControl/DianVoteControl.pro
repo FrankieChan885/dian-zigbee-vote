@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     drawbase.cpp \
     hidlistener.cpp \
     hiddevice.cpp \
-    qtwin.cpp
+    qtwin.cpp \
+    hidcontrol.cpp
 
 HEADERS  += dianvotecontrol.h \
     drawhistgram.h \
@@ -32,7 +33,8 @@ HEADERS  += dianvotecontrol.h \
     drawbase.h \
     hidlistener.h \
     hiddevice.h \
-    qtwin.h
+    qtwin.h \
+    hidcontrol.h
 
 # using hidapi
 LIBS += -L../hidapi/lib -lhidapi
