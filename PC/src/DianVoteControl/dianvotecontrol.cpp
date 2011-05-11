@@ -21,7 +21,8 @@
 
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::DianVoteControl)
+    ui(new Ui::DianVoteControl),
+    curState(STOP)
 {
     ui->setupUi(this);
 
@@ -54,6 +55,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbAuto, SIGNAL(clicked()), this, SLOT(VoteAuto()));
     connect(pbPause, SIGNAL(clicked()), this, SLOT(VotePause()));
     connect(pbStop, SIGNAL(clicked()), this, SLOT(VoteStop()));
+    connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
     LoadStyleSheet("Coffee");
 
@@ -80,36 +82,73 @@ DianVoteControl::~DianVoteControl()
 
 void DianVoteControl::VoteStart()
 {
-    PrepareHid();
+    if(curState == RUNNING)
+    {
+        QMessageBox::critical(0, "warn", "Already Started");
+    }else if(curState == PAUSE)
+    {
+        // 修改主界面
+        pbStart->hide();
+        pbPause->show();
 
-    // 修改主界面
-    pbStart->hide();
-    pbAuto->hide();
-    pbPause->show();
-    pbStop->show();
+        // 启动秒表
+        stopWatch->start();
+    }
+    else if(curState == STOP)
+    {
+        PrepareHid();
 
-    // 画出秒表, 递增模式
-    ShowStopWatch();
-    stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
-    stopWatch->start();
+        // 修改主界面
+        pbStart->hide();
+        pbAuto->hide();
+        pbPause->show();
+        pbStop->show();
+
+        // 画出秒表, 递增模式
+        ShowStopWatch();
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
+        stopWatch->start();
+    }
+
+    // 改变状态
+    curState = RUNNING;
 }
 
 void DianVoteControl::VoteAuto()
 {
-    PrepareHid();
+    if(curState == RUNNING)
+    {
+        QMessageBox::critical(0, "warn", "Already Started");
+    }else if(curState == PAUSE)
+    {
+        // 修改主界面
+        pbStart->hide();
+        pbPause->show();
 
-    // 修改主界面
-    pbStart->hide();
-    pbAuto->hide();
-    pbPause->show();
-    pbStop->show();
+        // 启动秒表
+        stopWatch->start();
+    }
+    else if(curState == STOP)
+    {
+        PrepareHid();
 
-    // 画出秒表, 递减模式
-    ShowStopWatch();
-    Q_ASSERT(stopWatch != NULL);
-    stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
-    stopWatch->SetStartTime(60);//for test
-    stopWatch->start();
+        // 修改主界面
+        pbStart->hide();
+        pbAuto->hide();
+        pbPause->show();
+        pbStop->show();
+
+        // 画出秒表, 递增模式
+        ShowStopWatch();
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
+        stopWatch->SetStartTime(60);//for test
+        stopWatch->start();
+    }
+
+    // 改变状态
+    curState = RUNNING;
 }
 
 void DianVoteControl::VotePause()
@@ -122,6 +161,9 @@ void DianVoteControl::VotePause()
     // 修改主界面
     pbPause->hide();
     pbStart->show();
+
+    // 修改状态
+    curState = PAUSE;
 }
 
 void DianVoteControl::VoteStop()
@@ -132,17 +174,22 @@ void DianVoteControl::VoteStop()
 //    hidControl->stop();
 
     // 修改主界面
+    HideStopWatch();
     pbPause->hide();
     pbStop->hide();
     pbStart->show();
     pbAuto->show();
+
+    // 修改状态
+    curState = STOP;
 }
 
 void DianVoteControl::DoShowResults()
 {
     drawer = new DianVoteDrawer();
-    // 开启aero效果
+
 #ifdef WIN32
+    // 开启aero效果
     if (QtWin::isCompositionEnabled()) {
         QtWin::extendFrameIntoClientArea(drawer);
         drawer->setContentsMargins(0, 0, 0, 0);
@@ -218,7 +265,7 @@ void DianVoteControl::ShowStopWatch()
     animationGroup = new QSequentialAnimationGroup(this);
 
     resizeAnimation = new QPropertyAnimation(this, "geometry");
-    resizeAnimation->setDuration(1500);
+    resizeAnimation->setDuration(1000);
     resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
     resizeAnimation->setEndValue(QRect(0, 0, width(), height() + 100));
 
@@ -236,6 +283,20 @@ void DianVoteControl::ShowStopWatch()
     animationGroup->start();
 }
 
+void DianVoteControl::HideStopWatch()
+{
+    // show的逆过程
+    resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
+    resizeAnimation->setEndValue(QRect(0, 0, width(), height() - 100));
+    connect(resizeAnimation, SIGNAL(finished()), this, SLOT(DoHideStopWatch()));
+    animationGroup->start();
+
+    if (stopWatch == NULL)
+    {
+        return;
+    }
+}
+
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
@@ -250,4 +311,14 @@ void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
         move(event->globalPos() - dragPosition);
         event->accept();
     }
+}
+
+//void DianVoteControl::DoShowStopWatch()
+//{
+
+//}
+
+void DianVoteControl::DoHideStopWatch()
+{
+    delete stopWatch;
 }

@@ -21,6 +21,13 @@ typedef struct _RevData
     QString *revTime;
 }RevData;
 
+enum ControlState
+{
+    RUNNING,
+    PAUSE,
+    STOP
+};
+
 namespace Ui {
     class DianVoteControl;
 }
@@ -81,10 +88,18 @@ private:
     QPropertyAnimation *resizeAnimation;
 //    QPropertyAnimation *showStopWatchAnimation;
 
+    // 控制状态
+    enum ControlState curState; // 当前状态
+
+private slots:
+//    void DoShowStopWatch();     // 显示秒表widget，在下拉动画完毕后调用
+    void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
+
 private:
     void PrepareHid();     // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
-    void ShowStopWatch();
+    void ShowStopWatch();   // 显示秒表
+    void HideStopWatch();   // 删掉秒表
 };
 
 #endif // DIANVOTECONTROL_H
