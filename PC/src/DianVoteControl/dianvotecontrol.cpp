@@ -167,7 +167,7 @@ void DianVoteControl::ShowStopWatch()
     resizeAnimation = new QPropertyAnimation(this, "geometry");
     resizeAnimation->setDuration(1500);
     resizeAnimation->setStartValue(QRect(0, 0, width(), 50));
-    resizeAnimation->setEndValue(QRect(0, 0, width(), 80));
+    resizeAnimation->setEndValue(QRect(0, 0, width(), 150));
 
     stopWatch = new StopWatch(this);
     ui->stopWatchLayout->addWidget(stopWatch);
@@ -175,7 +175,7 @@ void DianVoteControl::ShowStopWatch()
     showStopWatchAnimation = new QPropertyAnimation(stopWatch, "geometry");
     showStopWatchAnimation->setDuration(1500);
     showStopWatchAnimation->setStartValue(QRect(0, height(), width(), height()));
-    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), 2 * height()));
+    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), height()));
 
     animationGroup->addAnimation(resizeAnimation);
     animationGroup->addAnimation(showStopWatchAnimation);
