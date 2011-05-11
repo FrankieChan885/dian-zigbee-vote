@@ -43,7 +43,6 @@ public slots:
     void VotePause();
     void VoteStop();
     void VoteAuto();
-    void SetStopWatch(int time = 60);
     //-----control part-----//
 
     //-----display part-----//
@@ -80,9 +79,10 @@ private:
 
     QSequentialAnimationGroup *animationGroup;
     QPropertyAnimation *resizeAnimation;
-    QPropertyAnimation *showStopWatchAnimation;
+//    QPropertyAnimation *showStopWatchAnimation;
 
 private:
+    void PrepareHid();     // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
     void ShowStopWatch();
 };

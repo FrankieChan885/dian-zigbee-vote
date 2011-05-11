@@ -26,18 +26,34 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     ui->setupUi(this);
 
     pbStart = new QPushButton(this);
+    pbStart->setText("Star");
     ui->buttonLayout->addWidget(pbStart, 0, 0);
     pbAuto = new QPushButton(this);
+    pbAuto->setText("Auto");
     ui->buttonLayout->addWidget(pbAuto, 0, 1);
+    pbPause = new QPushButton(this);
+    pbPause->setText("Paus");
+    ui->buttonLayout->addWidget(pbPause, 0, 0);
+    pbPause->hide();
+    pbStop = new QPushButton(this);
+    pbStop->setText("Stop");
+    ui->buttonLayout->addWidget(pbStop, 0, 1);
+    pbStop->hide();
     pbResult = new QPushButton(this);
+    pbResult->setText("Resu");
     ui->buttonLayout->addWidget(pbResult, 0, 2);
     pbOption = new QPushButton(this);
+    pbOption->setText("Opti");
     ui->buttonLayout->addWidget(pbOption, 0, 3);
     pbClose = new QPushButton(this);
+    pbClose->setText("Clos");
     ui->buttonLayout->addWidget(pbClose, 0, 4);
 
     connect(pbClose, SIGNAL(clicked()), this, SLOT(close()));
-    connect(pbStart, SIGNAL(clicked()), this, SLOT(DoShowResults()));
+    connect(pbStart, SIGNAL(clicked()), this, SLOT(VoteStart()));
+    connect(pbAuto, SIGNAL(clicked()), this, SLOT(VoteAuto()));
+    connect(pbPause, SIGNAL(clicked()), this, SLOT(VotePause()));
+    connect(pbStop, SIGNAL(clicked()), this, SLOT(VoteStop()));
 
     LoadStyleSheet("Coffee");
 
@@ -54,7 +70,7 @@ DianVoteControl::~DianVoteControl()
         {
             delete (*log)[i]->revTime;
         }
-        if ((*log)[i])
+        if((*log)[i])
         {
             delete (*log)[i];
         }
@@ -64,42 +80,62 @@ DianVoteControl::~DianVoteControl()
 
 void DianVoteControl::VoteStart()
 {
-    try
-    {
-        hidControl = new HidControl(this);
-        connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
-                this, SLOT(ParseData(quint32, quint8)));
-        // start all remote.
-        hidControl->start();
-    }
-    catch(DianVoteStdException *e)
-    {
-        QMessageBox::critical(0, "error", e->what());
-    }
-    catch(...)
-    {
-        QMessageBox::critical(0, "error", "unknow exception.");
-    }
+    PrepareHid();
+
+    // 修改主界面
+    pbStart->hide();
+    pbAuto->hide();
+    pbPause->show();
+    pbStop->show();
+
+    // 画出秒表, 递增模式
+    ShowStopWatch();
+    stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
+    stopWatch->start();
 }
 
 void DianVoteControl::VoteAuto()
 {
+    PrepareHid();
 
-}
+    // 修改主界面
+    pbStart->hide();
+    pbAuto->hide();
+    pbPause->show();
+    pbStop->show();
 
-void DianVoteControl::SetStopWatch(int time)
-{
-
+    // 画出秒表, 递减模式
+    ShowStopWatch();
+    Q_ASSERT(stopWatch != NULL);
+    stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
+    stopWatch->SetStartTime(60);//for test
+    stopWatch->start();
 }
 
 void DianVoteControl::VotePause()
 {
+    Q_ASSERT(stopWatch != NULL);
+//    Q_ASSERT(hidControl != NULL);
+    stopWatch->pause();
+//    hidControl->stop();
 
+    // 修改主界面
+    pbPause->hide();
+    pbStart->show();
 }
 
 void DianVoteControl::VoteStop()
 {
+    Q_ASSERT(stopWatch != NULL);
+//    Q_ASSERT(hidControl != NULL);
+    stopWatch->stop();
+//    hidControl->stop();
 
+    // 修改主界面
+    pbPause->hide();
+    pbStop->hide();
+    pbStart->show();
+    pbAuto->show();
 }
 
 void DianVoteControl::DoShowResults()
@@ -116,9 +152,6 @@ void DianVoteControl::DoShowResults()
     drawer->setAttribute(Qt::WA_DeleteOnClose);
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
 
-    // 开始接收数据
-    VoteStart();
-    ShowStopWatch();
     drawer->show();
 }
 
@@ -144,6 +177,26 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
     log->append(rd);
 }
 
+void DianVoteControl::PrepareHid()
+{
+    try
+    {
+        hidControl = new HidControl(this);
+        connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                this, SLOT(ParseData(quint32, quint8)));
+        // start all remote.
+        hidControl->start();
+    }
+    catch(DianVoteStdException *e)
+    {
+        QMessageBox::critical(0, "error", e->what());
+    }
+    catch(...)
+    {
+        QMessageBox::critical(0, "error", "unknow exception.");
+    }
+}
+
 void DianVoteControl::LoadStyleSheet(const QString &sheetName)
 {
     QDir dir(QCoreApplication::applicationDirPath());
@@ -166,19 +219,20 @@ void DianVoteControl::ShowStopWatch()
 
     resizeAnimation = new QPropertyAnimation(this, "geometry");
     resizeAnimation->setDuration(1500);
-    resizeAnimation->setStartValue(QRect(0, 0, width(), 50));
-    resizeAnimation->setEndValue(QRect(0, 0, width(), 150));
+    resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
+    resizeAnimation->setEndValue(QRect(0, 0, width(), height() + 100));
 
     stopWatch = new StopWatch(this);
+    connect(stopWatch, SIGNAL(autoStop()), this, SLOT(VoteStop()));
     ui->stopWatchLayout->addWidget(stopWatch);
 
-    showStopWatchAnimation = new QPropertyAnimation(stopWatch, "geometry");
-    showStopWatchAnimation->setDuration(1500);
-    showStopWatchAnimation->setStartValue(QRect(0, height(), width(), height()));
-    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), height()));
+//    showStopWatchAnimation = new QPropertyAnimation(stopWatch, "geometry");
+//    showStopWatchAnimation->setDuration(1500);
+//    showStopWatchAnimation->setStartValue(QRect(0, 0, width(), 0));
+//    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), 100));
 
     animationGroup->addAnimation(resizeAnimation);
-    animationGroup->addAnimation(showStopWatchAnimation);
+//    animationGroup->addAnimation(showStopWatchAnimation);
     animationGroup->start();
 }
 
