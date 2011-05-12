@@ -174,8 +174,8 @@ void DianVoteEditor::updateSlideList() {
                           findChild<QListView*>(tr("slideListView"));
     if (listView) {
         listView->setModel(slidesListModel);
-        QObject::connect(listView, SIGNAL(clicked(QModelIndex)),
-                         this, SLOT(slideListClicked(QModelIndex)));
+        QObject::connect(listView, SIGNAL(activated(QModelIndex)),
+                         this, SLOT(slideListActivated(QModelIndex)));
     }
     else {
         qDebug("listView not found...");
@@ -208,6 +208,11 @@ void DianVoteEditor::closeEvent(QCloseEvent *event)
 
 void DianVoteEditor::newFile()
 {
+    // if modified and cancel to save, cancel open.
+    if (isWindowModified() && !maybeSave()) {
+        return;
+    }
+
     // first clean the resources.
     clean();
 
@@ -279,14 +284,41 @@ void DianVoteEditor::sceneAreaChanged(const QList<QRectF> &) {
 
 void DianVoteEditor::setupToolBars()
 {
-////! [0]
-//    fileToolBar = addToolBar(tr("File"));
-//    fileToolBar->addAction(newAct);
-//    fileToolBar->addAction(openAct);
-////! [0]
-//    fileToolBar->addAction(saveAct);
-//
-//    editToolBar = addToolBar(tr("Edit"));
+    QToolBar *fileToolBar = dianvoteWindow->addToolBar(tr("File"));
+
+    QAction *action = 0;
+    // add new action.
+    action = dianvoteWindow->findChild<QAction *>(tr("action_New"));
+    if (action == 0) {
+        qDebug("DianVoteEditor::setupToolBars(): action_New not found...");
+    }
+    else {
+        action->setIcon(QIcon(":/res/new.png"));
+        fileToolBar->addAction(action);
+    }
+
+    // add open action.
+    action = dianvoteWindow->findChild<QAction *>(tr("action_Open"));
+    if (action == 0) {
+        qDebug("DianVoteEditor::setupToolBars(): action_Open not found...");
+    }
+    else {
+        action->setIcon(QIcon(":/res/open.png"));
+        fileToolBar->addAction(action);
+    }
+
+    // add save action.
+    action = dianvoteWindow->findChild<QAction *>(tr("action_Save"));
+    if (action == 0) {
+        qDebug("DianVoteEditor::setupToolBars(): action_Save not found...");
+    }
+    else {
+        action->setIcon(QIcon(":/res/save.png"));
+        fileToolBar->addAction(action);
+    }
+
+//    // add a edit toolbar.
+//    QToolBar *editToolBar = addToolBar(tr("Edit"));
 //    editToolBar->addAction(cutAct);
 //    editToolBar->addAction(copyAct);
 //    editToolBar->addAction(pasteAct);
@@ -483,8 +515,8 @@ QSlideScene* DianVoteEditor::newSlide() {
     return scene;
 }
 
-void DianVoteEditor::slideListClicked(const QModelIndex & index) {
+void DianVoteEditor::slideListActivated(const QModelIndex & index) {
         currentSlideScene = slideScenes.at(index.row());
         qobject_cast<QGraphicsView*>(dianvoteWindow->centralWidget())->
-                setScene(slideScenes.at(index.row()));
+                setScene(currentSlideScene);
 }

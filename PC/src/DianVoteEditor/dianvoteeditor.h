@@ -47,7 +47,7 @@ public slots:
     void sceneAreaChanged(const QList<QRectF> & region);
 
     // slide list clicked
-    void slideListClicked(const QModelIndex &);
+    void slideListActivated(const QModelIndex &);
 
     // the slides may be save at close.
     void closeEvent(QCloseEvent *event);

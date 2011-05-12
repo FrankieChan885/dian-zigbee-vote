@@ -61,6 +61,7 @@ QHidDevice::~QHidDevice()
 {
     // if device open, close it first.
     if (isOpen()) {
+        qDebug("QHidDevice::~QHidDevice(): hid is open...");
         close();
     }
 
@@ -115,9 +116,6 @@ bool QHidDevice::open(OpenMode mode) {
 
     if (hid == NULL) {
         qDebug("QHidDevice::open: hid opend failed...");
-        throw new DianVoteStdException(
-                                std::string("QHidDevice::open: hid opend failed..."));
-
         return false;
     }
 #endif // #ifdef USE_LIBHID
@@ -132,9 +130,6 @@ bool QHidDevice::open(OpenMode mode) {
 void QHidDevice::close() {
     // first clear the listener.
     if (hidListener) {
-        QObject::disconnect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
-                this, SIGNAL(readInterrupt(QByteArray)));
-
         // stop and wait listener exit.
         hidListener->stop();
         hidListener->wait();
@@ -159,6 +154,8 @@ void QHidDevice::close() {
     }
 #endif // #ifdef USE_LIBHID
 
+    qDebug("QHidDevice::close(): hid closed...");
+    setOpenMode(QIODevice::NotOpen);
     return;
 }
 

@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     try {
         DianVoteEditor *w = new DianVoteEditor;
         w->setupUi(dir.absoluteFilePath("res/dianvoteeditor.ui"));
-        w->setStyle(dir.absoluteFilePath("res/skins/default.qss"));
+        w->setStyle(dir.absoluteFilePath("res/skins/coffee.qss"));
         w->show();
     } catch (DianVoteException *uie) {
         QMessageBox::critical(0, "error", uie->what());

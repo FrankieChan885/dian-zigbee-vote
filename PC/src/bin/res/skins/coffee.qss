@@ -16,8 +16,8 @@ QPushButton {
     border-style: solid;
     border-radius: 5;
     padding: 3px;
-    min-width: 10ex;
-    min-height: 10ex;
+    min-width: 10;
+    min-height: 10;
 }
 
 QPushButton:hover {
@@ -39,8 +39,8 @@ QToolButton {
     border-style: solid;
     border-radius: 5;
     padding: 3px;
-    min-width: 10ex;
-    min-height: 10ex;
+    min-width: 10;
+    min-height: 10;
 }
 
 QToolButton:hover {

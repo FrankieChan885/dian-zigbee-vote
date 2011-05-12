@@ -21,7 +21,7 @@ QSlideFontBar::QSlideFontBar(QWidget *parent)
  */
 QToolBar *QSlideFontBar::addToolBar(const QString& title) {
     QToolBar * ToolBar = new QToolBar(title.isEmpty() ?
-                                      tr("font") : title);
+                                      tr("Font") : title);
     ToolBar->addWidget(fontCombo);
     ToolBar->addWidget(fontSizeCombo);
     ToolBar->addAction(boldAction);
