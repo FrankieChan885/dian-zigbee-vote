@@ -69,6 +69,8 @@ void QHidListener::exec()
                            (unsigned char *) packet, dataLength,
                            INT_WAIT_TIME);
         if (ret > 0) {
+			quint16 id[2];
+			memcpy(id, packet, 4);
             emit hidDataReceived(QByteArray(packet, dataLength));
         }
         else if (ret < 0) {

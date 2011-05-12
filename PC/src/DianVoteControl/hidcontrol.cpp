@@ -77,7 +77,7 @@ void HidControl::dataReceived(QByteArray ba)
 quint32 HidControl::usbId2PCId(QByteArray ba)
 {
     quint16 id[2];
-    memcpy (id, (quint16*) ba.data(), 2);
+    memcpy (id, ba.data(), 4);
     return quint32((id[0] << 16) | id[1]);
 }
 

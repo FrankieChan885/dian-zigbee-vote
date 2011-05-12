@@ -39,7 +39,7 @@ void TestDianvote::showInData(QByteArray ba) {
     QString msg;
     msg.append(QString("%L1: remote: ").arg(count++, 4, 16));
     quint16 id[2];
-    memcpy(id, (quint16*) ba.data(), 2);
+    memcpy(id, ba.data(), 4);
     msg.append(QString("0x%L1%L2").
                arg(id[0], 4, 16, QChar('0')).arg(id[1], 4, 16, QChar('0')));
 
@@ -116,15 +116,17 @@ void TestDianvote::usbStartClicked(bool isStart) {
         } catch (...) {
             QMessageBox::critical(0, "error", "unknow exception.");
         }
-    }
+    } // if (isStart)
     else {
+		// sleep remote.
+		ui->remoteState->setChecked(false);
         if (hidDevice) {
             hidDevice->close();
             delete hidDevice;
             hidDevice = 0;
             qDebug("TestDianvote::usbStartClicked(): hidDevice deleted...");
         }
-    }
+    } // if (isStart) else
 }
 
 void TestDianvote::remoteStateClicked(bool isWork) {
@@ -143,7 +145,7 @@ void TestDianvote::remoteStateClicked(bool isWork) {
             return;
         }
         char remoteCtrl[5] = {0xff, 0xff, 0xff, 0xff, isWork? 1: 0};
-        memcpy(remoteCtrl, (char*) id, 4);
+        memcpy(remoteCtrl, id, 4);
         hidDevice->writeData(remoteCtrl, 5);
     }
     else {
