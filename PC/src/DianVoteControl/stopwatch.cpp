@@ -30,7 +30,11 @@ void StopWatch::paintEvent(QPaintEvent *event)
 void StopWatch::draw(QPainter *painter)
 {
     // 在这里需要画出时间drawText
-    painter->drawText(width() / 2, height() / 2, QString("%1").arg(cSecond));
+    QString Minute = QString("%1").arg(cSecond / 60);
+    QString dSecond = QString("%1").arg(cSecond % 60 / 10);
+    QString sSecond = QString("%1").arg(cSecond % 60 % 10);
+    QString Time = Minute + " : " + dSecond + sSecond;
+    painter->drawText(width() / 2, height() / 2, Time);
 }
 
 void StopWatch::SetStartTime(int sec)

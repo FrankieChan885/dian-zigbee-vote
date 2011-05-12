@@ -8,6 +8,7 @@ DrawBase::DrawBase(QWidget *parent) :
     voterNums(0),
     optionNums(5)
 {
+    colorSet = new QStringList();
     drawData = new QList< DisplayData* >();
     setDefaultColorSet();
     setDefaultDrawData();
@@ -50,9 +51,20 @@ void DrawBase::SetVoterNums(int nums)
     voterNums = nums;
 }
 
+void DrawBase::ClearData()
+{
+    // 必须先要保存数据~~
+
+    drawData->clear();
+    // 因为是每一次重新start投票调用这个，所以必须重新设置
+    setDefaultColorSet();
+    setDefaultDrawData();
+    update();
+}
+
 void DrawBase::HandleData(int index)
 {
-    if (index < 0 || index > drawData->length())
+    if (index < 0 || index >= drawData->length())
     {
         // 这里应该把错误记录写到错误的log文件中
         return;
@@ -65,7 +77,10 @@ void DrawBase::HandleData(int index)
 
 void DrawBase::setDefaultColorSet()
 {
-    colorSet = new QStringList();
+    if(colorSet->length())
+    {
+        return;
+    }
 
     colorSet->append("blue");
     colorSet->append("magenta");
@@ -77,10 +92,14 @@ void DrawBase::setDefaultColorSet()
 
 void DrawBase::setDefaultDrawData()
 {
+    if(drawData->length())
+    {
+        return;
+    }
     DisplayData *dd = NULL;
 
-    QString tmp[] = {"A", "B", "C", "D", "E", "F", "G"};
-    int num[] = {0, 2, 2, 0, 0};
+    QString tmp[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+    int num[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     for (int i = 0; i < optionNums; i ++)
     {

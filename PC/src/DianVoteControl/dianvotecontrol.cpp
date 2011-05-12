@@ -2,6 +2,8 @@
 #include <QTimer>
 #include <QFile>
 #include <QDir>
+#include <QInputDialog>
+#include <QLabel>
 #include <QSequentialAnimationGroup>
 #include <QPropertyAnimation>
 #include <QByteArray>
@@ -57,6 +59,11 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbStop, SIGNAL(clicked()), this, SLOT(VoteStop()));
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
+    drawer = new DianVoteDrawer();
+    connect(pbStart, SIGNAL(clicked()), drawer->histgram, SLOT(ClearData()));
+    connect(pbAuto, SIGNAL(clicked()), drawer->histgram, SLOT(ClearData()));
+    connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
+
     LoadStyleSheet("Coffee");
 
     log = new QList< RevData* >();
@@ -93,10 +100,19 @@ void DianVoteControl::VoteStart()
 
         // 启动秒表
         stopWatch->start();
+
+        hidControl->start();
     }
     else if(curState == STOP)
     {
-        PrepareHid();
+        GetOptionNum();     // 获取选项个数
+
+        // 这里会把hid打开
+        if(!PrepareHid())
+        {
+            // 把错误信息写入log文件
+            return;
+        }
 
         // 修改主界面
         pbStart->hide();
@@ -109,6 +125,7 @@ void DianVoteControl::VoteStart()
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
         stopWatch->start();
+        animationGroup->start();
     }
 
     // 改变状态
@@ -128,10 +145,19 @@ void DianVoteControl::VoteAuto()
 
         // 启动秒表
         stopWatch->start();
+
+        hidControl->start();
     }
     else if(curState == STOP)
     {
-        PrepareHid();
+        GetOptionNum();     // 获取选项个数
+
+        // 这里会把hid打开
+        if(!PrepareHid())
+        {
+            // 把错误信息写入log文件
+            return;
+        }
 
         // 修改主界面
         pbStart->hide();
@@ -139,12 +165,25 @@ void DianVoteControl::VoteAuto()
         pbPause->show();
         pbStop->show();
 
-        // 画出秒表, 递增模式
+        // 画出秒表, 递减模式
         ShowStopWatch();
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
-        stopWatch->SetStartTime(60);//for test
+
+        {
+            bool ok;
+            getLastTime = new QInputDialog();
+            getLastTime->setAttribute(Qt::WA_DeleteOnClose);
+            connect(this, SIGNAL(setLastTime(int)), stopWatch, SLOT(SetStartTime(int)));
+            int i = QInputDialog::getInt(this, tr("Get Last Time"),
+                                         tr("Last Time"), 60, 0, 1000, 1, &ok);
+            if (ok)
+            {
+                emit setLastTime(i);
+            }
+        }
         stopWatch->start();
+        animationGroup->start();
     }
 
     // 改变状态
@@ -153,14 +192,23 @@ void DianVoteControl::VoteAuto()
 
 void DianVoteControl::VotePause()
 {
-    Q_ASSERT(stopWatch != NULL);
-//    Q_ASSERT(hidControl != NULL);
-    stopWatch->pause();
-//    hidControl->stop();
+    if(curState == RUNNING)
+    {
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->pause();
 
-    // 修改主界面
-    pbPause->hide();
-    pbStart->show();
+        // 修改主界面
+        pbPause->hide();
+        pbStart->show();
+
+        // 停止USB设备
+        if(hidControl == NULL)
+        {
+            QMessageBox::critical(0, "Internal Error", "Can't Stop HidDevice");
+            return;
+        }
+        hidControl->stop();
+    }
 
     // 修改状态
     curState = PAUSE;
@@ -168,25 +216,47 @@ void DianVoteControl::VotePause()
 
 void DianVoteControl::VoteStop()
 {
-    Q_ASSERT(stopWatch != NULL);
-//    Q_ASSERT(hidControl != NULL);
-    stopWatch->stop();
-//    hidControl->stop();
+    if(curState == RUNNING)
+    {
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->stop();
 
-    // 修改主界面
-    HideStopWatch();
-    pbPause->hide();
-    pbStop->hide();
-    pbStart->show();
-    pbAuto->show();
+        // 修改主界面
+        HideStopWatch();
+        pbPause->hide();
+        pbStop->hide();
+        pbStart->show();
+        pbAuto->show();
 
+        // 停止USB设备
+        if(hidControl == NULL)
+        {
+            QMessageBox::critical(0, "Internal Error", "Can't Stop HidDevice");
+            return;
+        }
+        hidControl->stop();
+    }else if(curState == PAUSE)
+    {
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->stop();
+
+        // 修改主界面
+        HideStopWatch();
+        pbPause->hide();
+        pbStop->hide();
+        pbStart->show();
+        pbAuto->show();
+
+        // 因为pause状态hidCntrol已经停止，所以不需要停止
+    }
+
+    animationGroup->start();
     // 修改状态
     curState = STOP;
 }
 
 void DianVoteControl::DoShowResults()
 {
-    drawer = new DianVoteDrawer();
 
 #ifdef WIN32
     // 开启aero效果
@@ -195,9 +265,6 @@ void DianVoteControl::DoShowResults()
         drawer->setContentsMargins(0, 0, 0, 0);
     }
 #endif // #ifdef WIN32
-
-    drawer->setAttribute(Qt::WA_DeleteOnClose);
-    connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
 
     drawer->show();
 }
@@ -224,7 +291,21 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
     log->append(rd);
 }
 
-void DianVoteControl::PrepareHid()
+void DianVoteControl::GetOptionNum()
+{
+    bool ok;
+    getOptionNum = new QInputDialog();
+    getOptionNum->setAttribute(Qt::WA_DeleteOnClose);
+    connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
+    int i = QInputDialog::getInt(this, tr("Get Options Amounts"),
+                                 tr("Options Amounts"), 5, 0, 10, 1, &ok);
+    if (ok)
+    {
+        emit setOptionNum(i);
+    }
+}
+
+bool DianVoteControl::PrepareHid()
 {
     try
     {
@@ -233,14 +314,17 @@ void DianVoteControl::PrepareHid()
                 this, SLOT(ParseData(quint32, quint8)));
         // start all remote.
         hidControl->start();
+        return true;
     }
     catch(DianVoteStdException *e)
     {
         QMessageBox::critical(0, "error", e->what());
+        return false;
     }
     catch(...)
     {
         QMessageBox::critical(0, "error", "unknow exception.");
+        return false;
     }
 }
 
@@ -280,7 +364,6 @@ void DianVoteControl::ShowStopWatch()
 
     animationGroup->addAnimation(resizeAnimation);
 //    animationGroup->addAnimation(showStopWatchAnimation);
-    animationGroup->start();
 }
 
 void DianVoteControl::HideStopWatch()
@@ -289,12 +372,6 @@ void DianVoteControl::HideStopWatch()
     resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
     resizeAnimation->setEndValue(QRect(0, 0, width(), height() - 100));
     connect(resizeAnimation, SIGNAL(finished()), this, SLOT(DoHideStopWatch()));
-    animationGroup->start();
-
-    if (stopWatch == NULL)
-    {
-        return;
-    }
 }
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)

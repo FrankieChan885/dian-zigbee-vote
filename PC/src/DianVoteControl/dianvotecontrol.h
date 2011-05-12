@@ -5,12 +5,14 @@
 #include <QByteArray>
 #include "dianvotedrawer.h"
 
-class StopWatch;
+class QInputDialog;
 class QSpacerItem;
+class QErrorMessage;
 class QSequentialAnimationGroup;
 class QPropertyAnimation;
 class QPushButton;
 class HidControl;
+class StopWatch;
 
 #define MAP_VALUE   4               // 手持端按键到选项名索引的映射关系
 
@@ -41,6 +43,8 @@ public:
     ~DianVoteControl();
 
 signals:
+    void setLastTime(int sec);      // 信号--设置持续时间
+    void setOptionNum(int num);     // 信号--给histgram设置选项数目
     void updateGraph(int index);
 
 public slots:
@@ -82,6 +86,9 @@ private:
     QPushButton *pbOption;
     QPushButton *pbClose;
 
+    QInputDialog *getOptionNum;      // 弹出窗口，设置选项个数
+    QInputDialog *getLastTime;      // 当用Auto模式时需要设置
+
     QPoint dragPosition;
 
     QSequentialAnimationGroup *animationGroup;
@@ -96,7 +103,8 @@ private slots:
     void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
 
 private:
-    void PrepareHid();     // 准备好接收设备
+    void GetOptionNum();    // 获取选项个数，并传给histgram
+    bool PrepareHid();     // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
     void ShowStopWatch();   // 显示秒表
     void HideStopWatch();   // 删掉秒表

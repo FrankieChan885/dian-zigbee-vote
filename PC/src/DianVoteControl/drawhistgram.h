@@ -24,6 +24,7 @@ protected:
 private:
     void DoWithCoodinate();     // 计算画图时需要的坐标
 
+private:
     bool YAxisDashLineFlag;
 
     //-----Important Coordinate-----//

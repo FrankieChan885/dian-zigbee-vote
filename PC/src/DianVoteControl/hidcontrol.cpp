@@ -47,16 +47,16 @@ void HidControl::start(quint32 id/* = 0xffffffff*/)
  */
 void HidControl::stop(quint32 id/* = 0xffffffff*/)
 {
-	// if broadcast, means stop all device.
-	if (0xffffffff == id) {
-		device->close();
-	}
-
 	// send stop signal to remote
 	char data[5];
 	memcpy(data, PCId2usbId(id).data(), 4);
 	data[4] = 0x00;
 	device->writeData(data, 5);
+
+    // if broadcast, means stop all device.
+    if (0xffffffff == id) {
+        device->close();
+    }
 }
 
 /**
@@ -70,7 +70,7 @@ void HidControl::dataReceived(QByteArray ba)
     emit voteComing(id, option);
 
 	// when received succeed, stop this id.
-	stop(id);
+    //stop(id);
 }
 
 /// the usb and PC id translate function.
@@ -85,7 +85,7 @@ QByteArray HidControl::PCId2usbId(quint32 id)
 {
 	quint16 usbId[2];
 	usbId[0] = quint16(id >> 16);
-	usbId[1] = quint16(id & 0x00ff);
+    usbId[1] = quint16(id & 0xffff);
 
 	return QByteArray((char*)usbId, 4);
 }

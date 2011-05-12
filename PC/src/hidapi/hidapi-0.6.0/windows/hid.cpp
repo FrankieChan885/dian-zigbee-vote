@@ -499,8 +499,9 @@ int HID_API_EXPORT HID_API_CALL hid_write(hid_device *dev, const unsigned char *
 
 	res = WriteFile(dev->device_handle, data, length, NULL, &ol);
 	
-	if (!res) {
-		if (GetLastError() != ERROR_IO_PENDING) {
+    if (!res) {
+        long e = GetLastError();
+        if (e != ERROR_IO_PENDING) {
 			// WriteFile() failed. Return error.
 			register_error(dev, "WriteFile");
 			return -1;
@@ -541,8 +542,8 @@ int HID_API_EXPORT HID_API_CALL hid_read(hid_device *dev, unsigned char *data, s
 	res = ReadFile(dev->device_handle, data, length, &bytes_read, &ol);
 	
 	
-	if (!res) {
-		if (GetLastError() != ERROR_IO_PENDING) {
+    if (!res) {
+        if (GetLastError() != ERROR_IO_PENDING) {
 			// ReadFile() has failed.
 			// Clean up and return error.
 			CloseHandle(ev);

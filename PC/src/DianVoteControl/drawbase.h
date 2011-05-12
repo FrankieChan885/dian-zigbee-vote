@@ -44,6 +44,7 @@ public slots:
     void SetCorrectAnswer(QString answer);
     void SetCorrectAnswerFlag(bool flag);
 
+    void ClearData();               // 每一次Start都要将上次数据清空
     void HandleData(int index);    // 接收一个数据
 
 protected:
