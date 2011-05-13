@@ -4,7 +4,7 @@
 #include <QDir>
 #include <QInputDialog>
 #include <QLabel>
-#include <QSequentialAnimationGroup>
+#include <QDesktopWidget>
 #include <QPropertyAnimation>
 #include <QByteArray>
 #include <QMouseEvent>
@@ -24,6 +24,9 @@
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DianVoteControl),
+    drawer(NULL),
+    hidControl(NULL),
+    stopWatch(NULL),
     curState(STOP)
 {
     ui->setupUi(this);
@@ -72,6 +75,13 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     LoadStyleSheet("Default");
 
+    // 记录初始化窗口大小
+    initSize = this->size();
+    this->setFixedWidth(this->width());
+    this->setMaximumHeight(this->height() + 100);
+    this->move(0, 0);
+
+    // 初始化log记录链表
     log = new QList< RevData* >();
 }
 
@@ -141,7 +151,7 @@ void DianVoteControl::VoteStart()
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
         stopWatch->start();
-        animationGroup->start();
+        resizeAnimation->start();
         StartHid();     // 开启接收设备
     }
 
@@ -176,25 +186,27 @@ void DianVoteControl::VoteAuto()
 
         emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
-        int num = GetOptionNum();     // 获取选项个数
-        if(num)
-        {
-            emit setOptionNum(num);
-        }
-        else
-        {
-            return;
-        }
+        int num0 = GetOptionNum();     // 获取选项个数
 
         // 画出秒表, 递减模式
         ShowStopWatch();
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
 
-        num = GetLastTime();     // 获取持续时间
-        if(num)
+        int num1 = GetLastTime();     // 获取持续时间
+
+        if(num1)
         {
-            emit setLastTime(num);;
+            emit setLastTime(num1);;
+        }
+        else
+        {
+            return;
+        }
+
+        if(num0)
+        {
+            emit setOptionNum(num0);
         }
         else
         {
@@ -210,7 +222,7 @@ void DianVoteControl::VoteAuto()
         pbStop->show();
 
         stopWatch->start();
-        animationGroup->start();
+        resizeAnimation->start();
     }
 
     // 改变状态
@@ -243,6 +255,8 @@ void DianVoteControl::VotePause()
 
 void DianVoteControl::VoteStop()
 {
+    ClearLog(); // 不管如何，清空日志数据并保存之是必须的。
+
     if(curState == RUNNING)
     {
         Q_ASSERT(stopWatch != NULL);
@@ -277,7 +291,7 @@ void DianVoteControl::VoteStop()
         // 因为pause状态hidCntrol已经停止，所以不需要停止
     }
 
-    animationGroup->start();
+    resizeAnimation->start();
     // 修改状态
     curState = STOP;
 }
@@ -305,16 +319,27 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
 {
     RevData *rd = new RevData;
     rd->key = option;       // 取出最后一个字节
-    emit updateGraph((int)rd->key - MAP_VALUE);  // 更新数据
+    rd->id = id;            // 取出ID
 
-	// 取出ID
-	rd->id = id;
-
-    // 接收时间
-    QString *time;
+    QString *time;          // 接收时间
     time = new QString();
     *time = QTime::currentTime().toString("hh:mm:ss");
     rd->revTime = time;
+
+    // 容错性检查，如果收到已经发送过的数据手持端
+    //      果断丢弃数据，并且写入log中
+    for(int i = 0; i < log->length(); i++)
+    {
+        if((log->at(i)->id = id) && (log->at(i)->type == NORMAL))
+        {
+            rd->type = DUPLICATE;
+            log->append(rd);
+            return;
+        }
+    }
+    emit updateGraph((int)rd->key - MAP_VALUE);  // 更新数据
+
+    rd->type = NORMAL;
     log->append(rd);
 }
 
@@ -364,12 +389,12 @@ bool DianVoteControl::PrepareHid()
     }
     catch(DianVoteStdException *e)
     {
-        QMessageBox::critical(0, "error", e->what());
+        QMessageBox::critical(0, "Hid Open Failed", e->what());
         return false;
     }
     catch(...)
     {
-        QMessageBox::critical(0, "error", "unknow exception.");
+        QMessageBox::critical(0, "Hid Open Failed", "unknow exception.");
         return false;
     }
 }
@@ -432,32 +457,32 @@ void DianVoteControl::LoadStyleSheet(const QString &sheetName)
 
 void DianVoteControl::ShowStopWatch()
 {
-    animationGroup = new QSequentialAnimationGroup(this);
+    // 不管三七二十八，先把窗口设置成默认的大小
+//    QPoint curPos = this->pos();
+    this->resize(initSize);
+    QSize endSize(initSize);
+    endSize.setHeight(initSize.height() + 100);
 
-    resizeAnimation = new QPropertyAnimation(this, "geometry");
+    resizeAnimation = new QPropertyAnimation(this, "size");
     resizeAnimation->setDuration(1000);
-    resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
-    resizeAnimation->setEndValue(QRect(0, 0, width(), height() + 100));
+    resizeAnimation->setStartValue(initSize);
+    resizeAnimation->setEndValue(endSize);
 
-    stopWatch = new StopWatch(this);
+    if(!stopWatch)
+    {
+        stopWatch = new StopWatch(this);
+    }
     connect(this, SIGNAL(setLastTime(int)), stopWatch, SLOT(SetStartTime(int)));
     connect(stopWatch, SIGNAL(autoStop()), this, SLOT(VoteStop()));
     ui->stopWatchLayout->addWidget(stopWatch);
-
-//    showStopWatchAnimation = new QPropertyAnimation(stopWatch, "geometry");
-//    showStopWatchAnimation->setDuration(1500);
-//    showStopWatchAnimation->setStartValue(QRect(0, 0, width(), 0));
-//    showStopWatchAnimation->setEndValue(QRect(0, height(), width(), 100));
-
-    animationGroup->addAnimation(resizeAnimation);
-//    animationGroup->addAnimation(showStopWatchAnimation);
 }
 
 void DianVoteControl::HideStopWatch()
 {
     // show的逆过程
-    resizeAnimation->setStartValue(QRect(0, 0, width(), height()));
-    resizeAnimation->setEndValue(QRect(0, 0, width(), height() - 100));
+    QSize curSize = this->size();
+    resizeAnimation->setStartValue(curSize);
+    resizeAnimation->setEndValue(initSize);
     connect(resizeAnimation, SIGNAL(finished()), this, SLOT(DoHideStopWatch()));
 }
 
@@ -471,18 +496,47 @@ void DianVoteControl::mousePressEvent(QMouseEvent *event)
 
 void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
 {
+    QDesktopWidget* desktopWidget = QApplication::desktop();
+    //获取设备屏幕大小
+    int screenWidth = desktopWidget->screenGeometry().width();
+    int screenHeight = desktopWidget->screenGeometry().height();
+
     if (event->buttons() & Qt::LeftButton) {
-        move(event->globalPos() - dragPosition);
+        QPoint pos = event->globalPos() - dragPosition;
+        if((pos.x() <= DEFAULT_DOCK_SPACE))
+        {
+            pos.setX(0);
+        }
+        else if((pos.x() + this->width() + DEFAULT_DOCK_SPACE) \
+                 >= screenWidth)
+        {
+            pos.setX(screenWidth - this->width() - 2);
+        }
+
+        if((pos.y() <= DEFAULT_DOCK_SPACE))
+        {
+            pos.setY(0);
+        }
+        else if((pos.y() + this->height() + DEFAULT_DOCK_SPACE) \
+                >= screenHeight)
+        {
+            pos.setY(screenHeight - this->height() - 2);
+        }
+
+        move(pos);
         event->accept();
     }
 }
 
-//void DianVoteControl::DoShowStopWatch()
-//{
-
-//}
-
 void DianVoteControl::DoHideStopWatch()
 {
     delete stopWatch;
+    stopWatch = NULL;
+}
+
+void DianVoteControl::ClearLog()
+{
+    // 在此将所有数据写入log文件
+
+    log->clear();
 }

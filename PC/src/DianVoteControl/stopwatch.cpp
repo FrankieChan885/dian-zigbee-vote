@@ -29,16 +29,19 @@ void StopWatch::paintEvent(QPaintEvent *event)
 
 void StopWatch::draw(QPainter *painter)
 {
-    int fontSize = height() / 4;
+    int fontSize = height() / 2;
     QFont Font = QFont("Arial",fontSize,QFont::Bold,true);
     painter->setFont(Font);
 
     // 在这里需要画出时间drawText
+    QString dMinute = QString("%1").arg(cSecond / 360);
     QString Minute = QString("%1").arg(cSecond / 60);
     QString dSecond = QString("%1").arg(cSecond % 60 / 10);
     QString sSecond = QString("%1").arg(cSecond % 60 % 10);
-    QString Time = Minute + " : " + dSecond + sSecond;
-    painter->drawText(width() / 2, height() / 2, Time);
+    QString Time = dMinute + Minute + " : " + dSecond + sSecond;
+    painter->drawText(width() / 2 - ((Time.length() - 2.8) * fontSize / 2),
+                      height() / 2 + fontSize / 2,
+                      Time);
 }
 
 void StopWatch::SetStartTime(int sec)

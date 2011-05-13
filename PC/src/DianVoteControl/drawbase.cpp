@@ -39,6 +39,8 @@ void DrawBase::SetCorrectAnswerFlag(bool flag)
 void DrawBase::SetOptionNums(int nums)
 {
     optionNums = nums;
+    setDefaultDrawData();
+    update();
 }
 
 void DrawBase::SetQuestionName(QString name)
@@ -95,7 +97,7 @@ void DrawBase::setDefaultDrawData()
 {
     if(drawData->length())
     {
-        return;
+        drawData->clear();
     }
     DisplayData *dd = NULL;
 

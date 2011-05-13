@@ -48,11 +48,10 @@ void DrawHistgram::paintEvent(QPaintEvent *event)
 
 void DrawHistgram::draw(QPainter *painter)
 {
-    QPen thinPen(palette().foreground(), 2);
-
     //-----Do Calculate the Coodinate-----//
     DoWithCoodinate();
 
+    QPen thinPen(palette().foreground(), 2);
     painter->setPen(thinPen);
     // »­³öYÖá
 //    painter->drawLine(zeroPoint.x(), zeroPoint.y(),

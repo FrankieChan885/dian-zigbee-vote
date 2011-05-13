@@ -2,8 +2,8 @@
  *   this file defined the default style sheet of window.
  */
  
-QPushButton
-{   
+DianVoteControl > QPushButton
+{
   background-color: rgba(255, 255, 255, 0%);
   border-width: 1px;
   border-color: gray;
@@ -24,6 +24,79 @@ QPushButton#pbAuto
 	border-image: url(res/icons/auto.png);
 }
 
-QPushButton:hover {
+QPushButton#pbPause
+{
+	border-image: url(res/icons/pause.png);
+}
+
+QPushButton#pbStop
+{
+	border-image: url(res/icons/stop.png);
+}
+
+QPushButton#pbResult
+{
+	border-image: url(res/icons/histgram.png);
+}
+
+QPushButton#pbOption
+{
+	border-image: url(res/icons/option.png);
+}
+
+QPushButton#pbClose
+{
+	border-image: url(res/icons/close.png);
+}
+
+DianVoteControl > QPushButton:hover
+{
    background-color: white;
+}
+
+DianVoteDrawer > QToolButton:hover
+{
+   background-color: white;
+}
+
+DianVoteDrawer > QToolButton
+{   
+  background-color: rgba(255, 255, 255, 0%);
+  border-width: 1px;
+  border-color: gray;
+  border-style: solid;
+  border-radius: 5;
+  padding: 16px;
+  width: 10;
+  height: 10;
+}
+
+QToolButton#Previous_Drawer
+{
+   border-image: url(res/icons/previous.png);
+}
+
+QToolButton#Next_Drawer
+{
+   border-image: url(res/icons/next.png);
+}
+
+QToolButton#Pie_Drawer
+{
+   border-image: url(res/icons/pie.png);
+}
+
+QToolButton#CorrectAnsewer_Drawer
+{
+   border-image: url(res/icons/correctanswer.png);
+}
+
+QToolButton#Option_Drawer
+{
+   border-image: url(res/icons/option-2.png);
+}
+
+QToolButton#Close_Drawer
+{
+   border-image: url(res/icons/close.png);
 }

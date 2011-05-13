@@ -5,6 +5,7 @@
 #include <QByteArray>
 #include "dianvotedrawer.h"
 
+class QSize;
 class QInputDialog;
 class QSpacerItem;
 class QErrorMessage;
@@ -14,14 +15,10 @@ class QPushButton;
 class HidControl;
 class StopWatch;
 
+#define DEFAULT_DOCK_SPACE 20       // 吸附产生时最大反应距离
+                                    // 当窗口里桌面四周的距离小于或者等于这个距离时
+                                    // 窗口就吸附到桌面边框上
 #define MAP_VALUE   4               // 手持端按键到选项名索引的映射关系
-
-typedef struct _RevData
-{
-    quint32 id;   // 手持端ID
-    char key;   // 手持端按键的编号
-    QString *revTime;
-}RevData;
 
 enum ControlState
 {
@@ -29,6 +26,24 @@ enum ControlState
     PAUSE,
     STOP
 };
+
+enum ReceivedDataType
+{
+    NORMAL,
+    DUPLICATE,
+    ERROR_ID,
+    ERROR_OPTION,
+    ERROR_DATA,
+    UNKNOWN
+};
+
+typedef struct _RevData
+{
+    quint32 id;   // 手持端ID
+    quint8 key;   // 手持端按键的编号
+    QString *revTime;
+    enum ReceivedDataType type;
+}RevData;
 
 namespace Ui {
     class DianVoteControl;
@@ -92,10 +107,12 @@ private:
 
     QPoint dragPosition;
 
-    QSequentialAnimationGroup *animationGroup;
     QPropertyAnimation *resizeAnimation;
 //    QPropertyAnimation *showStopWatchAnimation;
 
+    // 主控界面位置及大小
+    QPoint prePoint;        // 记录动画开始时的位置
+    QSize initSize;         // 窗口初始化时的大小
     // 控制状态
     enum ControlState curState; // 当前状态
 
@@ -112,6 +129,7 @@ private:
     void LoadStyleSheet(const QString &sheetname);
     void ShowStopWatch();   // 显示秒表
     void HideStopWatch();   // 删掉秒表
+    void ClearLog();        // 清空log链表，并在此之前保存到log文件中
 };
 
 #endif // DIANVOTECONTROL_H
