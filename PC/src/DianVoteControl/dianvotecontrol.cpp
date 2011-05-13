@@ -29,27 +29,33 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     ui->setupUi(this);
 
     pbStart = new QPushButton(this);
-    pbStart->setText("Star");
+    pbStart->setObjectName(tr("pbStart"));
     ui->buttonLayout->addWidget(pbStart, 0, 0);
+
     pbAuto = new QPushButton(this);
-    pbAuto->setText("Auto");
+    pbAuto->setObjectName(tr("pbAuto"));
     ui->buttonLayout->addWidget(pbAuto, 0, 1);
+
     pbPause = new QPushButton(this);
-    pbPause->setText("Paus");
+    pbPause->setObjectName(tr("pbPause"));
     ui->buttonLayout->addWidget(pbPause, 0, 0);
     pbPause->hide();
+
     pbStop = new QPushButton(this);
-    pbStop->setText("Stop");
+    pbStop->setObjectName(tr("pbStop"));
     ui->buttonLayout->addWidget(pbStop, 0, 1);
     pbStop->hide();
+
     pbResult = new QPushButton(this);
-    pbResult->setText("Resu");
+    pbResult->setObjectName(tr("pbResult"));
     ui->buttonLayout->addWidget(pbResult, 0, 2);
+
     pbOption = new QPushButton(this);
-    pbOption->setText("Opti");
+    pbOption->setObjectName(tr("pbOption"));
     ui->buttonLayout->addWidget(pbOption, 0, 3);
+
     pbClose = new QPushButton(this);
-    pbClose->setText("Clos");
+    pbClose->setObjectName(tr("pbClose"));
     ui->buttonLayout->addWidget(pbClose, 0, 4);
 
     connect(pbClose, SIGNAL(clicked()), this, SLOT(close()));

@@ -10,7 +10,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     DianVoteControl w;
     w.setWindowFlags(Qt::Window
-                     | Qt::CustomizeWindowHint/*
+                     | Qt::CustomizeWindowHint
+                     | Qt::WindowStaysOnTopHint/*
                      | Qt::WindowTitleHint*/);
 
 #ifdef WIN32
