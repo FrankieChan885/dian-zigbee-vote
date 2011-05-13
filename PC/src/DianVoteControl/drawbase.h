@@ -6,6 +6,8 @@
 #include <QColor>
 #include <QList>
 
+#define INIT_VOTER_NUM 20   // 初始化投票总人数
+
 typedef struct _DisplayData
 {
     int type;   // 直方图数据还是饼图数据

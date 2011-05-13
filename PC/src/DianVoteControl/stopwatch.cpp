@@ -29,6 +29,10 @@ void StopWatch::paintEvent(QPaintEvent *event)
 
 void StopWatch::draw(QPainter *painter)
 {
+//    int fontSize = height() / 10;
+//    QFont Font = QFont("Arial",fontSize,QFont::Bold,true);
+//    painter->setFont(Font);
+
     // 在这里需要画出时间drawText
     QString Minute = QString("%1").arg(cSecond / 60);
     QString dSecond = QString("%1").arg(cSecond % 60 / 10);

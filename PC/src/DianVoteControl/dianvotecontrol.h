@@ -43,6 +43,7 @@ public:
     ~DianVoteControl();
 
 signals:
+    void clearDrawData();           // 信号--清空数据
     void setLastTime(int sec);      // 信号--设置持续时间
     void setOptionNum(int num);     // 信号--给histgram设置选项数目
     void updateGraph(int index);
@@ -103,7 +104,8 @@ private slots:
     void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
 
 private:
-    void GetOptionNum();    // 获取选项个数，并传给histgram
+    int GetOptionNum();    // 获取选项个数，并传给histgram
+    int GetLastTime();      // 获取秒表倒计时时间
     bool PrepareHid();     // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
     void ShowStopWatch();   // 显示秒表

@@ -1,5 +1,6 @@
 #include "hidcontrol.h"
 #include "hiddevice.h"
+#include "exceptions.h"
 
 HidControl::HidControl(QObject *parent)
 : QObject(parent)
@@ -26,19 +27,24 @@ HidControl::~HidControl()
  */
 void HidControl::start(quint32 id/* = 0xffffffff*/)
 {
-	if (0xffffffff == id) {
-		device->open(QIODevice::ReadOnly);
+    if (0xffffffff == id) {
+        if (!device->isOpen())
+        {
+        if (!device->open(QIODevice::ReadWrite)) {
+        throw new DianVoteStdException("hid open failed...");
+        }
 
         // start listening the endpoint 1 with data length 5
         // (in windows length should be 6, I don't know why).
         device->startListening(6);
+        }
     }
 
-	// send start signal to remote
-	char data[5];
-	memcpy(data, PCId2usbId(id).data(), 4);
-	data[4] = 0x01;
-	device->writeData(data, 5);
+    // send start signal to remote
+    char data[5];
+    memcpy(data, PCId2usbId(id).data(), 4);
+    data[4] = 0x01;
+    device->writeData(data, 5);
 }
 
 /**

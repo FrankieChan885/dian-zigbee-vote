@@ -60,8 +60,8 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
     drawer = new DianVoteDrawer();
-    connect(pbStart, SIGNAL(clicked()), drawer->histgram, SLOT(ClearData()));
-    connect(pbAuto, SIGNAL(clicked()), drawer->histgram, SLOT(ClearData()));
+    connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
+    connect(this, SIGNAL(clearDrawData()), drawer->histgram, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
 
     LoadStyleSheet("Coffee");
@@ -105,12 +105,21 @@ void DianVoteControl::VoteStart()
     }
     else if(curState == STOP)
     {
-        GetOptionNum();     // 获取选项个数
-
         // 这里会把hid打开
         if(!PrepareHid())
         {
             // 把错误信息写入log文件
+            return;
+        }
+
+        emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+        int num = GetOptionNum();
+        if(num)
+        {
+            emit setOptionNum(num);     // 获取选项个数
+        }
+        else
+        {
             return;
         }
 
@@ -126,6 +135,7 @@ void DianVoteControl::VoteStart()
         stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
         stopWatch->start();
         animationGroup->start();
+        hidControl->start();
     }
 
     // 改变状态
@@ -150,12 +160,37 @@ void DianVoteControl::VoteAuto()
     }
     else if(curState == STOP)
     {
-        GetOptionNum();     // 获取选项个数
-
         // 这里会把hid打开
         if(!PrepareHid())
         {
             // 把错误信息写入log文件
+            return;
+        }
+
+        emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+
+        int num = GetOptionNum();     // 获取选项个数
+        if(num)
+        {
+            emit setOptionNum(num);
+        }
+        else
+        {
+            return;
+        }
+
+        // 画出秒表, 递减模式
+        ShowStopWatch();
+        Q_ASSERT(stopWatch != NULL);
+        stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
+
+        num = GetLastTime();     // 获取持续时间
+        if(num)
+        {
+            emit setLastTime(num);;
+        }
+        else
+        {
             return;
         }
 
@@ -165,25 +200,9 @@ void DianVoteControl::VoteAuto()
         pbPause->show();
         pbStop->show();
 
-        // 画出秒表, 递减模式
-        ShowStopWatch();
-        Q_ASSERT(stopWatch != NULL);
-        stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
-
-        {
-            bool ok;
-            getLastTime = new QInputDialog();
-            getLastTime->setAttribute(Qt::WA_DeleteOnClose);
-            connect(this, SIGNAL(setLastTime(int)), stopWatch, SLOT(SetStartTime(int)));
-            int i = QInputDialog::getInt(this, tr("Get Last Time"),
-                                         tr("Last Time"), 60, 0, 1000, 1, &ok);
-            if (ok)
-            {
-                emit setLastTime(i);
-            }
-        }
         stopWatch->start();
         animationGroup->start();
+        hidControl->start();
     }
 
     // 改变状态
@@ -291,17 +310,37 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
     log->append(rd);
 }
 
-void DianVoteControl::GetOptionNum()
+int DianVoteControl::GetOptionNum()
 {
     bool ok;
     getOptionNum = new QInputDialog();
     getOptionNum->setAttribute(Qt::WA_DeleteOnClose);
-    connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
     int i = QInputDialog::getInt(this, tr("Get Options Amounts"),
                                  tr("Options Amounts"), 5, 0, 10, 1, &ok);
     if (ok)
     {
-        emit setOptionNum(i);
+        return i;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int DianVoteControl::GetLastTime()
+{
+    bool ok;
+    getLastTime = new QInputDialog();
+    getLastTime->setAttribute(Qt::WA_DeleteOnClose);
+    int i = QInputDialog::getInt(this, tr("Get Last Time"),
+                                 tr("Last Time"), 60, 0, 1000, 1, &ok);
+    if (ok)
+    {
+        return i;
+    }
+    else
+    {
+        return 0;
     }
 }
 
@@ -313,7 +352,6 @@ bool DianVoteControl::PrepareHid()
         connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                 this, SLOT(ParseData(quint32, quint8)));
         // start all remote.
-        hidControl->start();
         return true;
     }
     catch(DianVoteStdException *e)
@@ -354,6 +392,7 @@ void DianVoteControl::ShowStopWatch()
     resizeAnimation->setEndValue(QRect(0, 0, width(), height() + 100));
 
     stopWatch = new StopWatch(this);
+    connect(this, SIGNAL(setLastTime(int)), stopWatch, SLOT(SetStartTime(int)));
     connect(stopWatch, SIGNAL(autoStop()), this, SLOT(VoteStop()));
     ui->stopWatchLayout->addWidget(stopWatch);
 

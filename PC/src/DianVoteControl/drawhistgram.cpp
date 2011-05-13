@@ -25,6 +25,8 @@ DrawHistgram::DrawHistgram()
     RectWidthRatio = 0.5;    // 决定柱状条的宽度
     RectHeigthRatio = 0.8;      // 决定柱状条的高度
     RatioRectSize = 10;    // 用于显示比例的矩形大小
+
+    voterNums = INIT_VOTER_NUM;
 }
 
 DrawHistgram::~DrawHistgram()
@@ -133,14 +135,20 @@ void DrawHistgram::DoWithCoodinate()
     XaxisLength = XaixsLengthRatio * width();
     YaxisLength = YaxisLengthRatio * height();
 
-    voterNums = 0;
     int maxOptionVoteNum = 0;       // 投票人数最多的那个选项的个数，用于决定Y轴刻度的长度
 
     for (int i = 0; i < optionNums; i++)
     {
-        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
+//        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
         maxOptionVoteNum = drawData->at(i)->voterNum > maxOptionVoteNum ? \
                            drawData->at(i)->voterNum : maxOptionVoteNum;
+    }
+    // 更改增长模式，先固定使用默认的voterNum，然后当投票人数的最大值超过voterNum的时候
+    // voterNum自动增加到原来的2倍
+
+    if(maxOptionVoteNum > voterNums)
+    {
+        voterNums *= 2;
     }
 
     /*YaxisScaleNums = ceil((double)voterNums / BASIC_SLICE);     // 刻度数目
