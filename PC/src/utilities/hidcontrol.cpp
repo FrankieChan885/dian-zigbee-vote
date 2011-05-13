@@ -7,6 +7,7 @@
 HidControl::HidControl(QObject *parent)
 : QObject(parent)
 , device(0)
+, stopOnReceive(false)
 {
 	if (device == 0) {
 		device = new QHidDevice(HID_VID, HID_PID, this);
@@ -105,7 +106,9 @@ void HidControl::dataReceived(QByteArray ba)
     emit voteComing(id, option);
 
 	// when received succeed, stop this id.
-    //stop(id);
+	if (stopOnReceive) {
+		stop(id);
+	}
 }
 
 /**
@@ -153,9 +156,11 @@ void HidControl::startRollCall()
 /**
 * @brief roll-call to get the number of remote.
 */
-void HidControl::rollCallReplied(const QByteArray&)
+void HidControl::rollCallReplied(const QByteArray& ba)
 {
-    remoteCount++;
+	if ((quint8)ba.at(4) == 0xff) {
+		remoteCount++;
+	}
 }
 
 void HidControl::rollCallTimeOut() {

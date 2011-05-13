@@ -20,6 +20,8 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
             this, SLOT(remoteIDChanged(QString)));
     connect(ui->rollCall, SIGNAL(clicked()),
             this, SLOT(startRollCall()));
+    connect(ui->stopOnReceive, SIGNAL(clicked(bool)),
+            this, SLOT(stopOnReceiveClicked(bool)));
 
     try {
         // create new device.
@@ -142,11 +144,36 @@ void TestDianvote::remoteStateClicked(bool isWork) {
     }
 }
 
+void TestDianvote::stopOnReceiveClicked(bool needStop) {
+	// revert if no control.
+	if (!hidControl) {
+		ui->stopOnReceive->setChecked(!needStop);
+		QMessageBox::critical(0, "error", "hid control not created...");
+		return;
+	}
+	hidControl->setStopOnReceive(needStop);
+}
+
 void TestDianvote::startRollCall() {
-    hidControl->startRollCall();
-    connect(hidControl, SIGNAL(rollCallFinished(uint)),
-            this, SLOT(rollCallFinished(uint)));
-    setEnabled(false);
+	try {
+
+		if (!hidControl) {
+			hidControl = new HidControl(this);
+		}
+		hidControl->startRollCall();
+		connect(hidControl, SIGNAL(rollCallFinished(uint)),
+			this, SLOT(rollCallFinished(uint)));
+
+	} catch (DianVoteStdException *e) {
+		ui->startTest->setChecked(false);
+		QMessageBox::critical(0, "error", e->what());
+		return;
+	} catch (...) {
+		ui->startTest->setChecked(false);
+		QMessageBox::critical(0, "error", "unknow exception.");
+		return;
+	}
+	setEnabled(false);
 }
 
 void TestDianvote::rollCallFinished(uint count) {

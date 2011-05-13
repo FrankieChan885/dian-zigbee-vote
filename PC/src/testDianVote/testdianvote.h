@@ -17,6 +17,7 @@ public slots:
     void remoteIDChanged(const QString &);
     void usbStartClicked(bool);
     void remoteStateClicked(bool);
+	void stopOnReceiveClicked(bool);
     void startRollCall();
     void rollCallFinished(uint count);
 

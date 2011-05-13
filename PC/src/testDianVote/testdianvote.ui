@@ -192,12 +192,12 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QCheckBox" name="sleepOnReceive">
+       <widget class="QCheckBox" name="stopOnReceive">
         <property name="toolTip">
          <string>Sleep the REMOTE when received his vote.</string>
         </property>
         <property name="text">
-         <string>Sleep on receive.</string>
+         <string>Stop on receive.</string>
         </property>
        </widget>
       </item>

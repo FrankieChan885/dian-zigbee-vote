@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <string>
 #include <iostream>
+#include <queue>
 #include "exceptions.h"
 #include "hidlistener.h"
 

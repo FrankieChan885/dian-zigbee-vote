@@ -24,6 +24,13 @@ public:
 	static quint32 usbId2PCId(QByteArray);
     static QByteArray PCId2usbId(quint32);
 
+	void setStopOnReceive(bool needStop) {
+		stopOnReceive = needStop;
+	}
+	bool needStopOnReceive() {
+		return stopOnReceive;
+	}
+
 signals:
 	/**
 	* @brief when vote data coming, this signal will be emit.
@@ -63,6 +70,7 @@ private:
 
 	QHidDevice *device;
     uint remoteCount;
+	bool stopOnReceive;
 };
 
 #endif // #ifndef __HIDCONTROL_H_
