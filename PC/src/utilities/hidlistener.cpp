@@ -11,7 +11,6 @@
 #include <QThread>
 
 #include "hidlistener.h"
-#include "exceptions.h"
 
 QHidListener::QHidListener(
 #ifdef USE_LIBHID
@@ -56,8 +55,7 @@ void QHidListener::exec()
             emit hidDataReceived(QByteArray(packet, dataLength));
         }
         else if (ret != HID_RET_TIMEOUT) {
-            throw new DianVoteStdException(
-                    std::string(hid_strerror(ret)));
+            qDebug(hid_strerror(ret));
         }
     }
 #else // #ifdef USE_LIBHID
@@ -71,6 +69,8 @@ void QHidListener::exec()
         if (ret > 0) {
 			quint16 id[2];
 			memcpy(id, packet, 4);
+			qDebug("data received from: 0x%04d%04d with %d",
+				   id[0], id[1], packet[dataLength-1]);
             emit hidDataReceived(QByteArray(packet, dataLength));
         }
         else if (ret < 0) {

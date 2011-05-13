@@ -35,6 +35,13 @@ QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
 , hid(0)
 , hidListener(0)
 {
+    if (!mutex.tryLock(500))
+    {
+        qDebug("QHidDevice::QHidDevice(): hid constructor locked...");
+        throw new DianVoteStdException(
+            std::string("QHidDevice::QHidDevice(): hid constructor locked..."));
+    }
+    
 #ifdef USE_LIBHID
     // debug configuration.
     hid_set_debug(HID_DEBUG_NOTRACES);
@@ -55,6 +62,7 @@ QHidDevice::QHidDevice(unsigned short vid, unsigned short pid,
             std::string("hid_new_HIDInterface() failed, out of memory?"));
     }
 #endif // #ifdef USE_LIBHID
+    mutex.unlock();
 }
 
 QHidDevice::~QHidDevice()
@@ -87,6 +95,12 @@ QHidDevice::~QHidDevice()
  * @return if find and openned, return true, or return false.
  */
 bool QHidDevice::open(OpenMode mode) {
+    if (!mutex.tryLock(500))
+    {
+        qDebug("QHidDevice::open(): hid open locked...");
+        return false;
+    }
+    
 #ifdef USE_LIBHID
     if (hid_is_opened(hid)) {
         std::cerr << "Error in QHidDevice::open: device already open"
@@ -121,6 +135,8 @@ bool QHidDevice::open(OpenMode mode) {
 #endif // #ifdef USE_LIBHID
     qDebug("QHidDevice::open: hid opened...");
 
+    mutex.unlock();
+
     return QIODevice::open(mode);
 }
 
@@ -128,13 +144,20 @@ bool QHidDevice::open(OpenMode mode) {
  * @brief close close the hid device.
  */
 void QHidDevice::close() {
+    if (!mutex.tryLock(500))
+    {
+        qDebug("QHidDevice::close(): hid close locked...");
+        return;
+    }
+    
     // first clear the listener.
     if (hidListener) {
         // stop and wait listener exit.
         hidListener->stop();
         hidListener->wait();
 
-        // no need to delete the QObject's children...
+        delete hidListener;
+        hidListener = 0;
     }
 
     // then close the hid device.
@@ -156,6 +179,8 @@ void QHidDevice::close() {
 
     qDebug("QHidDevice::close(): hid closed...");
     setOpenMode(QIODevice::NotOpen);
+
+    mutex.unlock();
     return;
 }
 
@@ -169,22 +194,35 @@ void QHidDevice::startListening(
 #ifdef USE_LIBHID
                                 unsigned short endpoint,
 #endif // #ifdef USE_LIBHID
-        unsigned int dataLength)
+                                unsigned int dataLength)
 {
-    // new a listener.
-    hidListener = new QHidListener(hid,
+    if (!mutex.tryLock(500))
+    {
+        qDebug("QHidDevice::startListening(): hid listening locked...");
+        return;
+    }
+
+    // start listening when listener not initialized.
+    if (!hidListener) {
+        // new a listener.
+        hidListener = new QHidListener(hid,
 #ifdef USE_LIBHID
-        endpoint,
+            endpoint,
 #endif // #ifdef USE_LIBHID
-        dataLength, this);
-    qDebug("QHidDevice::startListening(): hidListener created...");
+            dataLength, this);
+        if (hidListener) {
+            qDebug("QHidDevice::startListening(): hidListener created...");
+        }
 
-    // call readInterrupt if hid data received.
-    QObject::connect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
-        this, SIGNAL(readInterrupt(QByteArray)));
+        // call readInterrupt if hid data received.
+        QObject::connect(hidListener, SIGNAL(hidDataReceived(QByteArray)),
+            this, SIGNAL(readInterrupt(QByteArray)));
 
-    // start it.
-    hidListener->start();
+        // start it.
+        hidListener->start();
+    }
+
+    mutex.unlock();
 }
 
 /**
@@ -196,7 +234,7 @@ void QHidDevice::startListening(
  * @return the number of bytes that were actually written,
  *   or -1 if an error occurred.
  */
-qint64 QHidDevice::readData(char* data, qint64 len) {
+qint64 QHidDevice::readData(char*, qint64) {
     return -1;
 }
 
@@ -210,6 +248,12 @@ qint64 QHidDevice::readData(char* data, qint64 len) {
  *   or -1 on error.
  */
 qint64 QHidDevice::writeData(const char* data, qint64 len) {
+    if (!mutex.tryLock(500))
+    {
+        qDebug("QHidDevice::writeData(): hid write locked...");
+        return -1;
+    }
+
 #ifdef USE_LIBHID
     return -1;
 #else // #ifdef USE_LIBHID
@@ -218,7 +262,7 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
     // must contain a report ID. if single report, set it 0.
     buf[0] = 0;
     memcpy(buf+1, data, len);
-    // note!! don't using sizeof(buf) as buf's length!
+    // note!! don't using sizeof(buf) as buffer's length!
     // it will be the pointer length, 4.
  	int res = hid_write(hid, buf, len + 1);
  	if (res < 0) {
@@ -228,6 +272,8 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
         qDebug("QHidDevice::writeData(): %d data writed...", res);
     }
     delete [] buf;
+
+    mutex.unlock();
     return res;
 #endif // #ifdef USE_LIBHID
 }

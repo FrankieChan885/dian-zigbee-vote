@@ -20,12 +20,14 @@ LIBS += -L../bin -lhidapi
 HEADERS += \
            hiddevice.h \
            hidlistener.h \
-           testdianvote.h
+           testdianvote.h \
+           hidcontrol.h
 SOURCES += \
            hiddevice.cpp \
            hidlistener.cpp \
            main.cpp \
-           testdianvote.cpp
+           testdianvote.cpp \
+           hidcontrol.cpp
 
 # Output paths
 DESTDIR      = ../bin

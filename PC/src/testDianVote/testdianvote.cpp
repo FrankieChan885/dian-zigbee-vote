@@ -6,7 +6,7 @@
 TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
     : QDialog(parent)
     , count(0)
-    , hidDevice(0)
+    , hidControl(0)
     , ui(new Ui::TestDianVote)
 {
     ui->setupUi(this);
@@ -16,35 +16,55 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
             this, SLOT(usbStartClicked(bool)));
     connect(ui->remoteState, SIGNAL(clicked(bool)),
             this, SLOT(remoteStateClicked(bool)));
-    connect(ui->remoteID1, SIGNAL(textChanged(QString)),
+    connect(ui->remoteID, SIGNAL(textChanged(QString)),
             this, SLOT(remoteIDChanged(QString)));
-    connect(ui->remoteID2, SIGNAL(textChanged(QString)),
-            this, SLOT(remoteIDChanged(QString)));
+    connect(ui->rollCall, SIGNAL(clicked()),
+            this, SLOT(startRollCall()));
+
+    try {
+        // create new device.
+        if (hidControl) {
+            delete hidControl;
+            hidControl = 0;
+        }
+        hidControl = new HidControl(this);
+        QObject::connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+            this, SLOT(showInData(quint32, quint8)));
+
+    } catch (DianVoteStdException *e) {
+        if (hidControl) {
+            delete hidControl;
+            hidControl = 0;
+        }
+        QMessageBox::critical(0, "error", e->what());
+        return;
+    } catch (...) {
+        if (hidControl) {
+            delete hidControl;
+            hidControl = 0;
+        }
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return;
+    }
 }
 
 
 TestDianvote::~TestDianvote() {
-    if (hidDevice) {
-        hidDevice->close();
-        delete hidDevice;
-        hidDevice = 0;
+    if (hidControl) {
+        delete hidControl;
+        hidControl = 0;
     }
 }
 
-void TestDianvote::showInData(QByteArray ba) {
-    if (ba.size() < 5) {
-        return;
-    }
+void TestDianvote::showInData(quint32 id, quint8 option) {
     // print remote ID:
     QString msg;
     msg.append(QString("%L1: remote: ").arg(count++, 4, 16));
-    quint16 id[2];
-    memcpy(id, ba.data(), 4);
-    msg.append(QString("0x%L1%L2").
-               arg(id[0], 4, 16, QChar('0')).arg(id[1], 4, 16, QChar('0')));
+    msg.append(QString("0x%L1").
+               arg(id, 8, 16, QChar('0')));
 
     // print remote cmd
-    msg.append(QString("\t%L1").arg((unsigned char) ba.at(4), 2, 16));
+    msg.append(QString("\t%L1").arg(option, 2, 16));
 
     ui->output->append(msg);
 }
@@ -73,58 +93,30 @@ void TestDianvote::usbStartClicked(bool isStart) {
         count = 0;
 
         try {
-            // create new device.
-            if (hidDevice) {
-                delete hidDevice;
-                hidDevice = 0;
+            if (!hidControl) {
+                hidControl = new HidControl(this);
+                QObject::connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                    this, SLOT(showInData(quint32, quint8)));
             }
-#ifdef USE_LIBHID
-            hidDevice = new QHidDevice(vid, pid, 0, this);
-#else
-            hidDevice = new QHidDevice(vid, pid, this);
-            qDebug("TestDianvote::usbStartClicked(): hid device created...");
-#endif // #ifdef USE_LIBHID
-
-            QObject::connect(hidDevice, SIGNAL(readInterrupt(QByteArray)),
-                             this, SLOT(showInData(QByteArray)));
-
             // open hid device.
-            if (!hidDevice->open(QIODevice::ReadOnly)) {
-                // not started.
-                QMessageBox::critical(0, "error", "hid device open failed.");
-                ui->startTest->setChecked(false);
-                if (hidDevice) {
-                    delete hidDevice;
-                    hidDevice = 0;
-                    qDebug("TestDianvote::usbStartClicked(): hidDevice deleted...");
-                }
-                return;
-            }
-            qDebug("TestDianvote::usbStartClicked(): hidDevice opened...");
-
-            // start listening the endpoint 1 with data length 5
-            // (in windows length should be 6, I don't know why).
-#ifdef USE_LIBHID
-            hidDevice->startListening(1, 6);
-#else
-            hidDevice->startListening(6);
-#endif // #ifdef USE_LIBHID
+            hidControl->start();
+            qDebug("TestDianvote::usbStartClicked(): hidControl started...");
 
         } catch (DianVoteStdException *e) {
+            ui->startTest->setChecked(false);
             QMessageBox::critical(0, "error", e->what());
             return;
         } catch (...) {
+            ui->startTest->setChecked(false);
             QMessageBox::critical(0, "error", "unknow exception.");
+            return;
         }
     } // if (isStart)
     else {
 		// sleep remote.
 		ui->remoteState->setChecked(false);
-        if (hidDevice) {
-            hidDevice->close();
-            delete hidDevice;
-            hidDevice = 0;
-            qDebug("TestDianvote::usbStartClicked(): hidDevice deleted...");
+        if (hidControl) {
+            hidControl->stop();
         }
     } // if (isStart) else
 }
@@ -132,21 +124,16 @@ void TestDianvote::usbStartClicked(bool isStart) {
 void TestDianvote::remoteStateClicked(bool isWork) {
     // don't write data unless usb is opened.
     if (ui->startTest->isChecked()) {
-        quint16 id[2];
+        quint32 id;
         bool ok;
-        id[0] = ui->remoteID1->text().toUShort(&ok, 16);
+        id = ui->remoteID->text().toULong(&ok, 16);
         if (!ok) {
             qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
             return;
         }
-        id[1] = ui->remoteID2->text().toUShort(&ok, 16);
-        if (!ok) {
-            qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
-            return;
-        }
-        char remoteCtrl[5] = {0xff, 0xff, 0xff, 0xff, isWork? 1: 0};
-        memcpy(remoteCtrl, id, 4);
-        hidDevice->writeData(remoteCtrl, 5);
+        isWork ?
+            hidControl->start(id)
+            : hidControl->stop(id);
     }
     else {
         QMessageBox::critical(0, "error", "test not started.");
@@ -155,3 +142,14 @@ void TestDianvote::remoteStateClicked(bool isWork) {
     }
 }
 
+void TestDianvote::startRollCall() {
+    hidControl->startRollCall();
+    connect(hidControl, SIGNAL(rollCallFinished(uint)),
+            this, SLOT(rollCallFinished(uint)));
+    setEnabled(false);
+}
+
+void TestDianvote::rollCallFinished(uint count) {
+    ui->remoteCount->setText(QString::number(count));
+    setEnabled(true);
+}

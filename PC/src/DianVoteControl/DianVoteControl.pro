@@ -12,7 +12,6 @@ TEMPLATE = app
 DEPENDPATH  += ../utilities
 DEPENDPATH  += ../lib
 INCLUDEPATH += ../utilities
-INCLUDEPATH += ../include
 INCLUDEPATH += ../hidapi/hidapi-0.6.0/hidapi
 
 SOURCES += main.cpp\

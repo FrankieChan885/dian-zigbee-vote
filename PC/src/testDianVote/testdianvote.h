@@ -1,5 +1,5 @@
 #include <QByteArray>
-#include "hiddevice.h"
+#include "hidcontrol.h"
 #include "ui_testdianvote.h"
 
 class QHidDevice;
@@ -13,14 +13,16 @@ public:
     ~TestDianvote();
 
 public slots:
-    void showInData(QByteArray ba);
+    void showInData(quint32 id, quint8 option);
     void remoteIDChanged(const QString &);
     void usbStartClicked(bool);
     void remoteStateClicked(bool);
+    void startRollCall();
+    void rollCallFinished(uint count);
 
 private:
     uint count;
-    QHidDevice *hidDevice;
+    HidControl *hidControl;
     Ui::TestDianVote *ui;
 };
 

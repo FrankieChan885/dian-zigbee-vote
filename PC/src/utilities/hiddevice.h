@@ -10,7 +10,7 @@
 #define __HIDDEVICE_H_
 
 #include <QIODevice>
-#include <queue>
+#include <QMutex>
 
 extern "C" {
 #ifdef USE_LIBHID
@@ -120,10 +120,11 @@ private:
     unsigned short productID;
 #ifdef USE_LIBHID
     unsigned short interfaceNum;
-
     HIDInterface *hid;
 #else
     hid_device *hid;
+
+    QMutex mutex;
 #endif
     /**
     * @brief listen the hid data receiving.
