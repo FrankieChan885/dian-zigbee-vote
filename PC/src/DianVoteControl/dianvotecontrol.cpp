@@ -30,7 +30,6 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     pbStart = new QPushButton(this);
     pbStart->setText("Star");
-    pbStart->setFlat(true);
     ui->buttonLayout->addWidget(pbStart, 0, 0);
     pbAuto = new QPushButton(this);
     pbAuto->setText("Auto");
@@ -65,7 +64,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(this, SIGNAL(clearDrawData()), drawer->histgram, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
 
-//    LoadStyleSheet("Coffee");
+    LoadStyleSheet("Default");
 
     log = new QList< RevData* >();
 }
