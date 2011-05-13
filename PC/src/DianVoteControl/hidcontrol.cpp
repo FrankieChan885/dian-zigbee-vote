@@ -11,6 +11,8 @@ HidControl::HidControl(QObject *parent)
 		connect(device, SIGNAL(readInterrupt(QByteArray)),
 				this, SLOT(dataReceived(QByteArray)));
 	}
+    testDevice();   // try to open hid device
+                    // throw exception when failed
 }
 
 HidControl::~HidControl()
@@ -28,10 +30,9 @@ HidControl::~HidControl()
 void HidControl::start(quint32 id/* = 0xffffffff*/)
 {
     if (0xffffffff == id) {
-        if (!device->isOpen())
-        {
-        if (!device->open(QIODevice::ReadWrite)) {
-        throw new DianVoteStdException("hid open failed...");
+        if (!device->isOpen()) {
+            if (!device->open(QIODevice::ReadWrite)) {
+                throw new DianVoteStdException("hid open failed...");
         }
 
         // start listening the endpoint 1 with data length 5
@@ -63,6 +64,27 @@ void HidControl::stop(quint32 id/* = 0xffffffff*/)
     if (0xffffffff == id) {
         device->close();
     }
+}
+
+/**
+ * @brief test whether the hid device is connect to computer or not
+ */
+bool HidControl::testDevice()
+{
+    if(device->isOpen()) {
+        device->close();
+        return true;
+    }
+    else {
+        if(!device->open(QIODevice::ReadWrite)) {
+            throw new DianVoteStdException("hid open failed...");
+        }
+        else {
+            device->close();
+            return true;
+        }
+    }
+    return false;
 }
 
 /**

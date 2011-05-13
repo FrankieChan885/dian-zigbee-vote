@@ -171,7 +171,9 @@ WindowNotifier *QtWin::windowNotifier()
 {
     static WindowNotifier *windowNotifierInstance = 0;
     if (!windowNotifierInstance)
+    {
         windowNotifierInstance = new WindowNotifier;
+    }
     return windowNotifierInstance;
 }
 

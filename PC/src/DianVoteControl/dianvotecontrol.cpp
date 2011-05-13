@@ -30,6 +30,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     pbStart = new QPushButton(this);
     pbStart->setText("Star");
+    pbStart->setFlat(true);
     ui->buttonLayout->addWidget(pbStart, 0, 0);
     pbAuto = new QPushButton(this);
     pbAuto->setText("Auto");
@@ -64,7 +65,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(this, SIGNAL(clearDrawData()), drawer->histgram, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
 
-    LoadStyleSheet("Coffee");
+//    LoadStyleSheet("Coffee");
 
     log = new QList< RevData* >();
 }
@@ -101,7 +102,7 @@ void DianVoteControl::VoteStart()
         // 启动秒表
         stopWatch->start();
 
-        hidControl->start();
+        StartHid();     // 开启接收设备
     }
     else if(curState == STOP)
     {
@@ -113,6 +114,7 @@ void DianVoteControl::VoteStart()
         }
 
         emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+
         int num = GetOptionNum();
         if(num)
         {
@@ -135,7 +137,7 @@ void DianVoteControl::VoteStart()
         stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
         stopWatch->start();
         animationGroup->start();
-        hidControl->start();
+        StartHid();     // 开启接收设备
     }
 
     // 改变状态
@@ -156,7 +158,7 @@ void DianVoteControl::VoteAuto()
         // 启动秒表
         stopWatch->start();
 
-        hidControl->start();
+        StartHid();     // 开启接收设备
     }
     else if(curState == STOP)
     {
@@ -194,6 +196,8 @@ void DianVoteControl::VoteAuto()
             return;
         }
 
+        StartHid();     // 开启接收设备
+
         // 修改主界面
         pbStart->hide();
         pbAuto->hide();
@@ -202,7 +206,6 @@ void DianVoteControl::VoteAuto()
 
         stopWatch->start();
         animationGroup->start();
-        hidControl->start();
     }
 
     // 改变状态
@@ -226,7 +229,7 @@ void DianVoteControl::VotePause()
             QMessageBox::critical(0, "Internal Error", "Can't Stop HidDevice");
             return;
         }
-        hidControl->stop();
+        StopHid();  // 停止
     }
 
     // 修改状态
@@ -253,7 +256,7 @@ void DianVoteControl::VoteStop()
             QMessageBox::critical(0, "Internal Error", "Can't Stop HidDevice");
             return;
         }
-        hidControl->stop();
+        StopHid();  // 停止
     }else if(curState == PAUSE)
     {
         Q_ASSERT(stopWatch != NULL);
@@ -351,6 +354,46 @@ bool DianVoteControl::PrepareHid()
         hidControl = new HidControl(this);
         connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                 this, SLOT(ParseData(quint32, quint8)));
+
+        return true;
+    }
+    catch(DianVoteStdException *e)
+    {
+        QMessageBox::critical(0, "error", e->what());
+        return false;
+    }
+    catch(...)
+    {
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return false;
+    }
+}
+
+bool DianVoteControl::StartHid()
+{
+    try
+    {
+        hidControl->start();
+        // start all remote.
+        return true;
+    }
+    catch(DianVoteStdException *e)
+    {
+        QMessageBox::critical(0, "error", e->what());
+        return false;
+    }
+    catch(...)
+    {
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return false;
+    }
+}
+
+bool DianVoteControl::StopHid()
+{
+    try
+    {
+        hidControl->stop();;
         // start all remote.
         return true;
     }

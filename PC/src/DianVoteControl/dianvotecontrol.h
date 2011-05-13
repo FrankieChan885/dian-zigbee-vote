@@ -106,6 +106,8 @@ private slots:
 private:
     int GetOptionNum();    // 获取选项个数，并传给histgram
     int GetLastTime();      // 获取秒表倒计时时间
+    bool StartHid();        // 开启接收设备
+    bool StopHid();         // 关闭接收设备
     bool PrepareHid();     // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
     void ShowStopWatch();   // 显示秒表

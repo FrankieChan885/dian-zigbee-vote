@@ -35,9 +35,14 @@ public slots:
 	void dataReceived(QByteArray ba);
 
 private:
+    /**
+     * @brief test whether the hid device is connect to computer or not
+     */
+    bool testDevice();
+
 	/// the usb and PC id translate function.
 	quint32 usbId2PCId(QByteArray);
-	QByteArray PCId2usbId(quint32);
+    QByteArray PCId2usbId(quint32);
 
 	QHidDevice *device;
 };
