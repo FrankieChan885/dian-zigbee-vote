@@ -423,6 +423,12 @@ bool DianVoteControl::PrepareHid()
         connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                 this, SLOT(ParseData(quint32, quint8)));
 
+#ifdef DO_ROLL_CALL
+        hidControl->startRollCall();
+        connect(hidControl, SIGNAL(rollCallFinished(uint)),
+                drawer, SLOT(SetRepliedDeviceNum(uint)));
+#endif  // end ifdef
+
         return true;
     }
     catch(DianVoteStdException *e)

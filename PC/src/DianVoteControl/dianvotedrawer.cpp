@@ -7,7 +7,8 @@
 
 DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::DianVoteDrawer)
+    ui(new Ui::DianVoteDrawer),
+    replidDeviceNum(0)
 {
     ui->setupUi(this);
     connect(ui->Close_Drawer, SIGNAL(clicked()), this, SLOT(close()));
@@ -21,10 +22,10 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     timer->start();
 
     FontSizeRatio = 35;         // 控制字体大小
-    RatioQuestionNameX = 0.8;   // 总数位置与窗口的宽度比例
-    RatioQuestionNameY = 0.1;   //总数位置与窗口的高度度比例
+    RatioRepliedDeviceX = 0.52;   // 总数位置与窗口的宽度比例
+    RatioRepliedDeviceY = 0.1;   //总数位置与窗口的高度度比例
 
-    RatioTotalNumX = 0.6;       // 总数位置与窗口的宽度比例
+    RatioTotalNumX = 0.75;       // 总数位置与窗口的宽度比例
     RatioTotalNumY = 0.1;       // 总数位置与窗口的高度度比例
 }
 
@@ -32,6 +33,14 @@ DianVoteDrawer::~DianVoteDrawer()
 {
 
 }
+
+#ifdef DO_ROLL_CALL
+void DianVoteDrawer::SetRepliedDeviceNum(uint replyNum)
+{
+    replidDeviceNum = replyNum;
+    update();
+}
+#endif      // end ifdef
 
 void DianVoteDrawer::paintEvent(QPaintEvent *event)
 {
@@ -53,17 +62,24 @@ void DianVoteDrawer::draw(QPainter *painter)
 
     DoWithCoordinate();
 
-    QString totalNum = "Total Voter: " + QString("%1").arg(histgram->GetVoterNums());
+#ifdef DO_ROLL_CALL
+    QString replyNum = "Total: " + QString("%1").arg(replidDeviceNum);
+    painter->setFont(Font);
+    painter->drawText(RepliedDeviceNumX, RepliedDeviceNumY,
+                      replyNum);
+#endif  // end ifdef
+
+    QString totalVoteNum = "Voted: " + QString("%1").arg(histgram->GetVoterNums());
     painter->setFont(Font);
     painter->drawText(TotalNumX, TotalNumY,
-                      totalNum);
+                      totalVoteNum);
 }
 
 void DianVoteDrawer::DoWithCoordinate()
 {
     //-----question name coordiante----//
-    QuestionNameX = width() * RatioQuestionNameX;
-    QuestionNameY = height() * RatioQuestionNameY;
+    RepliedDeviceNumX = width() * RatioRepliedDeviceX;
+    RepliedDeviceNumY = height() * RatioRepliedDeviceY;
     //-----question name coordiante----//
 
     //-----total voter number coordinate----//
