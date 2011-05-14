@@ -37,6 +37,8 @@ public:
     explicit DrawBase(QWidget *parent = 0);
     virtual ~DrawBase();
 
+    int GetVoterNums();
+
 signals:
 
 public slots:
@@ -53,6 +55,7 @@ protected:
     bool correctAnswerFlag;     // 是否显示正确答案
     QString questionName;       // 问题名称
     QString correctAnswer;      // 正确答案
+    int fakeVoterNums;          // 假设的投票总人数，被最大值超过后自动增加一倍
     int voterNums;              // 投票的总人数
     int optionNums;             // 选项的数目
 

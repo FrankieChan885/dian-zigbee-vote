@@ -33,7 +33,8 @@ HEADERS  += dianvotecontrol.h \
     hidlistener.h \
     hiddevice.h \
     hidcontrol.h \
-    stopwatch.h
+    stopwatch.h \
+    dianvotedebug.h
 
 win32:SOURCES += qtwin.cpp
 win32:HEADERS += qtwin.h

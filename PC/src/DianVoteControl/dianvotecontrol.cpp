@@ -4,6 +4,8 @@
 #include <QDir>
 #include <QString>
 #include <QSplashScreen>
+#include <QFile>
+#include <QTextStream>
 #include <QInputDialog>
 #include <QLabel>
 #include <QDesktopWidget>
@@ -18,10 +20,13 @@
 #include "exceptions.h"
 #include "hidcontrol.h"
 #include "stopwatch.h"
+#include "dianvotedebug.h"
 
 #ifdef WIN32
     #include "qtwin.h"
 #endif
+
+QFile* DianVoteControl::VoteLog = new QFile(tr("Votelog.log"));
 
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
@@ -29,6 +34,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     drawer(NULL),
     hidControl(NULL),
     stopWatch(NULL),
+    splash(NULL),
     curState(STOP)
 {
 
@@ -36,7 +42,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     dir.setCurrent(QCoreApplication::applicationDirPath());
 
     // show splash.
-    QPixmap pixmap(dir.absoluteFilePath("res/images/splash.png"));
+    QPixmap pixmap(dir.absoluteFilePath("res/images/logo.jpg"));
     QSplashScreen *splash = new QSplashScreen(pixmap);
     splash->show();
 
@@ -80,6 +86,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
     drawer = new DianVoteDrawer();
+    connect(pbClose, SIGNAL(clicked()), this->drawer, SLOT(close()));
     connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
     connect(this, SIGNAL(clearDrawData()), drawer->histgram, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
@@ -88,9 +95,12 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     // 记录初始化窗口大小
     initSize = this->size();
-    this->setFixedWidth(this->width());
+    this->setMaximumWidth(this->width());
     this->setMaximumHeight(this->height() + 100);
     this->move(0, 0);
+
+    // 创建Log文件，并打开，程序退出是关闭
+    VoteLog->open(QIODevice::WriteOnly | QIODevice::Append);
 
     // 初始化log记录链表
     log = new QList< RevData* >();
@@ -112,6 +122,8 @@ DianVoteControl::~DianVoteControl()
         }
     }
     delete log;
+
+    VoteLog->close();
 }
 
 void DianVoteControl::VoteStart()
@@ -139,7 +151,7 @@ void DianVoteControl::VoteStart()
             return;
         }
 
-        emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+//      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
         int num = GetOptionNum();
         if(num)
@@ -175,7 +187,8 @@ void DianVoteControl::VoteAuto()
     if(curState == RUNNING)
     {
         QMessageBox::critical(0, "warn", "Already Started");
-    }else if(curState == PAUSE)
+    }
+    else if(curState == PAUSE)
     {
         // 修改主界面
         pbStart->hide();
@@ -195,34 +208,28 @@ void DianVoteControl::VoteAuto()
             return;
         }
 
-        emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+//      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
+
+        int num1 = GetLastTime();     // 获取持续时间
+
+        if(!num1)
+        {
+            return;
+        }
 
         int num0 = GetOptionNum();     // 获取选项个数
+        if(!num0)
+        {
+            return;
+        }
 
         // 画出秒表, 递减模式
         ShowStopWatch();
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
 
-        int num1 = GetLastTime();     // 获取持续时间
-
-        if(num1)
-        {
-            emit setLastTime(num1);;
-        }
-        else
-        {
-            return;
-        }
-
-        if(num0)
-        {
-            emit setOptionNum(num0);
-        }
-        else
-        {
-            return;
-        }
+        emit setLastTime(num1);;
+        emit setOptionNum(num0);
 
         StartHid();     // 开启接收设备
 
@@ -266,7 +273,7 @@ void DianVoteControl::VotePause()
 
 void DianVoteControl::VoteStop()
 {
-    ClearLog(); // 不管如何，清空日志数据并保存之是必须的。
+    ClearLogList(); // 不管如何，清空日志链表是必须的。
 
     if(curState == RUNNING)
     {
@@ -339,19 +346,23 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
 
     // 容错性检查，如果收到已经发送过的数据手持端
     //      果断丢弃数据，并且写入log中
+#ifndef TEST_RECEIVE_DATA_CONTINUE
     for(int i = 0; i < log->length(); i++)
     {
-        if((log->at(i)->id = id) && (log->at(i)->type == NORMAL))
+        if((log->at(i)->id == id) && (log->at(i)->type == NORMAL))
         {
             rd->type = DUPLICATE;
             log->append(rd);
+            WriteRevDataLog(rd);
             return;
         }
     }
+#endif
     emit updateGraph((int)rd->key - MAP_VALUE);  // 更新数据
 
     rd->type = NORMAL;
     log->append(rd);
+    WriteRevDataLog(rd);
 }
 
 int DianVoteControl::GetOptionNum()
@@ -359,8 +370,14 @@ int DianVoteControl::GetOptionNum()
     bool ok;
     getOptionNum = new QInputDialog();
     getOptionNum->setAttribute(Qt::WA_DeleteOnClose);
-    int i = QInputDialog::getInt(this, tr("Get Options Amounts"),
-                                 tr("Options Amounts"), 5, 0, 10, 1, &ok);
+    int i = QInputDialog::getInt(this,
+                                 tr("Get Options Amounts"),
+                                 tr("Options Amounts"),
+                                 DEFAULT_OPTION_NUM,
+                                 0,
+                                 MAXIMUN_OPTION_NUM,
+                                 1,
+                                 &ok);
     if (ok)
     {
         return i;
@@ -376,8 +393,14 @@ int DianVoteControl::GetLastTime()
     bool ok;
     getLastTime = new QInputDialog();
     getLastTime->setAttribute(Qt::WA_DeleteOnClose);
-    int i = QInputDialog::getInt(this, tr("Get Last Time"),
-                                 tr("Last Time"), 60, 0, 1000, 1, &ok);
+    int i = QInputDialog::getInt(this,
+                                 tr("Get Last Time"),
+                                 tr("Last Time"),
+                                 DEFAULT_DEADLINE,
+                                 0,
+                                 MAXIMUN_DEADLINE,
+                                 1,
+                                 &ok);
     if (ok)
     {
         return i;
@@ -393,6 +416,10 @@ bool DianVoteControl::PrepareHid()
     try
     {
         hidControl = new HidControl(this);
+        // for test, comment this line
+#ifndef TEST_RECEIVE_DATA_CONTINUE
+        hidControl->setStopOnReceive(true);
+#endif  // end ifndef
         connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                 this, SLOT(ParseData(quint32, quint8)));
 
@@ -500,8 +527,12 @@ void DianVoteControl::HideStopWatch()
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
 {
     // 关闭欢迎界面
-    splash->finish(this);
-    delete splash;
+    if(splash != NULL)
+    {
+        splash->finish(this);
+        delete splash;
+        splash = NULL;
+    }
 
     if (event->button() == Qt::LeftButton) {
         dragPosition = event->globalPos() - frameGeometry().topLeft();
@@ -549,9 +580,54 @@ void DianVoteControl::DoHideStopWatch()
     stopWatch = NULL;
 }
 
-void DianVoteControl::ClearLog()
+void DianVoteControl::DianVoteMsgHandler(QtMsgType type, const char *msg)
 {
-    // 在此将所有数据写入log文件
+    QString log;
+    switch (type) {
+        case QtDebugMsg:
+        {
+            log = QString("%1").arg(msg);
+            break;
+        }
 
+        case QtWarningMsg:
+        {
+            log = QString("Warning: %1").arg(msg);
+            break;
+        }
+
+        case QtCriticalMsg:
+        {
+            log = QString("Critical: %1").arg(msg);
+            break;
+        }
+
+        case QtFatalMsg:
+        {
+            log = QString("Fatal: %1").arg(msg);
+            abort();
+        }
+    }
+
+    QTextStream ts(VoteLog);
+    ts << log << endl;
+}
+
+void DianVoteControl::WriteRevDataLog(RevData *rd)
+{
+    QString log(*(rd->revTime) + " : ");
+    log += "Device ID: ";
+    log += QString("%1").arg(rd->id) + "\t";
+    log += "Key: ";
+    log += QString("%1").arg(rd->key) + "\t";
+    log += "Type: ";
+    log += QString("%1").arg(rd->type) + "\t";
+    log += "Received";
+
+    qDebug(log.toAscii().data());
+}
+
+void DianVoteControl::ClearLogList()
+{
     log->clear();
 }

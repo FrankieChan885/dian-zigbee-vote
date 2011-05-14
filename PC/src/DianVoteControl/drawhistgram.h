@@ -19,7 +19,7 @@ public:
     void draw(QPainter *painter);           // 画图
 
 protected:
-    void paintEvent(QPaintEvent *event);    // 重载paintEvent
+    void paintEvent(QPaintEvent *event);    // 覆盖paintEvent
 
 private:
     void DoWithCoodinate();     // 计算画图时需要的坐标

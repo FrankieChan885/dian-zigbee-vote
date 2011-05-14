@@ -5,7 +5,6 @@
 * @version 1.0.0
 * @date 2011-04-15
 */
-#include <queue>
 #include <QByteArray>
 #include <QThread>
 
@@ -41,11 +40,8 @@ void QHidListener::run() {
  */
 void QHidListener::exec()
 {
-    qDebug("QHidListener::exec(): started listening...");
-	// data struct.
     char *packet = new char[dataLength];
-	// queue as a buffer.
-	std::queue <char *> buffer;
+    qDebug("QHidListener::exec(): started listening...");
 
 #ifdef USE_LIBHID
     while (!needStop) {
@@ -68,31 +64,18 @@ void QHidListener::exec()
         int ret = hid_read(hidInterface,
                            (unsigned char *) packet, dataLength,
                            INT_WAIT_TIME);
-		// busy time, push data.
         if (ret > 0) {
-			buffer.push(packet);
-			// create new place.
-			packet = new char[dataLength];
+			quint16 id[2];
+			memcpy(id, packet, 4);
+			qDebug("data received from: 0x%04x%04x with %d",
+				   id[0], id[1], packet[dataLength-1]);
+            emit hidDataReceived(QByteArray(packet, dataLength));
         }
-		else {
-		    // idle time, pop data.
-			if (buffer.size() > 0) {
-				// debug message.
-				quint16 id[2];
-				memcpy(id, buffer.front(), 4);
-				qDebug("data received from: 0x%04x%04x with %d",
-					id[0], id[1], *(buffer.front() + 4));
-
-				emit hidDataReceived(QByteArray(buffer.front(), dataLength));
-				delete [] buffer.front();
-				buffer.pop();
-			}
-			if (ret < 0) {
-				qDebug("QHidListener::exec(): hid read failed...");
-				usleep(200);
-				//break;
-			}
-		}
+        else if (ret < 0) {
+            qDebug("QHidListener::exec(): hid read failed...");
+            usleep(100);
+			//break;
+        }
     }
 #endif // #ifdef USE_LIBHID
 

@@ -9,11 +9,14 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    // ÷ÿ∂®œÚ
+    qInstallMsgHandler(DianVoteControl::DianVoteMsgHandler);
+
     DianVoteControl w;
     w.setWindowFlags(Qt::Window
                      | Qt::CustomizeWindowHint
                      | Qt::WindowStaysOnTopHint
-                     | Qt::FramelessWindowHint
+                     /* | Qt::FramelessWindowHint*/
                      /* | Qt::WindowTitleHint*/);
 
 #ifdef WIN32
@@ -26,5 +29,6 @@ int main(int argc, char *argv[])
 
     w.show();
 
+    qDebug("---App Started---");
     return a.exec();
 }

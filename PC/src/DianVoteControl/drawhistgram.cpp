@@ -8,7 +8,7 @@ DrawHistgram::DrawHistgram()
     WidthSlices = 18;      // 将窗口宽分成20份
     HeightSlices = 20;     // 将窗口高分成20份
     XaixsLengthRatio = 16 / (float)WidthSlices;      // X坐标占窗口的比例
-    YaxisLengthRatio = 17 / (float)HeightSlices;     // Y坐标占窗口的比例
+    YaxisLengthRatio = 16 / (float)HeightSlices;     // Y坐标占窗口的比例
 
     ScaleSize = 5;         // X和Y轴上刻度的宽带或者高度
     YFontSpace = 25;     // 字离坐Y标轴的距离
@@ -26,7 +26,8 @@ DrawHistgram::DrawHistgram()
     RectHeigthRatio = 0.8;      // 决定柱状条的高度
     RatioRectSize = 10;    // 用于显示比例的矩形大小
 
-    voterNums = INIT_VOTER_NUM;
+    // 初始化虚拟投票总人数
+    fakeVoterNums = INIT_VOTER_NUM;
 }
 
 DrawHistgram::~DrawHistgram()
@@ -119,10 +120,17 @@ void DrawHistgram::draw(QPainter *painter)
         painter->drawRect((*drawData)[i - 1]->histgramX, (*drawData)[i - 1]->histgramY,
                           (*drawData)[i - 1]->histgramWidth, (*drawData)[i - 1]->histgramHeight); // 画柱状图
 
-        int textX = (*drawData)[i - 1]->histgramX +
+        // 显示投票人的个数
+        int numX = (*drawData)[i - 1]->histgramX +
                     ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->nums.length())) / 2;
-        int textY = (*drawData)[i - 1]->histgramY - XFontSize / 2;
-        painter->drawText(textX, textY, (*drawData)[i - 1]->nums);
+        int numY = (*drawData)[i - 1]->histgramY - 2 * XFontSize;
+        painter->drawText(numX, numY, (*drawData)[i - 1]->nums);
+
+        // 显示投票比例
+        int ratioX = (*drawData)[i - 1]->histgramX +
+                    ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->ratio.length())) / 2;
+        int ratioY = (*drawData)[i - 1]->histgramY - XFontSize / 2;
+        painter->drawText(ratioX, ratioY, (*drawData)[i - 1]->ratio);
     }
 }
 
@@ -134,23 +142,24 @@ void DrawHistgram::DoWithCoodinate()
     XaxisLength = XaixsLengthRatio * width();
     YaxisLength = YaxisLengthRatio * height();
 
+    voterNums = 0;
     int maxOptionVoteNum = 0;       // 投票人数最多的那个选项的个数，用于决定Y轴刻度的长度
 
     for (int i = 0; i < optionNums; i++)
     {
-//        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
+        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
         maxOptionVoteNum = drawData->at(i)->voterNum > maxOptionVoteNum ? \
                            drawData->at(i)->voterNum : maxOptionVoteNum;
     }
     // 更改增长模式，先固定使用默认的voterNum，然后当投票人数的最大值超过voterNum的时候
     // voterNum自动增加到原来的2倍
 
-    if(maxOptionVoteNum > voterNums)
+    if(maxOptionVoteNum > fakeVoterNums)
     {
-        voterNums *= 2;
+        fakeVoterNums *= 2;
     }
 
-    /*YaxisScaleNums = ceil((double)voterNums / BASIC_SLICE);     // 刻度数目
+    /*YaxisScaleNums = ceil((double)fakefakeVoterNums / BASIC_SLICE);     // 刻度数目
     YaxisScaleSpace =  RectHeigthRatio * YaxisLength / YaxisScaleNums;                    // 刻度间隔
     YaxisScaleNums += 2;*/
 
@@ -160,13 +169,22 @@ void DrawHistgram::DoWithCoodinate()
     for (int i = 0; i < optionNums; i++)
     {
         (*drawData)[i]->histgramWidth = RectWidthRatio * XaxisScaleSpace;     // 柱状条宽度
-        (*drawData)[i]->histgramHeight = (double)YaxisLength * (double)(*drawData)[i]->voterNum / (double)voterNums;   // 柱状图高度
+        (*drawData)[i]->histgramHeight = (double)YaxisLength * (double)(*drawData)[i]->voterNum / (double)fakeVoterNums;   // 柱状图高度
         (*drawData)[i]->histgramX = zeroPoint.x() + (i + 1) * XaxisScaleSpace -
                                    (XaxisScaleSpace + (*drawData)[i]->histgramWidth) / 2;    // 柱状条左上角X坐标
         (*drawData)[i]->histgramY = zeroPoint.y() - (*drawData)[i]->histgramHeight;       // 柱状条左上角Y坐标
 
         (*drawData)[i]->nums = QString("%1").arg((*drawData)[i]->voterNum);       // 个数，画出来
-        (*drawData)[i]->ratio = QString("%1").arg((float)(*drawData)[i]->voterNum / voterNums * 100);       // 算出比例
+
+        if(!voterNums)
+        {
+            (*drawData)[i]->ratio = QString("0");
+        }
+        else
+        {
+            (*drawData)[i]->ratio = QString("%1").arg((float)(*drawData)[i]->voterNum / voterNums * 100);       // 算出比例
+        }
+
         if ((*drawData)[i]->ratio.size() > Precision + 1)
         {
             (*drawData)[i]->ratio.resize(Precision + 1);        // 只显示Precision位小数，算上小数点故+1

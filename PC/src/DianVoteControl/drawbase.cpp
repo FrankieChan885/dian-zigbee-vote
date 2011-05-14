@@ -38,6 +38,7 @@ void DrawBase::SetCorrectAnswerFlag(bool flag)
 
 void DrawBase::SetOptionNums(int nums)
 {
+    ClearData();        // 必先清空数据，因为调用此槽函数的时候必然是需要开始一个新的投票了。
     optionNums = nums;
     setDefaultDrawData();
     update();
@@ -46,6 +47,11 @@ void DrawBase::SetOptionNums(int nums)
 void DrawBase::SetQuestionName(QString name)
 {
     questionName = name;
+}
+
+int DrawBase::GetVoterNums()
+{
+    return voterNums;
 }
 
 void DrawBase::SetVoterNums(int nums)
@@ -57,7 +63,7 @@ void DrawBase::ClearData()
 {
     // 必须先要保存数据~~
 
-    voterNums = INIT_VOTER_NUM;
+    fakeVoterNums = INIT_VOTER_NUM;
     drawData->clear();
     // 因为是每一次重新start投票调用这个，所以必须重新设置
     setDefaultColorSet();
