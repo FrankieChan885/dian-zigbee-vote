@@ -69,7 +69,7 @@ void QHidListener::exec()
         if (ret > 0) {
 			quint16 id[2];
 			memcpy(id, packet, 4);
-			qDebug("data received from: 0x%04d%04d with %d",
+			qDebug("data received from: 0x%04x%04x with %d",
 				   id[0], id[1], packet[dataLength-1]);
             emit hidDataReceived(QByteArray(packet, dataLength));
         }

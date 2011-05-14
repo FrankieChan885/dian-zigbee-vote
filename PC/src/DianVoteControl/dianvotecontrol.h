@@ -14,6 +14,7 @@ class QPropertyAnimation;
 class QPushButton;
 class HidControl;
 class StopWatch;
+class QSplashScreen;
 
 #define DEFAULT_DOCK_SPACE 20       // 吸附产生时最大反应距离
                                     // 当窗口里桌面四周的距离小于或者等于这个距离时
@@ -86,6 +87,8 @@ protected:
     void mousePressEvent(QMouseEvent *event);
 
 private:
+    QSplashScreen *splash;      // 欢迎界面
+
     QList< RevData* > *log;     // 数据接收的log
 
     Ui::DianVoteControl *ui;

@@ -2,6 +2,8 @@
 #include <QTimer>
 #include <QFile>
 #include <QDir>
+#include <QString>
+#include <QSplashScreen>
 #include <QInputDialog>
 #include <QLabel>
 #include <QDesktopWidget>
@@ -29,6 +31,15 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     stopWatch(NULL),
     curState(STOP)
 {
+
+    QDir dir;
+    dir.setCurrent(QCoreApplication::applicationDirPath());
+
+    // show splash.
+    QPixmap pixmap(dir.absoluteFilePath("res/images/splash.png"));
+    QSplashScreen *splash = new QSplashScreen(pixmap);
+    splash->show();
+
     ui->setupUi(this);
 
     pbStart = new QPushButton(this);
@@ -488,6 +499,10 @@ void DianVoteControl::HideStopWatch()
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
 {
+    // ¹Ø±Õ»¶Ó­½çÃæ
+    splash->finish(this);
+    delete splash;
+
     if (event->button() == Qt::LeftButton) {
         dragPosition = event->globalPos() - frameGeometry().topLeft();
         event->accept();
