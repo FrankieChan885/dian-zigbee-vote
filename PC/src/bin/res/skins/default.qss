@@ -86,6 +86,11 @@ QToolButton#Pie_Drawer
    border-image: url(res/icons/pie.png);
 }
 
+QToolButton#Histgram_Drawer
+{
+   border-image: url(res/icons/histgram.png);
+}
+
 QToolButton#CorrectAnsewer_Drawer
 {
    border-image: url(res/icons/correctanswer.png);

@@ -3,12 +3,15 @@
 
 #include <QWidget>
 #include "dianvotedebug.h"
-#include "drawhistgram.h"
 
 #define DEFAULT_UPDATE_TIMER 200  // million second
 
+class DrawBase;
+class DrawPie;
+class DrawHistgram;
 class QTimer;
 class QPainter;
+class QToolButton;
 
 namespace Ui {
     class DianVoteDrawer;
@@ -34,6 +37,7 @@ public slots:
 #ifdef DO_ROLL_CALL
     void SetRepliedDeviceNum(uint replyNum); // 设置设备总数
 #endif  // end ifdef
+    void SwithChart();      // 在饼图和直方图之间切换
 
 protected:
     void paintEvent(QPaintEvent *event);    // 覆盖paintEvent
@@ -62,6 +66,16 @@ private:
     int TotalNumY;          // 总数显示的Y坐标
     float RatioTotalNumY;   // 总数位置与窗口的高度度比例
     //----config values----//
+
+    //----buttons----//
+    QToolButton *previous;
+    QToolButton *next;
+    QToolButton *showPie;
+    QToolButton *showHistgram;
+    QToolButton *correctAnswer;
+    QToolButton *option;
+    QToolButton *close;
+    //----buttons----//
 };
 
 #endif // DIANVOTEDRAWER_H

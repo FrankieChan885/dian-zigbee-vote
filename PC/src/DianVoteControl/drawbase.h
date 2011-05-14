@@ -22,6 +22,8 @@ typedef struct _DisplayData
     int histgramHeight; // 直方图高度
     int pieStartAngle;  // 饼图开始的弧度
     int pieSpanAngle;   // 饼图经过的弧度
+    int PieTextX;       // 饼图字的坐标X
+    int PieTextY;       // 饼图字的坐标Y
     //-----coordinate info-----//
 
     //-----text info-----//

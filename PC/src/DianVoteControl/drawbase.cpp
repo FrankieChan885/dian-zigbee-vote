@@ -108,6 +108,7 @@ void DrawBase::setDefaultDrawData()
     DisplayData *dd = NULL;
 
     QString tmp[] = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+//    int num[] = {15, 0, 0, 40, 9, 0, 0, 0, 0, 0};
     int num[] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     for (int i = 0; i < optionNums; i ++)

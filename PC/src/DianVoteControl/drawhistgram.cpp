@@ -52,6 +52,11 @@ void DrawHistgram::draw(QPainter *painter)
     //-----Do Calculate the Coodinate-----//
     DoWithCoodinate();
 
+    if(voterNums == 0)
+    {
+        return;
+    }
+
     QPen thinPen(palette().foreground(), 2);
     painter->setPen(thinPen);
     // 画出Y轴
@@ -128,7 +133,7 @@ void DrawHistgram::draw(QPainter *painter)
 
         // 显示投票比例
         int ratioX = (*drawData)[i - 1]->histgramX +
-                    ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->ratio.length())) / 2;
+                    ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->ratio.length() - 1)) / 2;
         int ratioY = (*drawData)[i - 1]->histgramY - XFontSize / 2;
         painter->drawText(ratioX, ratioY, (*drawData)[i - 1]->ratio);
     }

@@ -20,6 +20,8 @@
 #include "exceptions.h"
 #include "hidcontrol.h"
 #include "stopwatch.h"
+#include "drawhistgram.h"
+#include "drawpie.h"
 #include "dianvotedebug.h"
 
 #ifdef WIN32

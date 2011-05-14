@@ -21,7 +21,7 @@ class QSplashScreen;
                                     // 当窗口里桌面四周的距离小于或者等于这个距离时
                                     // 窗口就吸附到桌面边框上
 #define MAP_VALUE   4               // 手持端按键到选项名索引的映射关系
-#define DEFAULT_OPTION_NUM 4        // 默认的投票的选项数目
+#define DEFAULT_OPTION_NUM 5        // 默认的投票的选项数目
 #define MAXIMUN_OPTION_NUM 5        // 投票题目选项的最大值
 #define DEFAULT_DEADLINE 60         // 秒表倒计时时的默认值
 #define MAXIMUN_DEADLINE 600        // 秒表倒计时时的最大值
