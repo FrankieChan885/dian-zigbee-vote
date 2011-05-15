@@ -2,6 +2,7 @@
 #define __HIDCONTROL_H_
 
 #include <QObject>
+#include <map>
 
 class QHidDevice;
 
@@ -21,8 +22,8 @@ public:
     ~HidControl();
 
 	/// the usb and PC id translate function.
-	static quint32 usbId2PCId(QByteArray);
-    static QByteArray PCId2usbId(quint32);
+	static quint32 usbId2PCId(const QByteArray&);
+    static QByteArray PCId2usbId(const quint32&);
 
 	void setStopOnReceive(bool needStop) {
 		stopOnReceive = needStop;
@@ -58,7 +59,7 @@ public slots:
     /**
     * @brief roll-call to get the number of remote.
     */
-    void startRollCall();
+    void startRollCall(ulong time = 3000);
     void rollCallReplied(const QByteArray&);
     void rollCallTimeOut();
 
@@ -71,6 +72,8 @@ private:
 	QHidDevice *device;
     uint remoteCount;
 	bool stopOnReceive;
+    // this is a map to containing the remote ID an option.
+    std::map <quint32, quint8> remoteMap;
 };
 
 #endif // #ifndef __HIDCONTROL_H_

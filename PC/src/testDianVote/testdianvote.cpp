@@ -160,7 +160,7 @@ void TestDianvote::startRollCall() {
 		if (!hidControl) {
 			hidControl = new HidControl(this);
 		}
-		hidControl->startRollCall();
+		hidControl->startRollCall(3000);
 		connect(hidControl, SIGNAL(rollCallFinished(uint)),
 			this, SLOT(rollCallFinished(uint)));
 

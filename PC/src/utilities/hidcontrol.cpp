@@ -114,10 +114,10 @@ void HidControl::dataReceived(QByteArray ba)
 /**
 * @brief roll-call to get the number of remote.
 */
-void HidControl::startRollCall()
+void HidControl::startRollCall(ulong time /*= 3000*/)
 {
-    // reset remoteCount;
-    remoteCount = 0;
+    // reset remoteMap;
+    remoteMap.clear();
 
     // first create the hid.
     if (!device) {
@@ -126,6 +126,7 @@ void HidControl::startRollCall()
             HidControl::HID_PID,
             this);
     }
+    // reconnect signal.
     disconnect(device, 0, 0, 0);
     connect(device, SIGNAL(readInterrupt(QByteArray)),
         this, SLOT(rollCallReplied(QByteArray)));
@@ -150,7 +151,7 @@ void HidControl::startRollCall()
     device->writeData(cmd, 5);
 
     // wait for roll-call reply.
-    QTimer::singleShot(2000, this, SLOT(rollCallTimeOut()));
+    QTimer::singleShot(time, this, SLOT(rollCallTimeOut()));
 }
 
 /**
@@ -159,7 +160,7 @@ void HidControl::startRollCall()
 void HidControl::rollCallReplied(const QByteArray& ba)
 {
 	if ((quint8)ba.at(4) == 0xff) {
-		remoteCount++;
+		remoteMap[usbId2PCId(ba)] = ba.at(4);
 	}
 }
 
@@ -167,18 +168,26 @@ void HidControl::rollCallTimeOut() {
     disconnect(device, 0, 0, 0);
     connect(device, SIGNAL(readInterrupt(QByteArray)),
         this, SLOT(dataReceived(QByteArray)));
-    emit rollCallFinished(remoteCount);
+    emit rollCallFinished(remoteMap.size());
+
+    // stop remote
+    stop();
+    // close device.
+    if (device->isOpen())
+    {
+        device->close();
+    }
 }
 
 /// the USB and PC id translate function.
-quint32 HidControl::usbId2PCId(QByteArray ba)
+quint32 HidControl::usbId2PCId(const QByteArray& ba)
 {
     quint16 id[2];
     memcpy (id, ba.data(), 4);
     return quint32((id[0] << 16) | id[1]);
 }
 
-QByteArray HidControl::PCId2usbId(quint32 id)
+QByteArray HidControl::PCId2usbId(const quint32& id)
 {
 	quint16 usbId[2];
 	usbId[0] = quint16(id >> 16);
