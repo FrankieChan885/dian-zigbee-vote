@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
     w.setWindowFlags(Qt::Window
                      | Qt::CustomizeWindowHint
                      | Qt::WindowStaysOnTopHint
-                     /* | Qt::FramelessWindowHint*/
                      /* | Qt::WindowTitleHint*/);
 
 #ifdef WIN32
