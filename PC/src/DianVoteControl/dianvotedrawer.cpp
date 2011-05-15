@@ -116,7 +116,9 @@ void DianVoteDrawer::draw(QPainter *painter)
                       replyNum);
 #endif  // end ifdef
 
-    QString totalVoteNum = "Voted: " + QString("%1").arg(histgram->GetVoterNums());
+    int voterNums = histgram->GetVoterNums() > pie->GetVoterNums() ? \
+                    histgram->GetVoterNums() : pie->GetVoterNums();
+    QString totalVoteNum = "Voted: " + QString("%1").arg(voterNums);
     painter->setFont(Font);
     painter->drawText(TotalNumX, TotalNumY,
                       totalVoteNum);

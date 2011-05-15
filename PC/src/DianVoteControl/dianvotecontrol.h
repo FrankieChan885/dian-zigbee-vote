@@ -43,6 +43,13 @@ enum ReceivedDataType
     UNKNOWN
 };
 
+enum VoteMode
+{
+    SINGLE_VOTE,
+    MULTIPLE_VOTE,
+    RACE_VOTE
+};
+
 typedef struct _RevData
 {
     quint32 id;   // 手持端ID
@@ -105,8 +112,6 @@ private:
     StopWatch *stopWatch;
     QSplashScreen *splash;      // 欢迎界面
 
-    static QFile *VoteLog;             // 日志文件
-
     // buttons
     QPushButton *pbStart;
     QPushButton *pbAuto;
@@ -119,16 +124,17 @@ private:
     QInputDialog *getOptionNum;      // 弹出窗口，设置选项个数
     QInputDialog *getLastTime;      // 当用Auto模式时需要设置
 
-    QPoint dragPosition;
-
     QPropertyAnimation *resizeAnimation;
 //    QPropertyAnimation *showStopWatchAnimation;
 
     // 主控界面位置及大小
+    QPoint dragPosition;    // 拖动位置
     QPoint prePoint;        // 记录动画开始时的位置
     QSize initSize;         // 窗口初始化时的大小
     // 控制状态
+    enum VoteMode voteMode;     // 投票模式，默认是SINGLE_VOTE
     enum ControlState curState; // 当前状态
+    static QFile *VoteLog;             // 日志文件
 
 private:
     int GetOptionNum();    // 获取选项个数，并传给histgram

@@ -63,6 +63,7 @@ void DrawBase::ClearData()
 {
     // 必须先要保存数据~~
 
+    voterNums = 0;
     fakeVoterNums = INIT_VOTER_NUM;
     drawData->clear();
     // 因为是每一次重新start投票调用这个，所以必须重新设置
@@ -79,6 +80,7 @@ void DrawBase::HandleData(int index)
         return;
     }
     (*drawData)[index]->voterNum++;
+    voterNums++;
     update();
 
     return;

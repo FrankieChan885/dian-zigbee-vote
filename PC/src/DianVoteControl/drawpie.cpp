@@ -6,7 +6,7 @@
 DrawPie::DrawPie() :
         RatioText(10),
         CoverTextSpace(25),
-        RatioLeftTextSpace(1.5),
+        RatioLeftTextSpace(1.3),
         RatioRightTextSpace(8.9),
         Precision(4),
         RatioPieRadius(0.8)
@@ -34,12 +34,12 @@ void DrawPie::paintEvent(QPaintEvent *event)
 
 void DrawPie::draw(QPainter *painter)
 {
-    DoWithCoodinate();
-
     if(voterNums == 0)
     {
         return;
     }
+
+    DoWithCoodinate();
 
     for (int i = 0; i < optionNums; i++)
     {
@@ -86,12 +86,6 @@ void DrawPie::DoWithCoodinate()
     DrawRegion->setY(CentreOfPieY - PieRadius);
     DrawRegion->setWidth(PieRadius * 2);
     DrawRegion->setHeight(PieRadius * 2);
-
-    voterNums = 0;
-    for (i = 0; i < optionNums; i++)
-    {
-        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
-    }
 
     int originStartAngle = DEFAULT_START_ANGLE;
     int startAngle = DEFAULT_START_ANGLE;

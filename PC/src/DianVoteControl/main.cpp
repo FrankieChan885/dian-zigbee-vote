@@ -1,3 +1,5 @@
+#include <QDir>
+#include <QIcon>
 #include <QtGui/QApplication>
 #include "dianvotecontrol.h"
 

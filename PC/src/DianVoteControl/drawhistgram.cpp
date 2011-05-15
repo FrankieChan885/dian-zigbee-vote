@@ -49,13 +49,13 @@ void DrawHistgram::paintEvent(QPaintEvent *event)
 
 void DrawHistgram::draw(QPainter *painter)
 {
-    //-----Do Calculate the Coodinate-----//
-    DoWithCoodinate();
-
     if(voterNums == 0)
     {
         return;
     }
+
+    //-----Do Calculate the Coodinate-----//
+    DoWithCoodinate();
 
     QPen thinPen(palette().foreground(), 2);
     painter->setPen(thinPen);
@@ -147,12 +147,10 @@ void DrawHistgram::DoWithCoodinate()
     XaxisLength = XaixsLengthRatio * width();
     YaxisLength = YaxisLengthRatio * height();
 
-    voterNums = 0;
     int maxOptionVoteNum = 0;       // 投票人数最多的那个选项的个数，用于决定Y轴刻度的长度
 
     for (int i = 0; i < optionNums; i++)
     {
-        voterNums += (*drawData)[i]->voterNum;   // 计算投票总人数
         maxOptionVoteNum = drawData->at(i)->voterNum > maxOptionVoteNum ? \
                            drawData->at(i)->voterNum : maxOptionVoteNum;
     }

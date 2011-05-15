@@ -1,20 +1,4 @@
-#include <QTime>
-#include <QTimer>
-#include <QFile>
-#include <QDir>
-#include <QString>
-#include <QSplashScreen>
-#include <QFile>
-#include <QTextStream>
-#include <QInputDialog>
-#include <QLabel>
-#include <QDesktopWidget>
-#include <QPropertyAnimation>
-#include <QByteArray>
-#include <QMouseEvent>
-#include <QPushButton>
-#include <QMessageBox>
-#include <QSpacerItem>
+#include <QtGui>
 #include "ui_dianvotecontrol.h"
 #include "dianvotecontrol.h"
 #include "exceptions.h"
@@ -37,15 +21,21 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     hidControl(NULL),
     stopWatch(NULL),
     splash(NULL),
+    voteMode(SINGLE_VOTE),
     curState(STOP)
 {
-
     QDir dir;
     dir.setCurrent(QCoreApplication::applicationDirPath());
 
+    QIcon windowIcon(dir.absoluteFilePath("res/images/app-icon.png"));
+    this->setWindowIcon(windowIcon);
+
     // show splash.
-    QPixmap pixmap(dir.absoluteFilePath("res/images/logo.jpg"));
+    QPixmap pixmap(dir.absoluteFilePath("res/images/logo.png"));
     QSplashScreen *splash = new QSplashScreen(pixmap);
+    splash->setWindowIcon(windowIcon);
+    splash->setWindowFlags(Qt::WindowStaysOnTopHint);
+    splash->setMask(pixmap.mask());
     splash->show();
 
     ui->setupUi(this);
@@ -88,10 +78,15 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
     drawer = new DianVoteDrawer();
+    drawer->setWindowIcon(windowIcon);
+    drawer->setWindowTitle(tr("Result"));
     connect(pbClose, SIGNAL(clicked()), this->drawer, SLOT(close()));
     connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
+    connect(this, SIGNAL(setOptionNum(int)), drawer->pie, SLOT(SetOptionNums(int)));
     connect(this, SIGNAL(clearDrawData()), drawer->histgram, SLOT(ClearData()));
+    connect(this, SIGNAL(clearDrawData()), drawer->pie, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
+    connect(this, SIGNAL(updateGraph(int)), drawer->pie, SLOT(HandleData(int)));
 
     LoadStyleSheet("Default");
 
@@ -537,7 +532,7 @@ void DianVoteControl::mousePressEvent(QMouseEvent *event)
     // ¹Ø±Õ»¶Ó­½çÃæ
     if(splash != NULL)
     {
-        splash->finish(this);
+        splash->finish(this);;
         delete splash;
         splash = NULL;
     }
