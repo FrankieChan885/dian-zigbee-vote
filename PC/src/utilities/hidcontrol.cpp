@@ -170,8 +170,6 @@ void HidControl::rollCallTimeOut() {
         this, SLOT(dataReceived(QByteArray)));
     emit rollCallFinished(remoteMap.size());
 
-    // stop remote
-    stop();
     // close device.
     if (device->isOpen())
     {
