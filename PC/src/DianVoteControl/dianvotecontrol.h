@@ -103,6 +103,7 @@ private slots:
     void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
     void DoRaceVoteMode();      // 抢答模式下的处理
     void ShowRaceVoteWinner(quint32 id, quint8 key);  // 抢答模式时显示抢到者的ID
+    void CloseRaceVoteWinner();             // 关闭抢答窗口时要关闭设备
     void DoSingleMode();        // 单选模式下
     void DoMutipleMode();       // 多选模式下
 

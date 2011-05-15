@@ -179,6 +179,7 @@ void DianVoteControl::VoteStart()
         pbAuto->hide();
         pbPause->show();
         pbStop->show();
+        pbOption->setEnabled(false);
 
         // 画出秒表, 递增模式
         ShowStopWatch();
@@ -249,6 +250,7 @@ void DianVoteControl::VoteAuto()
         pbAuto->hide();
         pbPause->show();
         pbStop->show();
+        pbOption->setEnabled(false);
 
         stopWatch->start();
         resizeAnimation->start();
@@ -320,6 +322,7 @@ void DianVoteControl::VoteStop()
         // 因为pause状态hidCntrol已经停止，所以不需要停止
     }
 
+    pbOption->setEnabled(true);
     resizeAnimation->start();
     // 修改状态
     curState = STOP;
@@ -556,10 +559,36 @@ void DianVoteControl::ShowRaceVoteWinner(quint32 id, quint8 key)
     VoteStop();
     hidControl->start(id);
 
+    disconnect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+            this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
+
     raceWinner = new QDialog();
     raceWinner->setAttribute(Qt::WA_DeleteOnClose);
     raceWinner->setWindowIcon(*windowIcon);
+    raceWinner->setWindowTitle(tr("Winner~!"));
+    QGridLayout *mainLayout = new QGridLayout(raceWinner);
+    QLabel *winner = new QLabel(raceWinner);
+    QString winnerID = QString("0x%L1").arg(id, 8, 16, QChar('0'));
+    QString Text = "Winner: " + winnerID;
+    QFont Font = QFont("Arial", 15, QFont::Bold, true);
+    winner->setFont(Font);
+    winner->setText(Text);
+    mainLayout->addWidget(winner, 0, 0, 1, 2);
+    QPushButton *close = new QPushButton(raceWinner);
+    mainLayout->addWidget(close, 1, 1);
+    connect(close, SIGNAL(clicked()), raceWinner, SLOT(close()));
+    connect(close, SIGNAL(clicked()), this, SLOT(CloseRaceVoteWinner()));
+    close->setText(tr("Close"));
+    raceWinner->setLayout(mainLayout);
+
+    raceWinner->resize(200, 200);
+    raceWinner->setFixedSize(this->width(), this->height());
     raceWinner->show();
+}
+
+void DianVoteControl::CloseRaceVoteWinner()
+{
+    hidControl->stop();
 }
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
@@ -672,6 +701,7 @@ void DianVoteControl::ClearLogList()
 
 void DianVoteControl::DoRaceVoteMode()
 {
+    voteMode = RACE_VOTE;
     // 更改Action的check状态
     qaRaceMode->setChecked(true);
     qaMutipleMode->setChecked(false);
@@ -680,11 +710,7 @@ void DianVoteControl::DoRaceVoteMode()
 
 void DianVoteControl::DoSingleMode()
 {
-    if(qaRaceMode->isChecked())
-    {
-        disconnect(hidControl, SIGNAL(voteComing(quint32, quint8)),
-                   this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
-    }
+    voteMode = SINGLE_VOTE;
     // 更改Action的check状态
     qaRaceMode->setChecked(false);
     qaMutipleMode->setChecked(false);
@@ -693,11 +719,7 @@ void DianVoteControl::DoSingleMode()
 
 void DianVoteControl::DoMutipleMode()
 {
-    if(qaRaceMode->isChecked())
-    {
-        disconnect(hidControl, SIGNAL(voteComing(quint32, quint8)),
-                  this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
-    }
+    voteMode = MULTIPLE_VOTE;
     // 更改Action的check状态
     qaRaceMode->setChecked(false);
     qaMutipleMode->setChecked(true);

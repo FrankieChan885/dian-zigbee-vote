@@ -34,16 +34,14 @@ HidControl::~HidControl()
  */
 void HidControl::start(quint32 id/* = 0xffffffff*/)
 {
-    if (0xffffffff == id) {
-        if (!device->isOpen()) {
-            if (!device->open(QIODevice::ReadWrite)) {
-                throw new DianVoteStdException("hid open failed...");
-            }
-
-            // start listening the endpoint 1 with data length 5
-            // (in windows length should be 6, I don't know why).
-            device->startListening(6);
+    if (!device->isOpen()) {
+        if (!device->open(QIODevice::ReadWrite)) {
+            throw new DianVoteStdException("hid open failed...");
         }
+
+        // start listening the endpoint 1 with data length 5
+        // (in windows length should be 6, I don't know why).
+        device->startListening(6);
     }
 
 	// send start signal to remote
