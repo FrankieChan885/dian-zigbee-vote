@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     // ÷ÿ∂®œÚ
-    qInstallMsgHandler(DianVoteControl::DianVoteMsgHandler);
+//    qInstallMsgHandler(DianVoteControl::DianVoteMsgHandler);
 
     DianVoteControl w;
     w.setWindowFlags(Qt::Window

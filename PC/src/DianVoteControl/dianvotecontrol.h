@@ -5,16 +5,19 @@
 #include <QByteArray>
 #include "dianvotedrawer.h"
 
+class HidControl;
+class StopWatch;
 class QSize;
 class QFile;
+class QMenu;
+class QAction;
+class QDialog;
 class QInputDialog;
 class QSpacerItem;
 class QErrorMessage;
 class QSequentialAnimationGroup;
 class QPropertyAnimation;
 class QPushButton;
-class HidControl;
-class StopWatch;
 class QSplashScreen;
 
 #define DEFAULT_DOCK_SPACE 20       // 吸附产生时最大反应距离
@@ -98,6 +101,10 @@ public slots:
 private slots:
 //    void DoShowStopWatch();     // 显示秒表widget，在下拉动画完毕后调用
     void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
+    void DoRaceVoteMode();      // 抢答模式下的处理
+    void ShowRaceVoteWinner(quint32 id, quint8 key);  // 抢答模式时显示抢到者的ID
+    void DoSingleMode();        // 单选模式下
+    void DoMutipleMode();       // 多选模式下
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);
@@ -111,6 +118,14 @@ private:
     HidControl *hidControl;
     StopWatch *stopWatch;
     QSplashScreen *splash;      // 欢迎界面
+    QDialog *raceWinner;        // 显示抢答结果
+    QIcon *windowIcon;          // windowIcon
+
+    // mode menu
+    QMenu *qmMode;
+    QAction *qaSingleMode;  // 单选模式
+    QAction *qaMutipleMode; // 多选
+    QAction *qaRaceMode;    // 抢答
 
     // buttons
     QPushButton *pbStart;
@@ -118,7 +133,7 @@ private:
     QPushButton *pbResult;
     QPushButton *pbPause;
     QPushButton *pbStop;
-    QPushButton *pbOption;
+    QToolButton *pbOption;
     QPushButton *pbClose;
 
     QInputDialog *getOptionNum;      // 弹出窗口，设置选项个数

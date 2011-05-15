@@ -27,13 +27,13 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     QDir dir;
     dir.setCurrent(QCoreApplication::applicationDirPath());
 
-    QIcon windowIcon(dir.absoluteFilePath("res/images/app-icon.png"));
-    this->setWindowIcon(windowIcon);
+    windowIcon = new QIcon(dir.absoluteFilePath("res/images/app-icon.png"));
+    this->setWindowIcon(*windowIcon);
 
     // show splash.
     QPixmap pixmap(dir.absoluteFilePath("res/images/logo.png"));
     QSplashScreen *splash = new QSplashScreen(pixmap);
-    splash->setWindowIcon(windowIcon);
+    splash->setWindowIcon(*windowIcon);
     splash->setWindowFlags(Qt::WindowStaysOnTopHint);
     splash->setMask(pixmap.mask());
     splash->show();
@@ -62,9 +62,23 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     pbResult->setObjectName(tr("pbResult"));
     ui->buttonLayout->addWidget(pbResult, 0, 2);
 
-    pbOption = new QPushButton(this);
+    pbOption = new QToolButton(this);
     pbOption->setObjectName(tr("pbOption"));
     ui->buttonLayout->addWidget(pbOption, 0, 3);
+
+    qaSingleMode = new QAction(tr("SingleVoteMode"), this);  // 单选模式
+    qaSingleMode->setCheckable(true);
+    qaSingleMode->setChecked(true);         // 默认模式
+    qaMutipleMode = new QAction(tr("MutipleVoteMode"), this); // 多选
+    qaMutipleMode->setCheckable(true);
+    qaRaceMode = new QAction(tr("RaceVoteMode"), this);    // 抢答
+    qaRaceMode->setCheckable(true);
+    pbOption->addAction(qaSingleMode);
+    pbOption->addAction(qaMutipleMode);
+    pbOption->addAction(qaRaceMode);
+    connect(qaSingleMode, SIGNAL(triggered()), this, SLOT(DoSingleMode()));
+    connect(qaMutipleMode, SIGNAL(triggered()), this, SLOT(DoMutipleMode()));
+    connect(qaRaceMode, SIGNAL(triggered()), this, SLOT(DoRaceVoteMode()));
 
     pbClose = new QPushButton(this);
     pbClose->setObjectName(tr("pbClose"));
@@ -78,7 +92,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
 
     drawer = new DianVoteDrawer();
-    drawer->setWindowIcon(windowIcon);
+    drawer->setWindowIcon(*windowIcon);
     drawer->setWindowTitle(tr("Result"));
     connect(pbClose, SIGNAL(clicked()), this->drawer, SLOT(close()));
     connect(this, SIGNAL(setOptionNum(int)), drawer->histgram, SLOT(SetOptionNums(int)));
@@ -412,19 +426,27 @@ bool DianVoteControl::PrepareHid()
 {
     try
     {
-        hidControl = new HidControl(this);
+        if(!hidControl)
+        {
+            hidControl = new HidControl(this);
+
+#ifdef DO_ROLL_CALL
+            connect(hidControl, SIGNAL(rollCallFinished(uint)),
+                    drawer, SLOT(SetRepliedDeviceNum(uint)));
+            hidControl->startRollCall();
+#endif  // end ifdef
+        }
         // for test, comment this line
 #ifndef TEST_RECEIVE_DATA_CONTINUE
         hidControl->setStopOnReceive(true);
 #endif  // end ifndef
         connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                 this, SLOT(ParseData(quint32, quint8)));
-
-#ifdef DO_ROLL_CALL
-        hidControl->startRollCall();
-        connect(hidControl, SIGNAL(rollCallFinished(uint)),
-                drawer, SLOT(SetRepliedDeviceNum(uint)));
-#endif  // end ifdef
+        if(voteMode == RACE_VOTE)
+        {
+            connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                    this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
+        }
 
         return true;
     }
@@ -525,6 +547,19 @@ void DianVoteControl::HideStopWatch()
     resizeAnimation->setStartValue(curSize);
     resizeAnimation->setEndValue(initSize);
     connect(resizeAnimation, SIGNAL(finished()), this, SLOT(DoHideStopWatch()));
+}
+
+
+void DianVoteControl::ShowRaceVoteWinner(quint32 id, quint8 key)
+{
+    // 先关闭所有的设备，在打开被选中的设备
+    VoteStop();
+    hidControl->start(id);
+
+    raceWinner = new QDialog();
+    raceWinner->setAttribute(Qt::WA_DeleteOnClose);
+    raceWinner->setWindowIcon(*windowIcon);
+    raceWinner->show();
 }
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
@@ -633,4 +668,38 @@ void DianVoteControl::WriteRevDataLog(RevData *rd)
 void DianVoteControl::ClearLogList()
 {
     log->clear();
+}
+
+void DianVoteControl::DoRaceVoteMode()
+{
+    // 更改Action的check状态
+    qaRaceMode->setChecked(true);
+    qaMutipleMode->setChecked(false);
+    qaSingleMode->setChecked(false);
+}
+
+void DianVoteControl::DoSingleMode()
+{
+    if(qaRaceMode->isChecked())
+    {
+        disconnect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                   this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
+    }
+    // 更改Action的check状态
+    qaRaceMode->setChecked(false);
+    qaMutipleMode->setChecked(false);
+    qaSingleMode->setChecked(true);
+}
+
+void DianVoteControl::DoMutipleMode()
+{
+    if(qaRaceMode->isChecked())
+    {
+        disconnect(hidControl, SIGNAL(voteComing(quint32, quint8)),
+                  this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
+    }
+    // 更改Action的check状态
+    qaRaceMode->setChecked(false);
+    qaMutipleMode->setChecked(true);
+    qaSingleMode->setChecked(false);
 }

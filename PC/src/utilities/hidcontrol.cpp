@@ -170,11 +170,11 @@ void HidControl::rollCallTimeOut() {
         this, SLOT(dataReceived(QByteArray)));
     emit rollCallFinished(remoteMap.size());
 
-    // close device.
-    if (device->isOpen())
-    {
-        device->close();
-    }
+//    // close device.
+//    if (device->isOpen())
+//    {
+//        device->close();
+//    }
 }
 
 /// the USB and PC id translate function.
