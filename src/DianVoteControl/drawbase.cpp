@@ -2,6 +2,7 @@
 
 DrawBase::DrawBase(QWidget *parent) :
     QWidget(parent),
+    displayResultWhileVoting(false),
     correctAnswerFlag(false),
     questionName("Question 1"),
     correctAnswer(""),
@@ -24,6 +25,12 @@ DrawBase::~DrawBase()
     delete colorSet;
 }
 
+void DrawBase::SetDisplayResultWhileVoting(bool flag)
+{
+    displayResultWhileVoting = flag;
+    update();
+}
+
 void DrawBase::SetCorrectAnswer(QString answer)
 {
     correctAnswer = answer;
@@ -38,6 +45,7 @@ void DrawBase::SetCorrectAnswerFlag(bool flag)
 
 void DrawBase::SetOptionNums(int nums)
 {
+    displayResultWhileVoting = false;   // 投票过程中不显示结果
     ClearData();        // 必先清空数据，因为调用此槽函数的时候必然是需要开始一个新的投票了。
     optionNums = nums;
     setDefaultDrawData();

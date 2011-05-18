@@ -125,7 +125,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>0xffffffff</string>
+           <string>0xffff</string>
           </property>
           <property name="maxLength">
            <number>10</number>
@@ -174,9 +174,43 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="rollCall">
+         <widget class="QPushButton" name="getIDList">
           <property name="text">
-           <string>Roll Call</string>
+           <string>Get ID List</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <spacer name="horizontalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>ID Amounts</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="idAmount"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="getIDAmount">
+          <property name="text">
+           <string>Get ID Amounts</string>
           </property>
          </widget>
         </item>

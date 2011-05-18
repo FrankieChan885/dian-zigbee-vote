@@ -106,6 +106,7 @@ bool QHidDevice::open(OpenMode mode) {
     if (hid_is_opened(hid)) {
         std::cerr << "Error in QHidDevice::open: device already open"
             << std::endl;
+        mutex.unlock();
         return false;
     }
 
@@ -119,6 +120,7 @@ bool QHidDevice::open(OpenMode mode) {
     if (ret != HID_RET_SUCCESS) {
         // close and throw an error.
         close();
+        mutex.unlock();
         throw new DianVoteStdException(
                 std::string(hid_strerror(ret)));
 
@@ -131,6 +133,7 @@ bool QHidDevice::open(OpenMode mode) {
 
     if (hid == NULL) {
         qDebug("QHidDevice::open: hid opend failed...");
+        mutex.unlock();
         return false;
     }
 #endif // #ifdef USE_LIBHID

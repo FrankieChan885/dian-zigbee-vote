@@ -75,6 +75,7 @@ public:
     static void DianVoteMsgHandler(QtMsgType type, const char *msg);
 
 signals:
+    void displayResult(bool flag);  // 信号--显示结果
     void clearDrawData();           // 信号--清空数据
     void setLastTime(int sec);      // 信号--设置持续时间
     void setOptionNum(int num);     // 信号--给histgram设置选项数目

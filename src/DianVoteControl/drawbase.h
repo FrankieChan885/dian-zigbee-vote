@@ -47,6 +47,7 @@ public slots:
     void SetQuestionName(QString name);
     void SetOptionNums(int nums);
     void SetVoterNums(int nums);
+    void SetDisplayResultWhileVoting(bool flag); // 设置是否在投票过程中显示结果
     void SetCorrectAnswer(QString answer);
     void SetCorrectAnswerFlag(bool flag);
 
@@ -54,6 +55,7 @@ public slots:
     void HandleData(int index);    // 接收一个数据
 
 protected:
+    bool displayResultWhileVoting; // 是否在投票过程中显示投票结果
     bool correctAnswerFlag;     // 是否显示正确答案
     QString questionName;       // 问题名称
     QString correctAnswer;      // 正确答案

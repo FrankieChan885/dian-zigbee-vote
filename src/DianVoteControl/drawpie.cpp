@@ -61,12 +61,14 @@ void DrawPie::draw(QPainter *painter)
         painter->drawPie(*DrawRegion,
                          drawData->at(i)->pieStartAngle * 16,
                          drawData->at(i)->pieSpanAngle * 16);
-
-        QString ratio = drawData->at(i)->optionName + ": " + drawData->at(i)->ratio;
-        QFont Font = QFont("Arial",FontSize,QFont::Bold,true);  // 设置字体
-        painter->setFont(Font);
-        painter->drawText(drawData->at(i)->PieTextX, drawData->at(i)->PieTextY,
-                          ratio);
+        if (displayResultWhileVoting)
+        {
+            QString ratio = drawData->at(i)->optionName + ": " + drawData->at(i)->ratio;
+            QFont Font = QFont("Arial",FontSize,QFont::Bold,true);  // 设置字体
+            painter->setFont(Font);
+            painter->drawText(drawData->at(i)->PieTextX, drawData->at(i)->PieTextY,
+                              ratio);
+        }
     }
 }
 
@@ -103,41 +105,44 @@ void DrawPie::DoWithCoodinate()
         (*drawData)[i]->pieStartAngle = startAngle;
         startAngle += (*drawData)[i]->pieSpanAngle;
 
-        float angle = float((*drawData)[i]->pieStartAngle + (*drawData)[i]->pieSpanAngle / 2) * \
-                      PI / 180;
-        (*drawData)[i]->PieTextX = CentreOfPieX + PieRadius * cos(angle);
-        // 调整X坐标，防止字与饼图覆盖
-        if(cos(angle) < 0)
+        if (displayResultWhileVoting)
         {
-            (*drawData)[i]->PieTextX -= PieRadius / RatioLeftTextSpace;
-        }
-        else
-        {
-            (*drawData)[i]->PieTextX += PieRadius / RatioRightTextSpace;
-        }
-
-        (*drawData)[i]->PieTextY = CentreOfPieY - PieRadius * sin(angle);
-        // 调整坐标，防止出现两个坐标相同的情况，相互覆盖的情况
-        for(int j = 0; j < i; j++)
-        {
-            if((*drawData)[i]->PieTextX == (*drawData)[j]->PieTextX)
+            float angle = float((*drawData)[i]->pieStartAngle + (*drawData)[i]->pieSpanAngle / 2) * \
+                          PI / 180;
+            (*drawData)[i]->PieTextX = CentreOfPieX + PieRadius * cos(angle);
+            // 调整X坐标，防止字与饼图覆盖
+            if(cos(angle) < 0)
             {
-                (*drawData)[i]->PieTextX += CoverTextSpace;
+                (*drawData)[i]->PieTextX -= PieRadius / RatioLeftTextSpace;
             }
-            if((*drawData)[i]->PieTextY == (*drawData)[j]->PieTextY)
+            else
             {
-                (*drawData)[i]->PieTextY += CoverTextSpace;
+                (*drawData)[i]->PieTextX += PieRadius / RatioRightTextSpace;
             }
 
-        }
+            (*drawData)[i]->PieTextY = CentreOfPieY - PieRadius * sin(angle);
+            // 调整坐标，防止出现两个坐标相同的情况，相互覆盖的情况
+            for(int j = 0; j < i; j++)
+            {
+                if((*drawData)[i]->PieTextX == (*drawData)[j]->PieTextX)
+                {
+                    (*drawData)[i]->PieTextX += CoverTextSpace;
+                }
+                if((*drawData)[i]->PieTextY == (*drawData)[j]->PieTextY)
+                {
+                    (*drawData)[i]->PieTextY += CoverTextSpace;
+                }
 
-        (*drawData)[i]->nums = QString("%1").arg((*drawData)[i]->voterNum);
-        (*drawData)[i]->ratio = QString("%1").arg(percent * 100);       // 算出比例
-        if ((*drawData)[i]->ratio.size() > Precision + 1)
-        {
-            (*drawData)[i]->ratio.resize(Precision + 1);        // 只显示Precision位小数，算上小数点故+1
+            }
+
+            (*drawData)[i]->nums = QString("%1").arg((*drawData)[i]->voterNum);
+            (*drawData)[i]->ratio = QString("%1").arg(percent * 100);       // 算出比例
+            if ((*drawData)[i]->ratio.size() > Precision + 1)
+            {
+                (*drawData)[i]->ratio.resize(Precision + 1);        // 只显示Precision位小数，算上小数点故+1
+            }
+            (*drawData)[i]->ratio += "%";
         }
-        (*drawData)[i]->ratio += "%";
 
     }
     // 补全最后一扇形，防止不闭合的情况发生

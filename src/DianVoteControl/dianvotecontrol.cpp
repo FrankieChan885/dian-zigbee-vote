@@ -101,6 +101,8 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(this, SIGNAL(clearDrawData()), drawer->pie, SLOT(ClearData()));
     connect(this, SIGNAL(updateGraph(int)), drawer->histgram, SLOT(HandleData(int)));
     connect(this, SIGNAL(updateGraph(int)), drawer->pie, SLOT(HandleData(int)));
+    connect(this, SIGNAL(displayResult(bool)), drawer->histgram, SLOT(SetDisplayResultWhileVoting(bool)));
+    connect(this, SIGNAL(displayResult(bool)), drawer->pie, SLOT(SetDisplayResultWhileVoting(bool)));
 
     LoadStyleSheet("Default");
 
@@ -286,6 +288,7 @@ void DianVoteControl::VotePause()
 
 void DianVoteControl::VoteStop()
 {
+    emit displayResult(true);   // 显示结果
     ClearLogList(); // 不管如何，清空日志链表是必须的。
 
     if(curState == RUNNING)
@@ -330,16 +333,22 @@ void DianVoteControl::VoteStop()
 
 void DianVoteControl::DoShowResults()
 {
+    if(!drawer->isVisible())
+    {
+    #ifdef WIN32
+        // 开启aero效果
+        if (QtWin::isCompositionEnabled()) {
+            QtWin::extendFrameIntoClientArea(drawer);
+            drawer->setContentsMargins(0, 0, 0, 0);
+        }
+    #endif // #ifdef WIN32
 
-#ifdef WIN32
-    // 开启aero效果
-    if (QtWin::isCompositionEnabled()) {
-        QtWin::extendFrameIntoClientArea(drawer);
-        drawer->setContentsMargins(0, 0, 0, 0);
+        drawer->show();
     }
-#endif // #ifdef WIN32
-
-    drawer->show();
+    else
+    {
+        drawer->hide();
+    }
 }
 
 void DianVoteControl::DoShowStatics()

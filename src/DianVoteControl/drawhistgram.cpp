@@ -125,17 +125,20 @@ void DrawHistgram::draw(QPainter *painter)
         painter->drawRect((*drawData)[i - 1]->histgramX, (*drawData)[i - 1]->histgramY,
                           (*drawData)[i - 1]->histgramWidth, (*drawData)[i - 1]->histgramHeight); // 画柱状图
 
-        // 显示投票人的个数
-        int numX = (*drawData)[i - 1]->histgramX +
-                    ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->nums.length())) / 2;
-        int numY = (*drawData)[i - 1]->histgramY - 2 * XFontSize;
-        painter->drawText(numX, numY, (*drawData)[i - 1]->nums);
+        if (displayResultWhileVoting)
+        {
+            // 显示投票人的个数
+            int numX = (*drawData)[i - 1]->histgramX +
+                        ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->nums.length())) / 2;
+            int numY = (*drawData)[i - 1]->histgramY - 2 * XFontSize;
+            painter->drawText(numX, numY, (*drawData)[i - 1]->nums);
 
-        // 显示投票比例
-        int ratioX = (*drawData)[i - 1]->histgramX +
-                    ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->ratio.length() - 1)) / 2;
-        int ratioY = (*drawData)[i - 1]->histgramY - XFontSize / 2;
-        painter->drawText(ratioX, ratioY, (*drawData)[i - 1]->ratio);
+            // 显示投票比例
+            int ratioX = (*drawData)[i - 1]->histgramX +
+                        ((*drawData)[i - 1]->histgramWidth - XFontSize * ((*drawData)[i - 1]->ratio.length() - 1)) / 2;
+            int ratioY = (*drawData)[i - 1]->histgramY - XFontSize / 2;
+            painter->drawText(ratioX, ratioY, (*drawData)[i - 1]->ratio);
+        }
     }
 }
 
@@ -176,23 +179,25 @@ void DrawHistgram::DoWithCoodinate()
         (*drawData)[i]->histgramX = zeroPoint.x() + (i + 1) * XaxisScaleSpace -
                                    (XaxisScaleSpace + (*drawData)[i]->histgramWidth) / 2;    // 柱状条左上角X坐标
         (*drawData)[i]->histgramY = zeroPoint.y() - (*drawData)[i]->histgramHeight;       // 柱状条左上角Y坐标
-
-        (*drawData)[i]->nums = QString("%1").arg((*drawData)[i]->voterNum);       // 个数，画出来
-
-        if(!voterNums)
+        if (displayResultWhileVoting)
         {
-            (*drawData)[i]->ratio = QString("0");
-        }
-        else
-        {
-            (*drawData)[i]->ratio = QString("%1").arg((float)(*drawData)[i]->voterNum / voterNums * 100);       // 算出比例
-        }
+            (*drawData)[i]->nums = QString("%1").arg((*drawData)[i]->voterNum);       // 个数，画出来
 
-        if ((*drawData)[i]->ratio.size() > Precision + 1)
-        {
-            (*drawData)[i]->ratio.resize(Precision + 1);        // 只显示Precision位小数，算上小数点故+1
+            if(!voterNums)
+            {
+                (*drawData)[i]->ratio = QString("0");
+            }
+            else
+            {
+                (*drawData)[i]->ratio = QString("%1").arg((float)(*drawData)[i]->voterNum / voterNums * 100);       // 算出比例
+            }
+
+            if ((*drawData)[i]->ratio.size() > Precision + 1)
+            {
+                (*drawData)[i]->ratio.resize(Precision + 1);        // 只显示Precision位小数，算上小数点故+1
+            }
+            (*drawData)[i]->ratio += "%";
         }
-        (*drawData)[i]->ratio += "%";
     }
 
     //-----calc distance of text and axis-----//
