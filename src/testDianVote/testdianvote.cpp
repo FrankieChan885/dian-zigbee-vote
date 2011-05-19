@@ -1,6 +1,8 @@
 #include <iostream>
 #include <QtGui>
+#include <QIcon>
 #include <QTimer>
+#include <Qdir>
 #include "exceptions.h"
 #include "testdianvote.h"
 
@@ -68,6 +70,11 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
         QMessageBox::critical(0, "error", "unknow exception.");
         return;
     }
+    QDir dir;
+    dir.setCurrent(QCoreApplication::applicationDirPath());
+
+    QIcon *windowIcon = new QIcon(dir.absoluteFilePath("res/icons/test.png"));
+    this->setWindowIcon(*windowIcon);
 }
 
 
