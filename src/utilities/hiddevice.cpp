@@ -169,6 +169,7 @@ void QHidDevice::close() {
     if (hid_is_opened(hid)) {
         hid_return ret = hid_close(hid);
         if (ret != HID_RET_SUCCESS) {
+            mutex.unlock();
             throw new DianVoteStdException(
                     std::string(hid_strerror(ret)));
             return;
@@ -259,6 +260,7 @@ qint64 QHidDevice::writeData(const char* data, qint64 len) {
     }
 
 #ifdef USE_LIBHID
+    mutex.unlock();
     return -1;
 #else // #ifdef USE_LIBHID
  	// send control command.

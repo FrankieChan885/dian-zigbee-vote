@@ -9,9 +9,7 @@ HidControl::HidControl(QObject *parent)
 , device(0)
 , bitmapSliceCounter(0)
 {
-    remoteDeviceBitmap = new quint16[DEVICE_ID_BITMAP_SIZE_IN_WORD];
-
-	if (device == 0) {
+    if (device == 0) {
 		device = new QHidDevice(HID_VID, HID_PID, this);
 		connect(device, SIGNAL(readInterrupt(QByteArray)),
 				this, SLOT(dataReceived(QByteArray)));
@@ -33,20 +31,19 @@ HidControl::~HidControl()
 }
 
 /**
+* @brief open control.
+*/
+void HidControl::open() {
+    ensureDeviceOpened();
+}
+
+/**
  * @brief start a specific remote by its id.
  * 		the default remote id is a broadcast id.
  */
 void HidControl::start(quint16 id/* = 0xffff*/)
 {
-    if (!device->isOpen()) {
-        if (!device->open(QIODevice::ReadWrite)) {
-            throw new DianVoteStdException("hid open failed...");
-        }
-
-        // start listening the endpoint 1 with data length 5
-        // (in windows length should be 6, I don't know why).
-        device->startListening(4);
-    }
+    ensureDeviceOpened();
 
 	// send start signal to remote
     char data[3];
@@ -81,21 +78,24 @@ void HidControl::stop(quint16 id/* = 0xffff*/)
  */
 void HidControl::dataReceived(QByteArray ba)
 {
-    quint16 data = usbId2PCId(ba);
+    quint16 data;
     quint8 flag = (quint8) ba.at(2);
 
     switch(flag) {
-    case ID_FLAG: {
-            // data is part a remote device id map, accurately 1/16
-            remoteDeviceBitmap[bitmapSliceCounter++] = data;
-            if(bitmapSliceCounter == DEVICE_ID_BITMAP_SIZE_IN_WORD)
+    case ID_MAP_FLAG: {
+            // data is part a remote device id map, accurately 1/32
+            remoteDeviceBitmap[bitmapSliceCounter++] = ba.at(0);
+            remoteDeviceBitmap[bitmapSliceCounter++] = ba.at(1);
+            if(bitmapSliceCounter == DEVICE_ID_BITMAP_SIZE_IN_BYTE)
             {
+                bitmapSliceCounter = 0;
                 emit idMapReceiveFinished();
             }
             break;
         }
 
     case ID_AMOUNT_FLAG: {
+            memcpy(&data, ba.data(), 2);
             // data is the number of remote devices
             emit idAmountComing(data);
             break;
@@ -103,6 +103,7 @@ void HidControl::dataReceived(QByteArray ba)
 
     default:
         {
+            data = usbId2PCId(ba);
             // data is remote device id, flag is the option
             emit voteComing(data, flag);
             break;
@@ -151,16 +152,11 @@ void HidControl::GetIDListLength()
 void HidControl::DoReceiveBitMapFinished()
 {
     quint8 id = 0;
-    for(int i = 0; ; i++)
-    {
-        id = findNextAddrFrom((quint8*)(remoteDeviceBitmap), id, 1);
-        if(i != 0 && id == 0)
-        {
-            break;
-        }
+    while (id = findNextAddrFrom((quint8*)(remoteDeviceBitmap), id, 1)) {
         emit idComing(quint16(id));
-        remoteMap[quint16(id)] = quint8(i);
+        remoteMap[quint16(id)] = 0;
     }
+    emit idSentFinished();
 }
 
 /**
@@ -192,10 +188,10 @@ void HidControl::ensureDeviceOpened()
 /// the USB and PC id translate function.
 quint16 HidControl::usbId2PCId(const QByteArray& ba)
 {
-    quint16 id[1];
-    id[0] |= ba.at(0);
-    id[1] |= ba.at(1) << 8;
-    return id[0];
+    quint16 id;
+    id = ba.at(0);
+    id |= quint16(ba.at(1)) << 8;
+    return id;
 }
 
 QByteArray HidControl::PCId2usbId(const quint16& id)
@@ -212,7 +208,7 @@ quint16 HidControl::findNextAddrFrom(quint8* bmp, quint8 addr, quint8 isSet)
     quint8 bit = (addr % 8) + 1; // from next addr.
     for (; byte < DEVICE_ID_BITMAP_SIZE_IN_BYTE; byte++) {
         // only check when byte has 1.
-        if (bmp[byte]) {
+        if (isSet? bmp[byte] : !bmp[byte]) {
             while(0x80 >> bit) {
                 if (isSet) {
                     if (bmp[byte] & (0x80 >> bit)) {

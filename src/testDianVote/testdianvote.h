@@ -1,7 +1,9 @@
 #include <QByteArray>
+#include <QList>
 #include "hidcontrol.h"
 #include "ui_testdianvote.h"
 
+class QTimer;
 class QHidDevice;
 
 class TestDianvote : public QDialog
@@ -18,9 +20,13 @@ public slots:
     void usbStartClicked(bool);
     void remoteStateClicked(bool);
     void getIDList();
+    void idReceiveFinished();
     void showID(quint16);
     void getIDListLength();
     void showIDAmount(uint);
+    void showIntenalMessage();
+
+    static void DianVoteMsgHandler(QtMsgType type, const char *msg);
 //	void stopOnReceiveClicked(bool);
 //    void startRollCall();
 //    void rollCallFinished(uint count);
@@ -30,5 +36,7 @@ private:
     uint countID;
     HidControl *hidControl;
     Ui::TestDianVote *ui;
+    QTimer *timer;
+    static QList< QString > *message;
 };
 

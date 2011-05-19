@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>459</width>
-    <height>419</height>
+    <height>441</height>
    </rect>
   </property>
   <property name="font">
@@ -236,16 +236,44 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="output">
-        <property name="font">
-         <font>
-          <family>Courier 10 Pitch</family>
-         </font>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="dispDataLayout">
+        <item>
+         <widget class="QTextEdit" name="output">
+          <property name="font">
+           <font>
+            <family>Courier 10 Pitch</family>
+           </font>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="rollcall"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearData">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QTextEdit" name="message"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="clearMessage">
+          <property name="text">
+           <string>Clear</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

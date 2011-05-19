@@ -9,10 +9,10 @@ class QHidDevice;
 /**
  * @brief message definitiond
  */
-#define ID_FLAG                     0xff        // message which has this flag is a device ID
+#define ID_MAP_FLAG                 0xff        // message which has this flag is a device ID
 #define ID_AMOUNT_FLAG              0xf0        // message which has this flag is the amount of device
-#define PC_GET_ID_LIST              0xf1        // get total voter id
-#define PC_GET_ID_LIST_LENGTH       0xf2        // get total voter nums
+#define PC_GET_ID_LIST              0xf2        // get total voter id
+#define PC_GET_ID_LIST_LENGTH       0xf1        // get total voter nums
 #define PC_STOP_HID_DEVICE          0x01        // stop vote
 #define PC_START_HID_DEVICE         0x02        // start vote
 
@@ -54,6 +54,11 @@ signals:
     void idMapReceiveFinished();
 
     /**
+     * @brief when id sent finished, this signal will be emit.
+     */
+    void idSentFinished();
+
+    /**
      * @brief when (the number of id) data coming, this signal will be emit.
      */
     void idAmountComing(uint count);
@@ -61,6 +66,10 @@ signals:
 //    void rollCallFinished(uint count);
 
 public slots:
+    /**
+    * @brief open control.
+    */
+    void open();
 	/**
 	* @brief start a specific remote by its id.
 	* 		the default remote id is a broadcast id.
@@ -105,7 +114,7 @@ private:
 
     QHidDevice *device;
     // bitmap of the remote device
-    quint16 *remoteDeviceBitmap;
+    quint8 remoteDeviceBitmap[DEVICE_ID_BITMAP_SIZE_IN_BYTE];
     // bitmap slice counter, USB need send 32 messages until the bitmap transmit finished
     quint8 bitmapSliceCounter;
     // this is a map to containing the remote ID an option.

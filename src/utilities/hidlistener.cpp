@@ -65,10 +65,10 @@ void QHidListener::exec()
                            (unsigned char *) packet, dataLength,
                            INT_WAIT_TIME);
         if (ret > 0) {
-			quint16 id[2];
-			memcpy(id, packet, 4);
-			qDebug("data received from: 0x%04x%04x with %d",
-				   id[0], id[1], packet[dataLength-1]);
+            quint8 id[2];
+            memcpy(id, packet, 2);
+            qDebug("data received from: 0x%02x%02x with %02x",
+                   id[0], id[1], (quint8)packet[dataLength-1]);
             emit hidDataReceived(QByteArray(packet, dataLength));
         }
         else if (ret < 0) {
