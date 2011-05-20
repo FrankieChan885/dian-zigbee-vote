@@ -20,8 +20,8 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     drawer(NULL),
     hidControl(NULL),
     stopWatch(NULL),
-    splash(NULL),
-    voteMode(SINGLE_VOTE),
+    splash(NULL),/*
+    voteMode(SINGLE_VOTE),*/
     curState(STOP)
 {
     QDir dir;
@@ -66,19 +66,19 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     pbOption->setObjectName(tr("pbOption"));
     ui->buttonLayout->addWidget(pbOption, 0, 3);
 
-    qaSingleMode = new QAction(tr("SingleVoteMode"), this);  // 单选模式
-    qaSingleMode->setCheckable(true);
-    qaSingleMode->setChecked(true);         // 默认模式
-    qaMutipleMode = new QAction(tr("MutipleVoteMode"), this); // 多选
-    qaMutipleMode->setCheckable(true);
-    qaRaceMode = new QAction(tr("RaceVoteMode"), this);    // 抢答
-    qaRaceMode->setCheckable(true);
-    pbOption->addAction(qaSingleMode);
-    pbOption->addAction(qaMutipleMode);
-    pbOption->addAction(qaRaceMode);
-    connect(qaSingleMode, SIGNAL(triggered()), this, SLOT(DoSingleMode()));
-    connect(qaMutipleMode, SIGNAL(triggered()), this, SLOT(DoMutipleMode()));
-    connect(qaRaceMode, SIGNAL(triggered()), this, SLOT(DoRaceVoteMode()));
+//    qaSingleMode = new QAction(tr("SingleVoteMode"), this);  // 单选模式
+//    qaSingleMode->setCheckable(true);
+//    qaSingleMode->setChecked(true);         // 默认模式
+//    qaMutipleMode = new QAction(tr("MutipleVoteMode"), this); // 多选
+//    qaMutipleMode->setCheckable(true);
+//    qaRaceMode = new QAction(tr("RaceVoteMode"), this);    // 抢答
+//    qaRaceMode->setCheckable(true);
+//    pbOption->addAction(qaSingleMode);
+//    pbOption->addAction(qaMutipleMode);
+//    pbOption->addAction(qaRaceMode);
+//    connect(qaSingleMode, SIGNAL(triggered()), this, SLOT(DoSingleMode()));
+//    connect(qaMutipleMode, SIGNAL(triggered()), this, SLOT(DoMutipleMode()));
+//    connect(qaRaceMode, SIGNAL(triggered()), this, SLOT(DoRaceVoteMode()));
 
     pbClose = new QPushButton(this);
     pbClose->setObjectName(tr("pbClose"));
@@ -163,6 +163,11 @@ void DianVoteControl::VoteStart()
             // 把错误信息写入log文件
             return;
         }
+        if(!StartHid())     // 开启接收设备
+        {
+            return;
+        }
+        hidControl->GetIDListLength();
 
 //      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
@@ -181,7 +186,6 @@ void DianVoteControl::VoteStart()
         pbAuto->hide();
         pbPause->show();
         pbStop->show();
-        pbOption->setEnabled(false);
 
         // 画出秒表, 递增模式
         ShowStopWatch();
@@ -189,7 +193,6 @@ void DianVoteControl::VoteStart()
         stopWatch->setMode(STOP_WATCH_INCREASE_MODE);
         stopWatch->start();
         resizeAnimation->start();
-        StartHid();     // 开启接收设备
     }
 
     // 改变状态
@@ -221,6 +224,11 @@ void DianVoteControl::VoteAuto()
             // 把错误信息写入log文件
             return;
         }
+        if(!StartHid())     // 开启接收设备
+        {
+            return;
+        }
+        hidControl->GetIDListLength();
 
 //      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
@@ -245,14 +253,11 @@ void DianVoteControl::VoteAuto()
         emit setLastTime(num1);;
         emit setOptionNum(num0);
 
-        StartHid();     // 开启接收设备
-
         // 修改主界面
         pbStart->hide();
         pbAuto->hide();
         pbPause->show();
         pbStop->show();
-        pbOption->setEnabled(false);
 
         stopWatch->start();
         resizeAnimation->start();
@@ -325,7 +330,6 @@ void DianVoteControl::VoteStop()
         // 因为pause状态hidCntrol已经停止，所以不需要停止
     }
 
-    pbOption->setEnabled(true);
     resizeAnimation->start();
     // 修改状态
     curState = STOP;
@@ -356,7 +360,7 @@ void DianVoteControl::DoShowStatics()
 
 }
 
-void DianVoteControl::ParseData(quint32 id, quint8 option)
+void DianVoteControl::ParseData(quint16 id, quint8 option)
 {
     RevData *rd = new RevData;
     rd->key = option;       // 取出最后一个字节
@@ -369,7 +373,6 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
 
     // 容错性检查，如果收到已经发送过的数据手持端
     //      果断丢弃数据，并且写入log中
-#ifndef TEST_RECEIVE_DATA_CONTINUE
     for(int i = 0; i < log->length(); i++)
     {
         if((log->at(i)->id == id) && (log->at(i)->type == NORMAL))
@@ -380,7 +383,6 @@ void DianVoteControl::ParseData(quint32 id, quint8 option)
             return;
         }
     }
-#endif
     emit updateGraph((int)rd->key - MAP_VALUE);  // 更新数据
 
     rd->type = NORMAL;
@@ -441,24 +443,20 @@ bool DianVoteControl::PrepareHid()
         if(!hidControl)
         {
             hidControl = new HidControl(this);
-
-#ifdef DO_ROLL_CALL
-            connect(hidControl, SIGNAL(rollCallFinished(uint)),
-                    drawer, SLOT(SetRepliedDeviceNum(uint)));
-            hidControl->startRollCall();
-#endif  // end ifdef
         }
-        // for test, comment this line
-#ifndef TEST_RECEIVE_DATA_CONTINUE
-        hidControl->setStopOnReceive(true);
-#endif  // end ifndef
-        connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
-                this, SLOT(ParseData(quint32, quint8)));
+        connect(hidControl, SIGNAL(voteComing(quint16, quint8)),
+                this, SLOT(ParseData(quint16, quint8)));
+        connect(hidControl, SIGNAL(idAmountComing(uint)),
+                drawer, SLOT(SetRepliedVoters(uint)));
+
+
+#ifndef USELESS_CODE
         if(voteMode == RACE_VOTE)
         {
             connect(hidControl, SIGNAL(voteComing(quint32, quint8)),
                     this, SLOT(ShowRaceVoteWinner(quint32,quint8)));
         }
+#endif
 
         return true;
     }
@@ -561,7 +559,7 @@ void DianVoteControl::HideStopWatch()
     connect(resizeAnimation, SIGNAL(finished()), this, SLOT(DoHideStopWatch()));
 }
 
-
+#ifndef USELESS_CODE
 void DianVoteControl::ShowRaceVoteWinner(quint32 id, quint8 key)
 {
     // 先关闭所有的设备，在打开被选中的设备
@@ -599,6 +597,7 @@ void DianVoteControl::CloseRaceVoteWinner()
 {
     hidControl->stop();
 }
+#endif  // do not compile this
 
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
 {
@@ -708,6 +707,45 @@ void DianVoteControl::ClearLogList()
     log->clear();
 }
 
+void DianVoteControl::GetIDList()
+{
+    try {
+        if (!hidControl) {
+            hidControl = new HidControl(this);
+        }
+        // connect(hidControl, SIGNAL(idAmountComing(uint)), this, SLOT(showIDAmount(uint)));
+        // get id list
+        hidControl->GetIDList();
+
+    } catch (DianVoteStdException *e) {
+        QMessageBox::critical(0, "error", e->what());
+        return;
+    } catch (...) {
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return;
+    }
+}
+
+void DianVoteControl::GetIDListLength()
+{
+    try {
+        if (!hidControl) {
+            hidControl = new HidControl(this);
+        }
+        // connect(hidControl, SIGNAL(idComing(quint16)), this, SLOT(showID(quint16)));
+
+        // get id amounts
+        hidControl->GetIDListLength();
+    } catch (DianVoteStdException *e) {
+        QMessageBox::critical(0, "error", e->what());
+        return;
+    } catch (...) {
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return;
+    }
+}
+
+#ifndef USELESS_CODE
 void DianVoteControl::DoRaceVoteMode()
 {
     voteMode = RACE_VOTE;
@@ -734,3 +772,4 @@ void DianVoteControl::DoMutipleMode()
     qaMutipleMode->setChecked(true);
     qaSingleMode->setChecked(false);
 }
+#endif  // discard this

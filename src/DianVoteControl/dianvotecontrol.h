@@ -46,16 +46,18 @@ enum ReceivedDataType
     UNKNOWN
 };
 
+#ifndef USELESS_CODE
 enum VoteMode
 {
     SINGLE_VOTE,
     MULTIPLE_VOTE,
     RACE_VOTE
 };
+#endif
 
 typedef struct _RevData
 {
-    quint32 id;   // 手持端ID
+    quint16 id;   // 手持端ID
     quint8 key;   // 手持端按键的编号
     QString *revTime;
     enum ReceivedDataType type;
@@ -96,17 +98,22 @@ public slots:
     //-----display part-----//
 
     //-----data pre-process part-----//
-    void ParseData(quint32 id, quint8 option);
+    void ParseData(quint16 id, quint8 option);
     //-----data pre-process part-----//
 
 private slots:
 //    void DoShowStopWatch();     // 显示秒表widget，在下拉动画完毕后调用
     void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
+    void GetIDList();           // 发送获取ID列表消息
+    void GetIDListLength();     // 获取手持端设备的个数
+
+#ifndef USELESS_CODE
     void DoRaceVoteMode();      // 抢答模式下的处理
-    void ShowRaceVoteWinner(quint32 id, quint8 key);  // 抢答模式时显示抢到者的ID
+    void ShowRaceVoteWinner(quint16 id, quint8 key);  // 抢答模式时显示抢到者的ID
     void CloseRaceVoteWinner();             // 关闭抢答窗口时要关闭设备
     void DoSingleMode();        // 单选模式下
     void DoMutipleMode();       // 多选模式下
+#endif
 
 protected:
     void mouseMoveEvent(QMouseEvent *event);
@@ -124,10 +131,10 @@ private:
     QIcon *windowIcon;          // windowIcon
 
     // mode menu
-    QMenu *qmMode;
-    QAction *qaSingleMode;  // 单选模式
-    QAction *qaMutipleMode; // 多选
-    QAction *qaRaceMode;    // 抢答
+//    QMenu *qmMode;
+//    QAction *qaSingleMode;  // 单选模式
+//    QAction *qaMutipleMode; // 多选
+//    QAction *qaRaceMode;    // 抢答
 
     // buttons
     QPushButton *pbStart;
@@ -149,7 +156,7 @@ private:
     QPoint prePoint;        // 记录动画开始时的位置
     QSize initSize;         // 窗口初始化时的大小
     // 控制状态
-    enum VoteMode voteMode;     // 投票模式，默认是SINGLE_VOTE
+//    enum VoteMode voteMode;     // 投票模式，默认是SINGLE_VOTE
     enum ControlState curState; // 当前状态
     static QFile *VoteLog;             // 日志文件
 

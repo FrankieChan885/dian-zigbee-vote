@@ -34,9 +34,7 @@ public:
     DrawBase *pie;
 
 public slots:
-#ifdef DO_ROLL_CALL
-    void SetRepliedDeviceNum(uint replyNum); // 设置设备总数
-#endif  // end ifdef
+    void SetRepliedVoters(uint num);    // 设置点名后的获取的设备总数
     void SwithChart();      // 在饼图和直方图之间切换
 
 protected:

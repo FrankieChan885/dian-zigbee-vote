@@ -97,7 +97,7 @@ void HidControl::dataReceived(QByteArray ba)
     case ID_AMOUNT_FLAG: {
             memcpy(&data, ba.data(), 2);
             // data is the number of remote devices
-            emit idAmountComing(data);
+            emit idAmountComing(uint(data));
             break;
         }
 

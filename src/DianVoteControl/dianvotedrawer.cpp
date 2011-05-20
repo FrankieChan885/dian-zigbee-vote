@@ -16,7 +16,7 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     ui->setupUi(this);
 
     previous = new QToolButton();
-   previous->setObjectName(tr("Previous_Drawer"));
+    previous->setObjectName(tr("Previous_Drawer"));
     ui->NextPrevious->addWidget(previous, 0, 1);
 
     next = new QToolButton();
@@ -81,14 +81,6 @@ DianVoteDrawer::~DianVoteDrawer()
     }
 }
 
-#ifdef DO_ROLL_CALL
-void DianVoteDrawer::SetRepliedDeviceNum(uint replyNum)
-{
-    replidDeviceNum = replyNum;
-    update();
-}
-#endif      // end ifdef
-
 void DianVoteDrawer::paintEvent(QPaintEvent *event)
 {
     QPainter painter(this);
@@ -109,12 +101,10 @@ void DianVoteDrawer::draw(QPainter *painter)
 
     DoWithCoordinate();
 
-#ifdef DO_ROLL_CALL
     QString replyNum = "Total: " + QString("%1").arg(replidDeviceNum);
     painter->setFont(Font);
     painter->drawText(RepliedDeviceNumX, RepliedDeviceNumY,
                       replyNum);
-#endif  // end ifdef
 
     int voterNums = histgram->GetVoterNums() > pie->GetVoterNums() ? \
                     histgram->GetVoterNums() : pie->GetVoterNums();
@@ -135,6 +125,12 @@ void DianVoteDrawer::DoWithCoordinate()
     TotalNumX = width() * RatioTotalNumX;
     TotalNumY = height() * RatioTotalNumY;
     //-----total voter number coordinate----//
+}
+
+void DianVoteDrawer::SetRepliedVoters(uint num)
+{
+    replidDeviceNum = num;
+    update();
 }
 
 void DianVoteDrawer::SwithChart()

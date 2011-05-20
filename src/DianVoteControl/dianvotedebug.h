@@ -21,6 +21,12 @@
  * errors, warnings, fatal errors and debug messages
  * redirected to a file
  */
-#define REDIRECT_MESSAGE_TO_FILE
+//#define REDIRECT_MESSAGE_TO_FILE
+
+/*
+ * This macro is used to remove some useless code,
+ * which is better not be deleted.
+ */
+#define USELESS_CODE
 
 #endif // DIANVOTEDEBUG_H
