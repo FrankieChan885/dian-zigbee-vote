@@ -1,9 +1,0 @@
-Output: Bill of Materials
-Type  : ReportComponents
-From  : Project [CC2530.PrjPCB]
-
-
-Files Generated   : 0
-Documents Printed : 0
-
-Finished Output Generation At 14:43:33 On 2011-3-26
