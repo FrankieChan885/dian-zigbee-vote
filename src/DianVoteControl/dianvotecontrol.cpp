@@ -163,11 +163,6 @@ void DianVoteControl::VoteStart()
             // 把错误信息写入log文件
             return;
         }
-        if(!StartHid())     // 开启接收设备
-        {
-            return;
-        }
-        hidControl->GetIDListLength();
 
 //      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
@@ -177,6 +172,10 @@ void DianVoteControl::VoteStart()
             emit setOptionNum(num);     // 获取选项个数
         }
         else
+        {
+            return;
+        }
+        if(!StartHid())     // 开启接收设备
         {
             return;
         }
@@ -224,11 +223,6 @@ void DianVoteControl::VoteAuto()
             // 把错误信息写入log文件
             return;
         }
-        if(!StartHid())     // 开启接收设备
-        {
-            return;
-        }
-        hidControl->GetIDListLength();
 
 //      emit clearDrawData();   // 注意，这一步一定要在GetOptionNum之前
 
@@ -250,8 +244,12 @@ void DianVoteControl::VoteAuto()
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
 
-        emit setLastTime(num1);;
+        emit setLastTime(num1);
         emit setOptionNum(num0);
+        if(!StartHid())     // 开启接收设备
+        {
+            return;
+        }
 
         // 修改主界面
         pbStart->hide();
@@ -477,6 +475,7 @@ bool DianVoteControl::StartHid()
     try
     {
         hidControl->start();
+        hidControl->GetIDListLength();
         // start all remote.
         return true;
     }
