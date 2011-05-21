@@ -19,25 +19,31 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
     ui->setupUi(this);
     ui->retranslateUi(this);
 
-    connect(ui->startTest, SIGNAL(clicked(bool)),
-            this, SLOT(usbStartClicked(bool)));
     connect(ui->remoteState, SIGNAL(clicked(bool)),
-            this, SLOT(remoteStateClicked(bool)));
+            this, SLOT(usbStartClicked(bool)));
+//    connect(ui->remoteState, SIGNAL(clicked(bool)),
+//            this, SLOT(remoteStateClicked(bool)));
     connect(ui->remoteID, SIGNAL(textChanged(QString)),
             this, SLOT(remoteIDChanged(QString)));
     connect(ui->getIDList, SIGNAL(clicked()),
             this, SLOT(getIDList()));
     connect(ui->getIDAmount, SIGNAL(clicked()),
             this, SLOT(getIDListLength()));
-    connect(ui->clearData, SIGNAL(clicked()),
+    connect(ui->votedClear, SIGNAL(clicked()),
             ui->output, SLOT(clear()));
-    connect(ui->clearData, SIGNAL(clicked()),
+    connect(ui->notvotedClear, SIGNAL(clicked()),
+            ui->notVoted, SLOT(clear()));
+    connect(ui->notvotedClear, SIGNAL(clicked()),
+            this, SLOT(clearNotVoteList()));
+    connect(ui->rollCallClear, SIGNAL(clicked()),
             ui->rollcall, SLOT(clear()));
-    connect(ui->clearMessage, SIGNAL(clicked()),
+    connect(ui->logClear, SIGNAL(clicked()),
             ui->message, SLOT(clear()));
 
+    this->setMinimumSize(this->size());
+
     connect(timer, SIGNAL(timeout()), this, SLOT(showIntenalMessage()));
-    timer->setInterval(200);
+    timer->setInterval(100);
     timer->start();
 
     try {
@@ -75,6 +81,8 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
 
     QIcon *windowIcon = new QIcon(dir.absoluteFilePath("res/icons/test.png"));
     this->setWindowIcon(*windowIcon);
+
+    noteVoted = new QList< QString >();
 }
 
 
@@ -88,14 +96,23 @@ TestDianvote::~TestDianvote() {
 void TestDianvote::showInData(quint16 id, quint8 option) {
     // print remote ID:
     QString msg;
-    msg.append(QString("%L1: remote: ").arg(count++, 4, 16, QChar('0')));
-    msg.append(QString("0x%L1").
-               arg(id, 4, 16, QChar('0')));
+    QString sid = QString("%1").arg(QString("0x%L1").
+                                    arg(id, 4, 16, QChar('0')));
+    msg.append(QString("%L1: remote ID: ").arg(countID++, 4, 16, QChar('0')));
+    msg.append(sid);
 
     // print remote cmd
     msg.append(QString("\t%L1").arg(option, 2, 16));
-
     ui->output->append(msg);
+
+    for(int i = 0; i < noteVoted->length(); i++)
+    {
+        if(noteVoted->at(i) == sid)
+        {
+            noteVoted->removeAt(i);
+            break;
+        }
+    }
 }
 
 void TestDianvote::remoteIDChanged(const QString &) {
@@ -105,17 +122,9 @@ void TestDianvote::remoteIDChanged(const QString &) {
 void TestDianvote::usbStartClicked(bool isStart) {
     // get vid & pid.
     quint16 vid, pid;
-    bool ok;
-    vid = ui->usbVID->text().toUShort(&ok, 16);
-    if (!ok) {
-        qDebug("TestDianvote::usbStartClicked(): vid should be based 16.");
-        return;
-    }
-    pid = ui->usbPID->text().toUShort(&ok, 16);
-    if (!ok) {
-        qDebug("TestDianvote::usbStartClicked(): pid should be based 16.");
-        return;
-    }
+
+    vid = 0x0451;
+    pid = 0x16a9;
 
     if (isStart) {
         // clear count
@@ -128,13 +137,24 @@ void TestDianvote::usbStartClicked(bool isStart) {
             // open hid device.
             hidControl->open();
             qDebug("TestDianvote::usbStartClicked(): hidControl started...");
+            quint16 id;
+            bool ok;
+            id = ui->remoteID->text().toULong(&ok, 16);
+            if (!ok) {
+                ui->remoteState->setChecked(false);
+                qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
+                return;
+            }
+            isStart ?
+                hidControl->start(id)
+                : hidControl->stop(id);
 
         } catch (DianVoteStdException *e) {
-            ui->startTest->setChecked(false);
+            ui->remoteState->setChecked(false);
             QMessageBox::critical(0, "error", e->what());
             return;
         } catch (...) {
-            ui->startTest->setChecked(false);
+            ui->remoteState->setChecked(false);
             QMessageBox::critical(0, "error", "unknow exception.");
             return;
         }
@@ -150,7 +170,7 @@ void TestDianvote::usbStartClicked(bool isStart) {
 
 void TestDianvote::remoteStateClicked(bool isWork) {
     // don't write data unless usb is opened.
-    if (ui->startTest->isChecked()) {
+    if (isWork) {
         quint16 id;
         bool ok;
         id = ui->remoteID->text().toULong(&ok, 16);
@@ -175,18 +195,16 @@ void TestDianvote::getIDList()
         if (!hidControl) {
             hidControl = new HidControl(this);
         }
-        // connect(hidControl, SIGNAL(idAmountComing(uint)), this, SLOT(showIDAmount(uint)));
+
         // get id list
         countID = 0;        // clear counter
         hidControl->GetIDList();
         ui->getIDList->setEnabled(false);
 
     } catch (DianVoteStdException *e) {
-        ui->startTest->setChecked(false);
         QMessageBox::critical(0, "error", e->what());
         return;
     } catch (...) {
-        ui->startTest->setChecked(false);
         QMessageBox::critical(0, "error", "unknow exception.");
         return;
     }
@@ -195,12 +213,22 @@ void TestDianvote::getIDList()
 void TestDianvote::showID(quint16 id)
 {
     QString msg;
+    QString sid = QString("%1").arg(QString("0x%L1").
+                                    arg(id, 4, 16, QChar('0')));
     msg.append(QString("%L1: remote ID: ").arg(countID++, 4, 16, QChar('0')));
-    msg.append(QString("0x%L1").
-               arg(id, 4, 16, QChar('0')));
+    msg.append(sid);
 
     ui->remoteCount->setText(QString("%L1").arg(countID));
     ui->rollcall->append(msg);
+
+    for(int i = 0; i < noteVoted->length(); i++)
+    {
+        if(noteVoted->at(i) == sid)
+        {
+            return;
+        }
+    }
+    noteVoted->append(sid);
 }
 
 void TestDianvote::getIDListLength()
@@ -209,16 +237,13 @@ void TestDianvote::getIDListLength()
         if (!hidControl) {
             hidControl = new HidControl(this);
         }
-        // connect(hidControl, SIGNAL(idComing(quint16)), this, SLOT(showID(quint16)));
 
         // get id amounts
         hidControl->GetIDListLength();
     } catch (DianVoteStdException *e) {
-        ui->startTest->setChecked(false);
         QMessageBox::critical(0, "error", e->what());
         return;
     } catch (...) {
-        ui->startTest->setChecked(false);
         QMessageBox::critical(0, "error", "unknow exception.");
         return;
     }
@@ -276,4 +301,19 @@ void TestDianvote::showIntenalMessage()
         ui->message->append(message->first());
         message->removeFirst();
     }
+
+    ui->notVoted->clear();
+    for(int i = 0; i < noteVoted->length(); i++)
+    {
+        QString msg = "remote ID: " + noteVoted->at(i);
+        if(!ui->notVoted->find(msg))
+        {
+            ui->notVoted->append(msg);
+        }
+    }
+}
+
+void TestDianvote::clearNotVoteList()
+{
+    noteVoted->clear();
 }

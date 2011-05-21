@@ -185,12 +185,17 @@ void HidControl::ensureDeviceOpened()
     }
 }
 
+/// DianVoteControl need the device map
+std::map <quint16, quint8>* HidControl::GetMap()
+{
+    return &remoteMap;
+}
+
 /// the USB and PC id translate function.
 quint16 HidControl::usbId2PCId(const QByteArray& ba)
 {
     quint16 id;
-    id = ba.at(0);
-    id |= quint16(ba.at(1)) << 8;
+    memcpy(&id, ba.data(), 2);
     return id;
 }
 

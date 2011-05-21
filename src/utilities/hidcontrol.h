@@ -33,6 +33,7 @@ public:
     ~HidControl();
 
 	/// the usb and PC id translate function.
+    std::map <quint16, quint8>* GetMap();
     static quint16 usbId2PCId(const QByteArray&);
     static QByteArray PCId2usbId(const quint16&);
 
@@ -62,8 +63,6 @@ signals:
      * @brief when (the number of id) data coming, this signal will be emit.
      */
     void idAmountComing(uint count);
-
-//    void rollCallFinished(uint count);
 
 public slots:
     /**

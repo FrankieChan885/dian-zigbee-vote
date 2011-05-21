@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     hidlistener.cpp \
     hiddevice.cpp \
     hidcontrol.cpp \
-    stopwatch.cpp
+    stopwatch.cpp \
+    changestatus.cpp
 
 HEADERS  += dianvotecontrol.h \
     drawhistgram.h \

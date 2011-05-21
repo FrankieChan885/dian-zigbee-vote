@@ -38,3 +38,6 @@ UI_DIR       = ./temp
 
 FORMS += \
     testdianvote.ui
+
+RESOURCES += \
+    testDianVote.qrc

@@ -1,6 +1,7 @@
 #ifndef DIANVOTECONTROL_H
 #define DIANVOTECONTROL_H
 
+#include <map>
 #include <QWidget>
 #include <QByteArray>
 #include "dianvotedrawer.h"
@@ -46,22 +47,21 @@ enum ReceivedDataType
     UNKNOWN
 };
 
-#ifndef USELESS_CODE
+#if 0
 enum VoteMode
 {
     SINGLE_VOTE,
     MULTIPLE_VOTE,
     RACE_VOTE
 };
-#endif
 
 typedef struct _RevData
 {
     quint16 id;   // 手持端ID
     quint8 key;   // 手持端按键的编号
-    QString *revTime;
     enum ReceivedDataType type;
 }RevData;
+#endif
 
 namespace Ui {
     class DianVoteControl;
@@ -85,34 +85,25 @@ signals:
 
 public slots:
 
-    //-----control part-----//
     void VoteStart();
     void VotePause();
     void VoteStop();
     void VoteAuto();
-    //-----control part-----//
-
-    //-----display part-----//
     void DoShowResults();
     void DoShowStatics();
-    //-----display part-----//
-
-    //-----data pre-process part-----//
     void ParseData(quint16 id, quint8 option);
-    //-----data pre-process part-----//
 
 private slots:
-//    void DoShowStopWatch();     // 显示秒表widget，在下拉动画完毕后调用
-    void DoHideStopWatch();     // 删除秒表widget，在上拉动画完毕后调用
-    void GetIDList();           // 发送获取ID列表消息
-    void GetIDListLength();     // 获取手持端设备的个数
+    void DoHideStopWatch();                 // 删除秒表widget，在上拉动画完毕后调用
+    void GetIDList();                       // 发送获取ID列表消息
+    void GetIDListLength();                 // 获取手持端设备的个数
 
-#ifndef USELESS_CODE
-    void DoRaceVoteMode();      // 抢答模式下的处理
+#if 0
+    void DoRaceVoteMode();                  // 抢答模式下的处理
     void ShowRaceVoteWinner(quint16 id, quint8 key);  // 抢答模式时显示抢到者的ID
     void CloseRaceVoteWinner();             // 关闭抢答窗口时要关闭设备
-    void DoSingleMode();        // 单选模式下
-    void DoMutipleMode();       // 多选模式下
+    void DoSingleMode();                    // 单选模式下
+    void DoMutipleMode();                   // 多选模式下
 #endif
 
 protected:
@@ -120,21 +111,28 @@ protected:
     void mousePressEvent(QMouseEvent *event);
 
 private:
-    QList< RevData* > *log;     // 数据接收的log
-
     Ui::DianVoteControl *ui;
     DianVoteDrawer *drawer;
     HidControl *hidControl;
     StopWatch *stopWatch;
-    QSplashScreen *splash;      // 欢迎界面
-    QDialog *raceWinner;        // 显示抢答结果
-    QIcon *windowIcon;          // windowIcon
+    std::map<quint16, quint8> *remoteDeviceMap;
+    QSplashScreen *splash;              // 欢迎界面
+    QIcon *windowIcon;                  // windowIcon
+    QPoint dragPosition;                // 拖动位置
+    QPoint prePoint;                    // 记录动画开始时的位置
+    QSize initSize;                     // 窗口初始化时的大小
+    enum ControlState curState;         // 当前状态
+    static QFile *VoteLog;              // 日志文件
 
     // mode menu
-//    QMenu *qmMode;
-//    QAction *qaSingleMode;  // 单选模式
-//    QAction *qaMutipleMode; // 多选
-//    QAction *qaRaceMode;    // 抢答
+#if 0
+    QMenu *qmMode;
+    QAction *qaSingleMode;                  // 单选模式
+    QAction *qaMutipleMode;                 // 多选
+    QAction *qaRaceMode;                    // 抢答
+    enum VoteMode voteMode;                 // 投票模式，默认是SINGLE_VOTE
+    QDialog *raceWinner;                    // 显示抢答结果
+#endif
 
     // buttons
     QPushButton *pbStart;
@@ -145,32 +143,21 @@ private:
     QToolButton *pbOption;
     QPushButton *pbClose;
 
-    QInputDialog *getOptionNum;      // 弹出窗口，设置选项个数
-    QInputDialog *getLastTime;      // 当用Auto模式时需要设置
+    QInputDialog *getOptionNum;         // 弹出窗口，设置选项个数
+    QInputDialog *getLastTime;          // 当用Auto模式时需要设置
 
     QPropertyAnimation *resizeAnimation;
-//    QPropertyAnimation *showStopWatchAnimation;
-
-    // 主控界面位置及大小
-    QPoint dragPosition;    // 拖动位置
-    QPoint prePoint;        // 记录动画开始时的位置
-    QSize initSize;         // 窗口初始化时的大小
-    // 控制状态
-//    enum VoteMode voteMode;     // 投票模式，默认是SINGLE_VOTE
-    enum ControlState curState; // 当前状态
-    static QFile *VoteLog;             // 日志文件
 
 private:
-    int GetOptionNum();    // 获取选项个数，并传给histgram
-    int GetLastTime();      // 获取秒表倒计时时间
-    bool StartHid();        // 开启接收设备
-    bool StopHid();         // 关闭接收设备
-    bool PrepareHid();     // 准备好接收设备
+    int GetOptionNum();                 // 获取选项个数，并传给histgram
+    int GetLastTime();                  // 获取秒表倒计时时间
+    bool StartHid();                    // 开启接收设备
+    bool StopHid();                     // 关闭接收设备
+    bool PrepareHid();                  // 准备好接收设备
     void LoadStyleSheet(const QString &sheetname);
-    void ShowStopWatch();   // 显示秒表
-    void HideStopWatch();   // 删掉秒表
-    void WriteRevDataLog(RevData *rd);  // 在每一次接收到数据时，都将这次投票的所有记录写入文件，并清空log列表
-    void ClearLogList();        // 清空log链表，在此之前保存到log文件中
+    void ShowStopWatch();               // 显示秒表
+    void HideStopWatch();               // 删掉秒表
+    void ClearLogList();                // 清空log链表，在此之前保存到log文件中
 };
 
 #endif // DIANVOTECONTROL_H
