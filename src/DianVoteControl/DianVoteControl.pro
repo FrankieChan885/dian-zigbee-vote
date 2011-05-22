@@ -46,8 +46,6 @@ LIBS += -L../bin -lhidapi
 FORMS    += dianvotecontrol.ui \
     dianvotedrawer.ui
 
-RESOURCES += \
-    DianVoteDrawer.qrc
 
 # Output paths
 DESTDIR      = ../bin

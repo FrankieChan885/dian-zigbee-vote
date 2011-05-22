@@ -126,46 +126,37 @@ void TestDianvote::usbStartClicked(bool isStart) {
     vid = 0x0451;
     pid = 0x16a9;
 
-    if (isStart) {
-        // clear count
-        count = 0;
+    // clear count
+    count = 0;
 
-        try {
-            if (!hidControl) {
-                hidControl = new HidControl(this);
-            }
-            // open hid device.
-            hidControl->open();
-            qDebug("TestDianvote::usbStartClicked(): hidControl started...");
-            quint16 id;
-            bool ok;
-            id = ui->remoteID->text().toULong(&ok, 16);
-            if (!ok) {
-                ui->remoteState->setChecked(false);
-                qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
-                return;
-            }
-            isStart ?
-                hidControl->start(id)
-                : hidControl->stop(id);
-
-        } catch (DianVoteStdException *e) {
+    try {
+        if (!hidControl) {
+            hidControl = new HidControl(this);
+        }
+        // open hid device.
+        hidControl->open();
+        qDebug("TestDianvote::usbStartClicked(): hidControl started...");
+        quint16 id;
+        bool ok;
+        id = ui->remoteID->text().toULong(&ok, 16);
+        if (!ok) {
             ui->remoteState->setChecked(false);
-            QMessageBox::critical(0, "error", e->what());
-            return;
-        } catch (...) {
-            ui->remoteState->setChecked(false);
-            QMessageBox::critical(0, "error", "unknow exception.");
+            qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
             return;
         }
-    } // if (isStart)
-    else {
-		// sleep remote.
-		ui->remoteState->setChecked(false);
-        if (hidControl) {
-            hidControl->stop();
-        }
-    } // if (isStart) else
+        isStart ?
+            hidControl->start(id)
+            : hidControl->stop(id);
+
+    } catch (DianVoteStdException *e) {
+        ui->remoteState->setChecked(false);
+        QMessageBox::critical(0, "error", e->what());
+        return;
+    } catch (...) {
+        ui->remoteState->setChecked(false);
+        QMessageBox::critical(0, "error", "unknow exception.");
+        return;
+    }
 }
 
 void TestDianvote::remoteStateClicked(bool isWork) {
