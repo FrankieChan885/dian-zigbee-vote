@@ -25,7 +25,7 @@ public slots:
     void getIDListLength();
     void showIDAmount(uint);
     void showIntenalMessage();
-    void clearNotVoteList();
+    void clearVoteList();
 
     static void DianVoteMsgHandler(QtMsgType type, const char *msg);
 //	void stopOnReceiveClicked(bool);
@@ -39,6 +39,7 @@ private:
     Ui::TestDianVote *ui;
     QTimer *timer;
     static QList< QString > *message;
+    QList< QString > *voted;
     QList< QString > *noteVoted;
 };
 

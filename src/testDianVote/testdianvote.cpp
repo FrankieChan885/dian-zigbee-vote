@@ -21,8 +21,6 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
 
     connect(ui->remoteState, SIGNAL(clicked(bool)),
             this, SLOT(usbStartClicked(bool)));
-//    connect(ui->remoteState, SIGNAL(clicked(bool)),
-//            this, SLOT(remoteStateClicked(bool)));
     connect(ui->remoteID, SIGNAL(textChanged(QString)),
             this, SLOT(remoteIDChanged(QString)));
     connect(ui->getIDList, SIGNAL(clicked()),
@@ -34,7 +32,7 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
     connect(ui->notvotedClear, SIGNAL(clicked()),
             ui->notVoted, SLOT(clear()));
     connect(ui->notvotedClear, SIGNAL(clicked()),
-            this, SLOT(clearNotVoteList()));
+            this, SLOT(clearVoteList()));
     connect(ui->rollCallClear, SIGNAL(clicked()),
             ui->rollcall, SLOT(clear()));
     connect(ui->logClear, SIGNAL(clicked()),
@@ -82,6 +80,7 @@ TestDianvote::TestDianvote(QDialog *parent/* = 0*/)
     QIcon *windowIcon = new QIcon(dir.absoluteFilePath("res/icons/test.png"));
     this->setWindowIcon(*windowIcon);
 
+    voted = new QList< QString >();
     noteVoted = new QList< QString >();
 }
 
@@ -100,6 +99,15 @@ void TestDianvote::showInData(quint16 id, quint8 option) {
                                     arg(id, 4, 16, QChar('0')));
     msg.append(QString("%L1: remote ID: ").arg(countID++, 4, 16, QChar('0')));
     msg.append(sid);
+
+    for(int i = 0; i < voted->length(); i++)
+    {
+        if(voted->at(i) == sid)
+        {
+            return;
+        }
+    }
+    voted->append(sid);
 
     // print remote cmd
     msg.append(QString("\t%L1").arg(option, 2, 16));
@@ -144,9 +152,16 @@ void TestDianvote::usbStartClicked(bool isStart) {
             qDebug("TestDianvote::remoteStateClicked(): remote id should be based 16.");
             return;
         }
-        isStart ?
-            hidControl->start(id)
-            : hidControl->stop(id);
+
+        if(isStart)
+        {
+            hidControl->start(id);
+        }
+        else
+        {
+            hidControl->stop(id);
+            clearVoteList();
+        }
 
     } catch (DianVoteStdException *e) {
         ui->remoteState->setChecked(false);
@@ -304,7 +319,8 @@ void TestDianvote::showIntenalMessage()
     }
 }
 
-void TestDianvote::clearNotVoteList()
+void TestDianvote::clearVoteList()
 {
+    voted->clear();
     noteVoted->clear();
 }

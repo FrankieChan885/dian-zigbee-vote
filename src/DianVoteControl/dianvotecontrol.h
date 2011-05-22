@@ -115,7 +115,6 @@ private:
     DianVoteDrawer *drawer;
     HidControl *hidControl;
     StopWatch *stopWatch;
-    std::map<quint16, quint8> *remoteDeviceMap;
     QSplashScreen *splash;              // 欢迎界面
     QIcon *windowIcon;                  // windowIcon
     QPoint dragPosition;                // 拖动位置
@@ -123,6 +122,7 @@ private:
     QSize initSize;                     // 窗口初始化时的大小
     enum ControlState curState;         // 当前状态
     static QFile *VoteLog;              // 日志文件
+    QList< quint16 > *voted;            // 已投票的记录
 
     // mode menu
 #if 0

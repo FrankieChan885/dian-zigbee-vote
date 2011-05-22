@@ -115,6 +115,9 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     // 创建Log文件，并打开，程序退出是关闭
     VoteLog->open(QIODevice::WriteOnly | QIODevice::Append);
+
+    // 创建已投票者记录
+    voted = new QList< quint16 >();
 }
 
 DianVoteControl::~DianVoteControl()
@@ -150,6 +153,14 @@ void DianVoteControl::DoShowStatics()
 
 void DianVoteControl::ParseData(quint16 id, quint8 option)
 {
+    for(int i = 0; i < voted->length(); i++)
+    {
+        if(voted->at(i) == id)
+        {
+            return;
+        }
+    }
+    voted->append(id);
     emit updateGraph(option - MAP_VALUE);  // 更新数据
 }
 
@@ -206,7 +217,6 @@ bool DianVoteControl::PrepareHid()
         if(!hidControl)
         {
             hidControl = new HidControl(this);
-            remoteDeviceMap = hidControl->GetMap();
         }
         connect(hidControl, SIGNAL(voteComing(quint16, quint8)),
                 this, SLOT(ParseData(quint16, quint8)));
