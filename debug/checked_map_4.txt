@@ -1,0 +1,20 @@
+Debug: data received from: 0x79e0 with ff
+Debug: data received from: 0xf5c0 with ff
+Debug: data received from: 0x63c0 with ff
+Debug: data received from: 0xb9c0 with ff
+Debug: data received from: 0xcfc0 with ff
+Debug: data received from: 0x7d40 with ff
+Debug: data received from: 0xefc0 with ff
+Debug: data received from: 0x3300 with ff
+Debug: data received from: 0xcfc0 with ff
+Debug: data received from: 0xfbc0 with ff
+Debug: data received from: 0xa800 with ff
+Debug: data received from: 0x0000 with ff
+Debug: data received from: 0x0000 with ff
+Debug: data received from: 0x0000 with ff
+Debug: data received from: 0x0000 with ff
+Debug: data received from: 0x0000 with ff
+
+
+// 收到的数据的个数
+Debug: data received from: 0x5400 with f0

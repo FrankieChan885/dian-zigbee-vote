@@ -4,6 +4,7 @@
 #include <map>
 #include <QWidget>
 #include <QByteArray>
+#include "dianvoteoption.h"
 #include "dianvotedrawer.h"
 
 class HidControl;
@@ -16,7 +17,6 @@ class QDialog;
 class QInputDialog;
 class QSpacerItem;
 class QErrorMessage;
-class QSequentialAnimationGroup;
 class QPropertyAnimation;
 class QPushButton;
 class QSplashScreen;
@@ -89,6 +89,7 @@ public slots:
     void VotePause();
     void VoteStop();
     void VoteAuto();
+    void DoShowOptions();
     void DoShowResults();
     void DoShowStatics();
     void ParseData(quint16 id, quint8 option);
@@ -112,6 +113,7 @@ protected:
 
 private:
     Ui::DianVoteControl *ui;
+    DianVoteOption *options;
     DianVoteDrawer *drawer;
     HidControl *hidControl;
     StopWatch *stopWatch;
@@ -121,8 +123,8 @@ private:
     QPoint prePoint;                    // 记录动画开始时的位置
     QSize initSize;                     // 窗口初始化时的大小
     enum ControlState curState;         // 当前状态
-    static QFile *VoteLog;              // 日志文件
     QList< quint16 > *voted;            // 已投票的记录
+    static QFile *VoteLog;              // 日志文件
 
     // mode menu
 #if 0
@@ -142,10 +144,8 @@ private:
     QPushButton *pbStop;
     QToolButton *pbOption;
     QPushButton *pbClose;
-
     QInputDialog *getOptionNum;         // 弹出窗口，设置选项个数
     QInputDialog *getLastTime;          // 当用Auto模式时需要设置
-
     QPropertyAnimation *resizeAnimation;
 
 private:

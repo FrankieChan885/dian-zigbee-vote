@@ -68,7 +68,7 @@ void HidControl::stop(quint16 id/* = 0xffff*/)
 
         // if broadcast, means stop all device.
         if (0xffff == id) {
-            device->close();
+//            device->close();
         }
     }
 }

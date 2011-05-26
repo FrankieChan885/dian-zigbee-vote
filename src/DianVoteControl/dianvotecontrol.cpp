@@ -17,6 +17,7 @@ QFile* DianVoteControl::VoteLog = new QFile(tr("Votelog.log"));
 DianVoteControl::DianVoteControl(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DianVoteControl),
+    options(NULL),
     drawer(NULL),
     hidControl(NULL),
     stopWatch(NULL),
@@ -25,7 +26,6 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 {
     QDir dir;
     dir.setCurrent(QCoreApplication::applicationDirPath());
-
     windowIcon = new QIcon(dir.absoluteFilePath("res/images/app-icon.png"));
     this->setWindowIcon(*windowIcon);
 
@@ -91,6 +91,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbPause, SIGNAL(clicked()), this, SLOT(VotePause()));
     connect(pbStop, SIGNAL(clicked()), this, SLOT(VoteStop()));
     connect(pbResult, SIGNAL(clicked()), this, SLOT(DoShowResults()));
+    connect(pbOption, SIGNAL(clicked()), this, SLOT(DoShowOptions()));
 
     drawer = new DianVoteDrawer();
     drawer->setWindowIcon(*windowIcon);
@@ -124,6 +125,20 @@ DianVoteControl::~DianVoteControl()
 {
     delete ui;
     VoteLog->close();
+}
+
+void DianVoteControl::DoShowOptions()
+{
+    if(options == NULL)
+    {
+        options = new DianVoteOption();
+        connect(pbClose, SIGNAL(clicked()),
+                options, SLOT(close()));
+    }
+
+    options->isVisible() ?
+            options->hide() :
+            options->show();
 }
 
 void DianVoteControl::DoShowResults()
@@ -299,7 +314,6 @@ void DianVoteControl::LoadStyleSheet(const QString &sheetName)
         return;
     }
     QString styleSheet = QLatin1String(file.readAll());
-
     qApp->setStyleSheet(styleSheet);
 }
 
@@ -319,8 +333,10 @@ void DianVoteControl::ShowStopWatch()
     {
         stopWatch = new StopWatch(this);
     }
-    connect(this, SIGNAL(setLastTime(int)), stopWatch, SLOT(SetStartTime(int)));
-    connect(stopWatch, SIGNAL(autoStop()), this, SLOT(VoteStop()));
+    connect(this, SIGNAL(setLastTime(int)),
+            stopWatch, SLOT(SetStartTime(int)));
+    connect(stopWatch, SIGNAL(autoStop()),
+            this, SLOT(VoteStop()));
     ui->stopWatchLayout->addWidget(stopWatch);
 }
 

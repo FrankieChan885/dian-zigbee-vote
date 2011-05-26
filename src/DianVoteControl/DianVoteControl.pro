@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     hiddevice.cpp \
     hidcontrol.cpp \
     stopwatch.cpp \
-    changestatus.cpp
+    changestatus.cpp \
+    dianvoteoption.cpp
 
 HEADERS  += dianvotecontrol.h \
     drawhistgram.h \
@@ -35,7 +36,8 @@ HEADERS  += dianvotecontrol.h \
     hiddevice.h \
     hidcontrol.h \
     stopwatch.h \
-    dianvotedebug.h
+    dianvotedebug.h \
+    dianvoteoption.h
 
 win32:SOURCES += qtwin.cpp
 win32:HEADERS += qtwin.h
@@ -44,7 +46,8 @@ win32:HEADERS += qtwin.h
 LIBS += -L../bin -lhidapi
 
 FORMS    += dianvotecontrol.ui \
-    dianvotedrawer.ui
+    dianvotedrawer.ui \
+    dianvoteoptions.ui
 
 
 # Output paths

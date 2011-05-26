@@ -160,7 +160,7 @@ void TestDianvote::usbStartClicked(bool isStart) {
         else
         {
             hidControl->stop(id);
-            clearVoteList();
+            voted->clear();
         }
 
     } catch (DianVoteStdException *e) {
