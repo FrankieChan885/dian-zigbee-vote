@@ -116,10 +116,10 @@ void DianVoteDrawer::draw(QPainter *painter)
     DoWithCoordinate();
 
     QFont Font = QFont("Arial", FontSize, QFont::Bold, true);  // ÉèÖÃ×ÖÌå
-    QString questionName = "Question " + QString("%1").arg(questionNum);
-    painter->setFont(Font);
-    painter->drawText(QuestionNumX, QuestionNumY,
-                      questionName);
+//    QString questionName = "Question " + QString("%1").arg(questionNum);
+//    painter->setFont(Font);
+//    painter->drawText(QuestionNumX, QuestionNumY,
+//                      questionName);
 
     Font = QFont("Arial", FontSize, QFont::Light, true);
     QString replyNum = "Total: " + QString("%1").arg(replidDeviceNum);

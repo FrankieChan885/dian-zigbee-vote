@@ -94,13 +94,16 @@
          <item>
           <widget class="QLineEdit" name="FilterEdit">
            <property name="inputMask">
-            <string/>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string/>
            </property>
+           <property name="frame">
+            <bool>false</bool>
+           </property>
            <property name="placeholderText">
-            <string/>
+            <string notr="true"/>
            </property>
           </widget>
          </item>
