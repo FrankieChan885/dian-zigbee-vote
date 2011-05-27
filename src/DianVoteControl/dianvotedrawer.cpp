@@ -33,23 +33,23 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     showPie = new QToolButton();
     showPie->setObjectName(tr("Pie_Drawer"));
     showPie->setToolTip(tr("Show Pie Chart"));
-    ui->ContrulBar->addWidget(showPie, 0, 3);
+    ui->ContrulBar->addWidget(showPie, 0, 5);
 
     showHistgram = new QToolButton();
     showHistgram->hide();
     showHistgram->setObjectName(tr("Histgram_Drawer"));
     showHistgram->setToolTip(tr("Show Histgram Chart"));
-    ui->ContrulBar->addWidget(showHistgram, 0, 3);
+    ui->ContrulBar->addWidget(showHistgram, 0, 5);
 
-    correctAnswer = new QToolButton();
-    correctAnswer->setObjectName(tr("CorrectAnsewer_Drawer"));
-    correctAnswer->setToolTip(tr("Correct Answer"));
-    ui->ContrulBar->addWidget(correctAnswer, 0, 4);
+//    correctAnswer = new QToolButton();
+//    correctAnswer->setObjectName(tr("CorrectAnsewer_Drawer"));
+//    correctAnswer->setToolTip(tr("Correct Answer"));
+//    ui->ContrulBar->addWidget(correctAnswer, 0, 4);
 
-    details = new QToolButton();
-    details->setObjectName(tr("Details_Drawer"));
-    details->setToolTip(tr("Voting Details"));
-    ui->ContrulBar->addWidget(details, 0, 5);
+//    details = new QToolButton();
+//    details->setObjectName(tr("Details_Drawer"));
+//    details->setToolTip(tr("Voting Details"));
+//    ui->ContrulBar->addWidget(details, 0, 5);
 
     close = new QToolButton();
     close->setObjectName(tr("Close_Drawer"));
@@ -76,8 +76,8 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     RatioRepliedDeviceX = 0.6;   // 总数位置与窗口的宽度比例
     RatioRepliedDeviceY = 0.1;   //总数位置与窗口的高度度比例
 
-    RatioQuestionNumX = 0.35;
-    RatioQuestionNumY = 0.15;
+    RatioQuestionNumX = 0.1;
+    RatioQuestionNumY = 0.95;
 
     RatioTotalNumX = 0.8;       // 总数位置与窗口的宽度比例
     RatioTotalNumY = 0.1;       // 总数位置与窗口的高度度比例
@@ -116,10 +116,10 @@ void DianVoteDrawer::draw(QPainter *painter)
     DoWithCoordinate();
 
     QFont Font = QFont("Arial", FontSize, QFont::Bold, true);  // 设置字体
-//    QString questionName = "Question " + QString("%1").arg(questionNum);
-//    painter->setFont(Font);
-//    painter->drawText(QuestionNumX, QuestionNumY,
-//                      questionName);
+    QString questionIndex = QString("%1").arg(questionNum);
+    painter->setFont(Font);
+    painter->drawText(QuestionNumX, QuestionNumY,
+                      questionIndex);
 
     Font = QFont("Arial", FontSize, QFont::Light, true);
     QString replyNum = "Total: " + QString("%1").arg(replidDeviceNum);

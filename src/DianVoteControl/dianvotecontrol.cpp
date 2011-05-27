@@ -108,6 +108,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(this, SIGNAL(displayResult(bool)), drawer->pie, SLOT(SetDisplayResultWhileVoting(bool)));
     connect(drawer, SIGNAL(ShowPreviousQuestion()), this, SLOT(DoShowPreviousQuestion()));
     connect(drawer, SIGNAL(ShowNextQuestion()), this, SLOT(DoShowNextQuestion()));
+    connect(this, SIGNAL(setQuestionNum(int)), drawer, SLOT(SetQuestionNum(int)));
 
     LoadStyleSheet("Default");
 
@@ -121,6 +122,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     VoteLog->open(QIODevice::WriteOnly | QIODevice::Append);
 
     resultList = new QList< QList < VoteData* >* >();
+
 }
 
 DianVoteControl::~DianVoteControl()
@@ -153,6 +155,7 @@ void DianVoteControl::SavePreviousSession()
     }
     resultList->append(voted);
     resultIndex++;
+    emit setQuestionNum(resultIndex + 1);
 }
 
 void DianVoteControl::DoShowPreviousQuestion()
@@ -165,11 +168,13 @@ void DianVoteControl::DoShowPreviousQuestion()
     {
         voted = resultList->at(resultIndex);
         emit setOptionNum(optionNumList.at(resultIndex));
+        emit setQuestionNum(resultIndex + 1);
     }
     else
     {
         voted = resultList->at(--resultIndex);
         emit setOptionNum(optionNumList.at(resultIndex));
+        emit setQuestionNum(resultIndex + 1);
     }
     for(int i = 0; i < voted->length(); i++)
     {
@@ -186,6 +191,7 @@ void DianVoteControl::DoShowNextQuestion()
     }
     voted = resultList->at(++resultIndex);
     emit setOptionNum(optionNumList.at(resultIndex));
+    emit setQuestionNum(resultIndex + 1);
     for(int i = 0; i < voted->length(); i++)
     {
         updateGraph(voted->at(i)->key - MAP_VALUE);
