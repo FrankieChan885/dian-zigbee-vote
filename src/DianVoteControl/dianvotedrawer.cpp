@@ -11,37 +11,49 @@
 DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::DianVoteDrawer),
+    questionNum(0),
     replidDeviceNum(0)
 {
     ui->setupUi(this);
 
     previous = new QToolButton();
     previous->setObjectName(tr("Previous_Drawer"));
+    previous->setToolTip(tr("Previous"));
     ui->NextPrevious->addWidget(previous, 0, 1);
+    connect(previous, SIGNAL(clicked()),
+            this, SLOT(DoShowPreviousQuestion()));
 
     next = new QToolButton();
     next->setObjectName(tr("Next_Drawer"));
+    next->setToolTip(tr("Next"));
     ui->NextPrevious->addWidget(next, 0, 2);
+    connect(next, SIGNAL(clicked()),
+            this, SLOT(DoShowNextQuestion()));
 
     showPie = new QToolButton();
     showPie->setObjectName(tr("Pie_Drawer"));
+    showPie->setToolTip(tr("Show Pie Chart"));
     ui->ContrulBar->addWidget(showPie, 0, 3);
 
     showHistgram = new QToolButton();
     showHistgram->hide();
     showHistgram->setObjectName(tr("Histgram_Drawer"));
+    showHistgram->setToolTip(tr("Show Histgram Chart"));
     ui->ContrulBar->addWidget(showHistgram, 0, 3);
 
     correctAnswer = new QToolButton();
     correctAnswer->setObjectName(tr("CorrectAnsewer_Drawer"));
+    correctAnswer->setToolTip(tr("Correct Answer"));
     ui->ContrulBar->addWidget(correctAnswer, 0, 4);
 
-    option = new QToolButton();
-    option->setObjectName(tr("Option_Drawer"));
-    ui->ContrulBar->addWidget(option, 0, 5);
+    details = new QToolButton();
+    details->setObjectName(tr("Details_Drawer"));
+    details->setToolTip(tr("Voting Details"));
+    ui->ContrulBar->addWidget(details, 0, 5);
 
     close = new QToolButton();
     close->setObjectName(tr("Close_Drawer"));
+    close->setToolTip(tr("Close"));
     ui->ContrulBar->addWidget(close, 0, 6);
 
     connect(close, SIGNAL(clicked()), this, SLOT(close()));
@@ -61,10 +73,13 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     timer->start();
 
     FontSizeRatio = 35;         // 控制字体大小
-    RatioRepliedDeviceX = 0.52;   // 总数位置与窗口的宽度比例
+    RatioRepliedDeviceX = 0.6;   // 总数位置与窗口的宽度比例
     RatioRepliedDeviceY = 0.1;   //总数位置与窗口的高度度比例
 
-    RatioTotalNumX = 0.75;       // 总数位置与窗口的宽度比例
+    RatioQuestionNumX = 0.35;
+    RatioQuestionNumY = 0.15;
+
+    RatioTotalNumX = 0.8;       // 总数位置与窗口的宽度比例
     RatioTotalNumY = 0.1;       // 总数位置与窗口的高度度比例
 }
 
@@ -97,10 +112,16 @@ void DianVoteDrawer::paintEvent(QPaintEvent *event)
 void DianVoteDrawer::draw(QPainter *painter)
 {
     int FontSize = width() / FontSizeRatio;   // 计算字体大小
-    QFont Font = QFont("Arial", FontSize, QFont::Bold, true);  // 设置字体
 
     DoWithCoordinate();
 
+    QFont Font = QFont("Arial", FontSize, QFont::Bold, true);  // 设置字体
+    QString questionName = "Question " + QString("%1").arg(questionNum);
+    painter->setFont(Font);
+    painter->drawText(QuestionNumX, QuestionNumY,
+                      questionName);
+
+    Font = QFont("Arial", FontSize, QFont::Light, true);
     QString replyNum = "Total: " + QString("%1").arg(replidDeviceNum);
     painter->setFont(Font);
     painter->drawText(RepliedDeviceNumX, RepliedDeviceNumY,
@@ -117,14 +138,47 @@ void DianVoteDrawer::draw(QPainter *painter)
 void DianVoteDrawer::DoWithCoordinate()
 {
     //-----question name coordiante----//
+    QuestionNumX = width() * RatioQuestionNumX;
+    QuestionNumY = height() * RatioQuestionNumY;
+    //-----question name coordiante----//
+
+    //-----repliedDeviceNumX coordinate----//
     RepliedDeviceNumX = width() * RatioRepliedDeviceX;
     RepliedDeviceNumY = height() * RatioRepliedDeviceY;
-    //-----question name coordiante----//
+    //-----repliedDeviceNumX coordinate----//
 
     //-----total voter number coordinate----//
     TotalNumX = width() * RatioTotalNumX;
     TotalNumY = height() * RatioTotalNumY;
     //-----total voter number coordinate----//
+}
+
+void DianVoteDrawer::DoShowPreviousQuestion()
+{
+    emit ShowPreviousQuestion();
+}
+
+void DianVoteDrawer::DoShowNextQuestion()
+{
+    emit ShowNextQuestion();
+}
+
+void DianVoteDrawer::SetNextPreviousDisabled()
+{
+    previous->setDisabled(true);
+    next->setDisabled(true);
+}
+
+void DianVoteDrawer::SetNextPreviousEnabled()
+{
+    previous->setEnabled(true);
+    next->setEnabled(true);
+}
+
+void DianVoteDrawer::SetQuestionNum(int num)
+{
+    questionNum = num;
+    update();
 }
 
 void DianVoteDrawer::SetRepliedVoters(uint num)

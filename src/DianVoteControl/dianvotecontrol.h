@@ -47,6 +47,13 @@ enum ReceivedDataType
     UNKNOWN
 };
 
+typedef struct _VoteData
+{
+    QString name;       // 投票器持有者姓名
+    quint16 id;         // id
+    quint8 key;         // 按键选项
+}VoteData;
+
 #if 0
 enum VoteMode
 {
@@ -84,11 +91,14 @@ signals:
     void updateGraph(int index);
 
 public slots:
-
     void VoteStart();
     void VotePause();
     void VoteStop();
     void VoteAuto();
+    void StartNewSession();                 // 开始新的会话
+    void SavePreviousSession();             // 每次停止投票的时候，保存上次一会话（投票结果）
+    void DoShowPreviousQuestion();          // 将上一次记录的数据再次发送给drawer显示
+    void DoShowNextQuestion();              // 将下一次记录的数据再次发送给drawer显示
     void DoShowOptions();
     void DoShowResults();
     void DoShowStatics();
@@ -117,13 +127,16 @@ private:
     DianVoteDrawer *drawer;
     HidControl *hidControl;
     StopWatch *stopWatch;
-    QSplashScreen *splash;              // 欢迎界面
-    QIcon *windowIcon;                  // windowIcon
-    QPoint dragPosition;                // 拖动位置
-    QPoint prePoint;                    // 记录动画开始时的位置
-    QSize initSize;                     // 窗口初始化时的大小
-    enum ControlState curState;         // 当前状态
-    QList< quint16 > *voted;            // 已投票的记录
+    QSplashScreen *splash;                          // 欢迎界面
+    QIcon *windowIcon;                              // windowIcon
+    QPoint dragPosition;                            // 拖动位置
+    QPoint prePoint;                                // 记录动画开始时的位置
+    QSize initSize;                                 // 窗口初始化时的大小
+    enum ControlState curState;                     // 当前状态
+    QList< VoteData* > *voted;                      // 已投票的记录
+    int resultIndex;                                // 投票记录索引
+    QList< int > optionNumList;                     // 记录所有问题的选项个数
+    QList< QList < VoteData* >* > *resultList;      // 所有投票结果的记录
     static QFile *VoteLog;              // 日志文件
 
     // mode menu
@@ -142,7 +155,7 @@ private:
     QPushButton *pbResult;
     QPushButton *pbPause;
     QPushButton *pbStop;
-    QToolButton *pbOption;
+    QPushButton *pbOption;
     QPushButton *pbClose;
     QInputDialog *getOptionNum;         // 弹出窗口，设置选项个数
     QInputDialog *getLastTime;          // 当用Auto模式时需要设置

@@ -14,7 +14,6 @@ DianVoteOption::DianVoteOption(QDialog *parent) :
     QIcon *windowIcon = new QIcon(dir.absoluteFilePath("res/icons/option.png"));
     this->setWindowIcon(*windowIcon);
     this->setWindowTitle(tr("Options"));
-    this->setAttribute(Qt::WA_DeleteOnClose);
     this->setWindowFlags(Qt::WindowMinMaxButtonsHint);
 
     connect(ui->OkButton, SIGNAL(clicked()),

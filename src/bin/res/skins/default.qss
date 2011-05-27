@@ -39,7 +39,7 @@ QPushButton#pbResult
 	border-image: url(res/icons/histgram.png);
 }
 
-QToolButton#pbOption
+QPushButton#pbOption
 {
 	border-image: url(res/icons/option.png);
 }
@@ -108,9 +108,9 @@ QToolButton#CorrectAnsewer_Drawer
    border-image: url(res/icons/correctanswer.png);
 }
 
-QToolButton#Option_Drawer
+QToolButton#Details_Drawer
 {
-   border-image: url(res/icons/option-2.png);
+   border-image: url(res/icons/details.png);
 }
 
 QToolButton#Close_Drawer

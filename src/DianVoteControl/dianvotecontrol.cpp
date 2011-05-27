@@ -22,7 +22,8 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     hidControl(NULL),
     stopWatch(NULL),
     splash(NULL),
-    curState(STOP)
+    curState(STOP),
+    resultIndex(-1)
 {
     QDir dir;
     dir.setCurrent(QCoreApplication::applicationDirPath());
@@ -61,7 +62,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     pbResult->setObjectName(tr("pbResult"));
     ui->buttonLayout->addWidget(pbResult, 0, 2);
 
-    pbOption = new QToolButton(this);
+    pbOption = new QPushButton(this);
     pbOption->setObjectName(tr("pbOption"));
     ui->buttonLayout->addWidget(pbOption, 0, 3);
 
@@ -105,6 +106,8 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(this, SIGNAL(updateGraph(int)), drawer->pie, SLOT(HandleData(int)));
     connect(this, SIGNAL(displayResult(bool)), drawer->histgram, SLOT(SetDisplayResultWhileVoting(bool)));
     connect(this, SIGNAL(displayResult(bool)), drawer->pie, SLOT(SetDisplayResultWhileVoting(bool)));
+    connect(drawer, SIGNAL(ShowPreviousQuestion()), this, SLOT(DoShowPreviousQuestion()));
+    connect(drawer, SIGNAL(ShowNextQuestion()), this, SLOT(DoShowNextQuestion()));
 
     LoadStyleSheet("Default");
 
@@ -117,14 +120,77 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     // 创建Log文件，并打开，程序退出是关闭
     VoteLog->open(QIODevice::WriteOnly | QIODevice::Append);
 
-    // 创建已投票者记录
-    voted = new QList< quint16 >();
+    resultList = new QList< QList < VoteData* >* >();
 }
 
 DianVoteControl::~DianVoteControl()
 {
     delete ui;
     VoteLog->close();
+    for(int i = 0; i < resultList->length(); i++)
+    {
+        for(int j = 0; j < resultList->at(i)->length(); j++)
+        {
+            delete resultList->at(i)->at(j);
+        }
+        delete resultList->at(i);
+    }
+    delete resultList;
+}
+
+void DianVoteControl::StartNewSession()
+{
+    // 创建已投票者记录
+     voted = new QList< VoteData* >();
+}
+
+void DianVoteControl::SavePreviousSession()
+{
+    if(!voted->length())
+    {
+        // 如果没有投票数据
+        return;
+    }
+    resultList->append(voted);
+    resultIndex++;
+}
+
+void DianVoteControl::DoShowPreviousQuestion()
+{
+    if(resultIndex == -1)
+    {
+        return;
+    }
+    if(resultIndex == 0)
+    {
+        voted = resultList->at(resultIndex);
+        emit setOptionNum(optionNumList.at(resultIndex));
+    }
+    else
+    {
+        voted = resultList->at(--resultIndex);
+        emit setOptionNum(optionNumList.at(resultIndex));
+    }
+    for(int i = 0; i < voted->length(); i++)
+    {
+        updateGraph(voted->at(i)->key - MAP_VALUE);
+    }
+    emit displayResult(true);
+}
+
+void DianVoteControl::DoShowNextQuestion()
+{
+    if(resultIndex == (resultList->length() - 1))
+    {
+        return;
+    }
+    voted = resultList->at(++resultIndex);
+    emit setOptionNum(optionNumList.at(resultIndex));
+    for(int i = 0; i < voted->length(); i++)
+    {
+        updateGraph(voted->at(i)->key - MAP_VALUE);
+    }
+    emit displayResult(true);
 }
 
 void DianVoteControl::DoShowOptions()
@@ -168,14 +234,19 @@ void DianVoteControl::DoShowStatics()
 
 void DianVoteControl::ParseData(quint16 id, quint8 option)
 {
+    VoteData *data = new VoteData();
     for(int i = 0; i < voted->length(); i++)
     {
-        if(voted->at(i) == id)
+        if(voted->at(i)->id == id)
         {
             return;
         }
     }
-    voted->append(id);
+
+    data->name = "";
+    data->id = id;
+    data->key = option;
+    voted->append(data);
     emit updateGraph(option - MAP_VALUE);  // 更新数据
 }
 
@@ -420,21 +491,24 @@ void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
 
     if (event->buttons() & Qt::LeftButton) {
         QPoint pos = event->globalPos() - dragPosition;
+
+        /*
         if((pos.x() <= DEFAULT_DOCK_SPACE))
         {
             pos.setX(0);
         }
-        else if((pos.x() + this->width() + DEFAULT_DOCK_SPACE) \
+        else if((pos.x() + this->width() + DEFAULT_DOCK_SPACE)
                  >= screenWidth)
         {
             pos.setX(screenWidth - this->width() - 2);
         }
+        */
 
         if((pos.y() <= DEFAULT_DOCK_SPACE))
         {
             pos.setY(0);
         }
-        else if((pos.y() + this->height() + DEFAULT_DOCK_SPACE) \
+        else if((pos.y() + this->height() + DEFAULT_DOCK_SPACE)
                 >= screenHeight)
         {
             pos.setY(screenHeight - this->height() - 2);

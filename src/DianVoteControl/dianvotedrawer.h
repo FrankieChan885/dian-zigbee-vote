@@ -28,12 +28,16 @@ public:
 
     void draw(QPainter *painter);           // draw
 
-public:
-    Ui::DianVoteDrawer *ui;
-    DrawBase *histgram;
-    DrawBase *pie;
+signals:
+    void ShowPreviousQuestion();
+    void ShowNextQuestion();
 
 public slots:
+    void DoShowPreviousQuestion();      // 显示上一个问题
+    void DoShowNextQuestion();          // 显示下一个问题
+    void SetNextPreviousDisabled();     // 当在投票的过程中禁止切换
+    void SetNextPreviousEnabled();      // 不在投票过程中恢复切换题目
+    void SetQuestionNum(int num);       // 设置题目编号
     void SetRepliedVoters(uint num);    // 设置点名后的获取的设备总数
     void SwithChart();      // 在饼图和直方图之间切换
 
@@ -41,12 +45,17 @@ protected:
     void paintEvent(QPaintEvent *event);    // 覆盖paintEvent
 
 private:
-
     void DoWithCoordinate();    // 计算坐标
+
+public:
+    Ui::DianVoteDrawer *ui;
+    DrawBase *histgram;
+    DrawBase *pie;
 
 private:
     QTimer *timer;
 
+    int questionNum;            // 题目编号
     int replidDeviceNum;        // 点名后返回的设备总数
 
     //---- font ----//
@@ -58,6 +67,12 @@ private:
     float RatioRepliedDeviceX; // 问题名字位置与窗口的宽度比例
     int RepliedDeviceNumY;      // 问题名字的Y坐标
     float RatioRepliedDeviceY; // 问题名字位置与窗口的高度比例
+
+    int QuestionNumX;       // 题目编号显示的X坐标
+    float RatioQuestionNumX;  // 题目编号显示与窗口宽度的比例
+    int QuestionNumY;       // 题目编号显示的Y坐标
+    float RatioQuestionNumY;  // 题目编号显示与窗口高度的比例
+
 
     int TotalNumX;          // 总数显示的X坐标
     float RatioTotalNumX;   // 总数位置与窗口的宽度比例
@@ -71,7 +86,7 @@ private:
     QToolButton *showPie;
     QToolButton *showHistgram;
     QToolButton *correctAnswer;
-    QToolButton *option;
+    QToolButton *details;
     QToolButton *close;
     //----buttons----//
 };
