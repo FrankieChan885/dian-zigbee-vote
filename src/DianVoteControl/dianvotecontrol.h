@@ -9,6 +9,7 @@
 
 class HidControl;
 class StopWatch;
+class QxtGlobalShortcut;
 class QSize;
 class QFile;
 class QMenu;
@@ -17,6 +18,7 @@ class QDialog;
 class QInputDialog;
 class QSpacerItem;
 class QErrorMessage;
+class QDesktopWidget;
 class QPropertyAnimation;
 class QPushButton;
 class QSplashScreen;
@@ -82,6 +84,7 @@ public:
     explicit DianVoteControl(QWidget *parent = 0);
     ~DianVoteControl();
     static void DianVoteMsgHandler(QtMsgType type, const char *msg);
+    void RegistGlobalShortCut();        // 注册全局快捷键
 
 signals:
     void displayResult(bool flag);  // 信号--显示结果
@@ -103,7 +106,11 @@ public slots:
     void DoShowOptions();
     void DoShowResults();
     void DoShowStatics();
+    void HandlerControlMessage(quint16 id, quint8 option);  // 从控制端发来的控制消息
     void ParseData(quint16 id, quint8 option);
+    void StartOrStop();                     // 由全局快捷键触发，改变投票的状态
+    void ShowOrHideControler();             // 由全局快捷键触发，将主控制窗口从一个屏幕移动到另一个上面
+    void ShowOrHideResult();                // 由全局快捷键触发，将显示结果的窗口从一个屏幕移动到另一个上面
 
 private slots:
     void DoHideStopWatch();                 // 删除秒表widget，在上拉动画完毕后调用
@@ -128,6 +135,7 @@ private:
     DianVoteDrawer *drawer;
     HidControl *hidControl;
     StopWatch *stopWatch;
+    QDesktopWidget* desktopWidget;
     QSplashScreen *splash;                          // 欢迎界面
     QIcon *windowIcon;                              // windowIcon
     QPoint dragPosition;                            // 拖动位置
@@ -138,7 +146,10 @@ private:
     int resultIndex;                                // 投票记录索引
     QList< int > optionNumList;                     // 记录所有问题的选项个数
     QList< QList < VoteData* >* > *resultList;      // 所有投票结果的记录
-    static QFile *VoteLog;              // 日志文件
+    static QFile *VoteLog;                          // 日志文件
+    int previousOptionNum;                          // 上一次使用的选项个数
+    int previousLastTime;                           // 上一次使用的持续时间
+    bool straightStart;                             // 直接开始，不设置选项个数
 
     // mode menu
 #if 0
@@ -161,6 +172,13 @@ private:
     QInputDialog *getOptionNum;         // 弹出窗口，设置选项个数
     QInputDialog *getLastTime;          // 当用Auto模式时需要设置
     QPropertyAnimation *resizeAnimation;
+
+    // global shortcut
+    QxtGlobalShortcut *startOrStop;         // start or stop
+    QxtGlobalShortcut *showOrHideControler; // move controler from one screen to another
+    QxtGlobalShortcut *showOrHideResult;    // move result from one screen to another
+    QxtGlobalShortcut *previousSlide;       // show previous powerpoint
+    QxtGlobalShortcut *nextSlide;           // show next power point
 
 private:
     int GetOptionNum();                 // 获取选项个数，并传给histgram

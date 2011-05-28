@@ -1,8 +1,6 @@
 #ifndef DIANVOTEDEBUG_H
 #define DIANVOTEDEBUG_H
 
-//#define DO_ROLL_CALL                    // whether do roll call
-
 /*
  * This macro is defined to decide whether to allow
  * a hand-held terminal to send data several times,

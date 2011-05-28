@@ -16,6 +16,18 @@ class QHidDevice;
 #define PC_STOP_HID_DEVICE          0x01        // stop vote
 #define PC_START_HID_DEVICE         0x02        // start vote
 
+// for special control message, control the PC software via Voter
+#define CONTROL_START_OR_STOP       0xf6        // start or stop voting
+#define CONTROL_SHOW_OR_HIDE_CONTROLER  0xf7    // move controler to another screen
+#define CONTROL_SHOW_OR_HIDE_RESULT     0xf8    // move result to another screen
+#define CONTROL_PREVIOUS_SLIDE          0xf4    // flip to previous slide
+#define CONTROL_NEXT_SLIDE              0xf5    // flip to next slide
+#define CONTROL_MESSAGE (CONTROL_START_OR_STOP \
+                         || CONTROL_SHOW_OR_HIDE_CONTROLER \
+                         || CONTROL_SHOW_OR_HIDE_RESULT \
+                         || CONTROL_PREVIOUS_SLIDE \
+                         || CONTROL_NEXT_SLIDE)
+
 /**
  * @brief regular definition
  */
@@ -63,6 +75,11 @@ signals:
      * @brief when (the number of id) data coming, this signal will be emit.
      */
     void idAmountComing(uint count);
+
+    /**
+     * @brief when control message is comming
+     */
+    void controlMessageComming(quint16 id, quint8 option);
 
 public slots:
     /**

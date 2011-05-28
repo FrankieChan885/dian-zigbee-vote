@@ -15,4 +15,5 @@ SUBDIRS    +=   ./DianVoteEditor \
                 ./hidapi \
                 ./testDianVote \
                 ./DianVoteControl \
-                ./DianVotePlayer
+                ./DianVotePlayer \
+                ./qxtglobalshortcut

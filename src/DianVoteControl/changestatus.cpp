@@ -33,16 +33,28 @@ void DianVoteControl::VoteStart()
             return;
         }
 
-        int num = GetOptionNum();
-        if(num)
+        if(!straightStart)
         {
-            emit setOptionNum(num);     // 获取选项个数
-            optionNumList.append(num);
+            int num = GetOptionNum();
+            previousOptionNum = num;
+            if(num)
+            {
+                emit setOptionNum(num);     // 获取选项个数
+                optionNumList.append(num);
+            }
+            else
+            {
+                return;
+            }
         }
         else
         {
-            return;
+            straightStart = false;
+            emit setOptionNum(previousOptionNum);
+            optionNumList.append(previousOptionNum);
         }
+
+
         if(!StartHid())     // 开启接收设备
         {
             return;
@@ -94,17 +106,30 @@ void DianVoteControl::VoteAuto()
             return;
         }
 
-        int num1 = GetLastTime();     // 获取持续时间
-
-        if(!num1)
+        int num1;
+        int num0;
+        if(!straightStart)
         {
-            return;
+            num1 = GetLastTime();     // 获取持续时间
+            previousLastTime = num1;
+
+            if(!num1)
+            {
+                return;
+            }
+
+            num0 = GetOptionNum();     // 获取选项个数
+            previousOptionNum = num0;
+            if(!num0)
+            {
+                return;
+            }
         }
-
-        int num0 = GetOptionNum();     // 获取选项个数
-        if(!num0)
+        else
         {
-            return;
+            emit setLastTime(previousLastTime);
+            emit setOptionNum(previousOptionNum);
+            optionNumList.append(previousOptionNum);
         }
 
         // 画出秒表, 递减模式
@@ -112,9 +137,17 @@ void DianVoteControl::VoteAuto()
         Q_ASSERT(stopWatch != NULL);
         stopWatch->setMode(STOP_WATCH_DECREASE_MODE);
 
-        emit setLastTime(num1);
-        emit setOptionNum(num0);
-        optionNumList.append(num0);
+        if(!straightStart)
+        {
+            emit setLastTime(num1);
+            emit setOptionNum(num0);
+            optionNumList.append(num0);
+        }
+        else
+        {
+            straightStart = false;
+        }
+
         if(!StartHid())     // 开启接收设备
         {
             return;

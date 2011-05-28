@@ -101,6 +101,29 @@ void HidControl::dataReceived(QByteArray ba)
             break;
         }
 
+        // control message received
+
+    case CONTROL_START_OR_STOP: {
+        }
+
+    case CONTROL_SHOW_OR_HIDE_CONTROLER: {
+        }
+
+    case CONTROL_SHOW_OR_HIDE_RESULT: {
+
+        }
+
+    case CONTROL_PREVIOUS_SLIDE: {
+
+        }
+
+    case CONTROL_NEXT_SLIDE: {
+            data = usbId2PCId(ba);
+            // data is remote device id, flag is the option
+            emit controlMessageComming(data, flag);
+            break;
+        }
+
     default:
         {
             data = usbId2PCId(ba);

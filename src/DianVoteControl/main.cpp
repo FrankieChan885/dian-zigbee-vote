@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 #endif // end if def
 
     DianVoteControl w;
+    w.RegistGlobalShortCut();
     w.setWindowFlags(Qt::Window
                      | Qt::CustomizeWindowHint
                      | Qt::WindowStaysOnTopHint

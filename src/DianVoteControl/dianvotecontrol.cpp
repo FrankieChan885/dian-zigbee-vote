@@ -10,6 +10,8 @@
 
 #ifdef WIN32
     #include "qtwin.h"
+    #include <windows.h>
+    #include <winable.h>
 #endif
 
 QFile* DianVoteControl::VoteLog = new QFile(tr("Votelog.log"));
@@ -23,7 +25,12 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     stopWatch(NULL),
     splash(NULL),
     curState(STOP),
-    resultIndex(-1)
+    resultIndex(-1),
+    previousOptionNum(DEFAULT_OPTION_NUM),
+    previousLastTime(DEFAULT_DEADLINE),
+    straightStart(false),
+    getOptionNum(NULL),
+    getLastTime(NULL)
 {
     QDir dir;
     dir.setCurrent(QCoreApplication::applicationDirPath());
@@ -95,6 +102,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(pbOption, SIGNAL(clicked()), this, SLOT(DoShowOptions()));
 
     drawer = new DianVoteDrawer();
+    drawer->setWindowFlags(Qt::WindowStaysOnTopHint);
     drawer->setWindowIcon(*windowIcon);
     drawer->setWindowTitle(tr("Result"));
     connect(pbClose, SIGNAL(clicked()), this->drawer, SLOT(close()));
@@ -110,6 +118,11 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(drawer, SIGNAL(ShowNextQuestion()), this, SLOT(DoShowNextQuestion()));
     connect(this, SIGNAL(setQuestionNum(int)), drawer, SLOT(SetQuestionNum(int)));
 
+    hidControl = new HidControl();
+    hidControl->open();
+    connect(hidControl, SIGNAL(controlMessageComming(quint16,quint8)),
+            this, SLOT(HandlerControlMessage(quint16,quint8)));
+
     LoadStyleSheet("Default");
 
     // 记录初始化窗口大小
@@ -123,6 +136,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
 
     resultList = new QList< QList < VoteData* >* >();
 
+    desktopWidget = QApplication::desktop();
 }
 
 DianVoteControl::~DianVoteControl()
@@ -226,6 +240,7 @@ void DianVoteControl::DoShowResults()
     #endif // #ifdef WIN32
 
         drawer->show();
+        drawer->raise();
     }
     else
     {
@@ -236,6 +251,142 @@ void DianVoteControl::DoShowResults()
 void DianVoteControl::DoShowStatics()
 {
 
+}
+
+void DianVoteControl::HandlerControlMessage(quint16 id, quint8 option)
+{
+    switch (option)
+    {
+        case CONTROL_START_OR_STOP: {
+                straightStart = true;
+#ifdef WIN32
+            INPUT input[3];
+            memset(input, 0, 3 * sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_SHIFT;
+
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_CONTROL;
+
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = 0x53;
+
+            SendInput(3, input, sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = 0x53;
+            input[0].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_SHIFT;
+            input[1].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = VK_CONTROL;
+            input[2].ki.dwFlags = KEYEVENTF_KEYUP;
+            SendInput(3, input, sizeof(INPUT));
+
+#endif // #ifdef WIN32
+
+                break;
+            }
+
+        case CONTROL_SHOW_OR_HIDE_CONTROLER: {
+#ifdef WIN32
+            INPUT input[3];
+            memset(input, 0, 3 * sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_SHIFT;
+
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_CONTROL;
+
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = 0x43;
+
+            SendInput(3, input, sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = 0x43;
+            input[0].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_SHIFT;
+            input[1].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = VK_CONTROL;
+            input[2].ki.dwFlags = KEYEVENTF_KEYUP;
+            SendInput(3, input, sizeof(INPUT));
+#endif
+                break;
+            }
+
+        case CONTROL_SHOW_OR_HIDE_RESULT: {
+#ifdef WIN32
+            INPUT input[3];
+            memset(input, 0, 3 * sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_SHIFT;
+
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_CONTROL;
+
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = 0x52;
+
+            SendInput(3, input, sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = 0x52;
+            input[0].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[1].type = INPUT_KEYBOARD;
+            input[1].ki.wVk = VK_SHIFT;
+            input[1].ki.dwFlags = KEYEVENTF_KEYUP;
+            input[2].type = INPUT_KEYBOARD;
+            input[2].ki.wVk = VK_CONTROL;
+            input[2].ki.dwFlags = KEYEVENTF_KEYUP;
+            SendInput(3, input, sizeof(INPUT));
+
+#endif // #ifdef WIN32
+                break;
+            }
+
+        case CONTROL_PREVIOUS_SLIDE: {
+#ifdef WIN32
+            INPUT input[1];
+            memset(input, 0, 1 * sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_PRIOR;
+
+            SendInput(1, input, sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_PRIOR;
+            SendInput(1, input, sizeof(INPUT));
+
+#endif // #ifdef WIN32
+                break;
+            }
+
+        case CONTROL_NEXT_SLIDE: {
+#ifdef WIN32
+            INPUT input[1];
+            memset(input, 0, 1 * sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_NEXT;
+
+            SendInput(1, input, sizeof(INPUT));
+
+            input[0].type = INPUT_KEYBOARD;
+            input[0].ki.wVk = VK_NEXT;
+            SendInput(1, input, sizeof(INPUT));
+
+#endif // #ifdef WIN32
+                break;
+            }
+    }
 }
 
 void DianVoteControl::ParseData(quint16 id, quint8 option)
@@ -260,7 +411,6 @@ int DianVoteControl::GetOptionNum()
 {
     bool ok;
     getOptionNum = new QInputDialog();
-    getOptionNum->setAttribute(Qt::WA_DeleteOnClose);
     int i = QInputDialog::getInt(this,
                                  tr("Get Options Amounts"),
                                  tr("Options Amounts"),
@@ -283,7 +433,6 @@ int DianVoteControl::GetLastTime()
 {
     bool ok;
     getLastTime = new QInputDialog();
-    getLastTime->setAttribute(Qt::WA_DeleteOnClose);
     int i = QInputDialog::getInt(this,
                                  tr("Get Last Time"),
                                  tr("Last Time"),
@@ -328,7 +477,7 @@ bool DianVoteControl::PrepareHid()
     }
     catch(DianVoteStdException *e)
     {
-        QMessageBox::critical(0, "Hid Open Failed", e->what());
+        QMessageBox::critical(0, "Hid Open Failed", "\nPlease ensure the Receiver is Pluged in.");
         return false;
     }
     catch(...)
@@ -349,7 +498,7 @@ bool DianVoteControl::StartHid()
     }
     catch(DianVoteStdException *e)
     {
-        QMessageBox::critical(0, "error", e->what());
+        QMessageBox::critical(0, "error", "Device Open Failed ! \nPlease ensure the Receiver is Pluged in.");
         return false;
     }
     catch(...)
@@ -490,9 +639,8 @@ void DianVoteControl::mousePressEvent(QMouseEvent *event)
 
 void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
 {
-    QDesktopWidget* desktopWidget = QApplication::desktop();
     //获取设备屏幕大小
-    int screenWidth = desktopWidget->screenGeometry().width();
+//    int screenWidth = desktopWidget->screenGeometry().width();
     int screenHeight = desktopWidget->screenGeometry().height();
 
     if (event->buttons() & Qt::LeftButton) {

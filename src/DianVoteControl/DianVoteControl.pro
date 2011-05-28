@@ -13,6 +13,7 @@ DEPENDPATH  += ../utilities
 DEPENDPATH  += ../lib
 INCLUDEPATH += ../utilities
 INCLUDEPATH += ../hidapi/hidapi-0.6.0/hidapi
+INCLUDEPATH += ../qxtglobalshortcut
 
 SOURCES += main.cpp\
         dianvotecontrol.cpp \
@@ -25,7 +26,8 @@ SOURCES += main.cpp\
     hidcontrol.cpp \
     stopwatch.cpp \
     changestatus.cpp \
-    dianvoteoption.cpp
+    dianvoteoption.cpp \
+    shortcut.cpp
 
 HEADERS  += dianvotecontrol.h \
     drawhistgram.h \
@@ -37,13 +39,15 @@ HEADERS  += dianvotecontrol.h \
     hidcontrol.h \
     stopwatch.h \
     dianvotedebug.h \
-    dianvoteoption.h
+    dianvoteoption.h \
+    shortcut.h
 
 win32:SOURCES += qtwin.cpp
 win32:HEADERS += qtwin.h
 
 # using hidapi
-LIBS += -L../bin -lhidapi
+LIBS += -L../bin -lhidapi \
+        -L../bin -lqxtglobalshortcut
 
 FORMS    += dianvotecontrol.ui \
     dianvotedrawer.ui \

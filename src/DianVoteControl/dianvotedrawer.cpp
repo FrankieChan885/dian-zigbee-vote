@@ -17,6 +17,7 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
     ui->setupUi(this);
 
     previous = new QToolButton();
+    previous->setShortcut(Qt::Key_PageUp);
     previous->setObjectName(tr("Previous_Drawer"));
     previous->setToolTip(tr("Previous"));
     ui->NextPrevious->addWidget(previous, 0, 1);
@@ -24,6 +25,7 @@ DianVoteDrawer::DianVoteDrawer(QWidget *parent) :
             this, SLOT(DoShowPreviousQuestion()));
 
     next = new QToolButton();
+    next->setShortcut(Qt::Key_PageDown);
     next->setObjectName(tr("Next_Drawer"));
     next->setToolTip(tr("Next"));
     ui->NextPrevious->addWidget(next, 0, 2);
