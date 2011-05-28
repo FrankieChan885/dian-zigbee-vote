@@ -37,14 +37,6 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     windowIcon = new QIcon(dir.absoluteFilePath("res/images/app-icon.png"));
     this->setWindowIcon(*windowIcon);
 
-    // show splash.
-    QPixmap pixmap(dir.absoluteFilePath("res/images/logo.png"));
-    QSplashScreen *splash = new QSplashScreen(pixmap);
-    splash->setWindowIcon(*windowIcon);
-    splash->setWindowFlags(Qt::WindowStaysOnTopHint);
-    splash->setMask(pixmap.mask());
-    splash->show();
-
     ui->setupUi(this);
 
     pbStart = new QPushButton(this);
@@ -118,10 +110,29 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     connect(drawer, SIGNAL(ShowNextQuestion()), this, SLOT(DoShowNextQuestion()));
     connect(this, SIGNAL(setQuestionNum(int)), drawer, SLOT(SetQuestionNum(int)));
 
-    hidControl = new HidControl();
-    hidControl->open();
-    connect(hidControl, SIGNAL(controlMessageComming(quint16,quint8)),
-            this, SLOT(HandlerControlMessage(quint16,quint8)));
+    try
+    {
+        hidControl = new HidControl();
+        hidControl->open();
+        connect(hidControl, SIGNAL(controlMessageComming(quint16,quint8)),
+                this, SLOT(HandlerControlMessage(quint16,quint8)));
+    }
+    catch(DianVoteStdException *e)
+    {
+        QMessageBox::critical(0, "error", "Device Open Failed ! \nPlease ensure the Receiver is Pluged in.");
+    }
+    catch(...)
+    {
+        QMessageBox::critical(0, "error", "unknow exception.");
+    }
+
+    // show splash.
+    QPixmap pixmap(dir.absoluteFilePath("res/images/logo.png"));
+    QSplashScreen *splash = new QSplashScreen(pixmap);
+    splash->setWindowIcon(*windowIcon);
+    splash->setWindowFlags(Qt::WindowStaysOnTopHint);
+    splash->setMask(pixmap.mask());
+    splash->show();
 
     LoadStyleSheet("Default");
 

@@ -45,6 +45,8 @@ HEADERS  += dianvotecontrol.h \
 win32:SOURCES += qtwin.cpp
 win32:HEADERS += qtwin.h
 
+RC_FILE = ../bin/dianvotecontrol.rc
+
 # using hidapi
 LIBS += -L../bin -lhidapi \
         -L../bin -lqxtglobalshortcut
@@ -60,3 +62,8 @@ OBJECTS_DIR  = ./temp
 MOC_DIR      = ./temp
 RCC_DIR      = ./temp
 UI_DIR       = ./temp
+
+RESOURCES +=
+
+OTHER_FILES += \
+    ../bin/dianvotecontrol.rc

@@ -175,7 +175,7 @@ void HidControl::GetIDListLength()
 void HidControl::DoReceiveBitMapFinished()
 {
     quint8 id = 0;
-    while (id = findNextAddrFrom((quint8*)(remoteDeviceBitmap), id, 1)) {
+    while ((id = findNextAddrFrom((quint8*)(remoteDeviceBitmap), id, 1))) {
         emit idComing(quint16(id));
         remoteMap[quint16(id)] = 0;
     }
