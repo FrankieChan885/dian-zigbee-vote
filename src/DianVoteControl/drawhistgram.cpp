@@ -58,6 +58,7 @@ void DrawHistgram::draw(QPainter *painter)
     DoWithCoodinate();
 
     QPen thinPen(palette().foreground(), 2);
+    thinPen.setColor(QColor("White"));
     painter->setPen(thinPen);
     // »­³öYÖá
 //    painter->drawLine(zeroPoint.x(), zeroPoint.y(),

@@ -11,7 +11,7 @@
 #ifdef WIN32
     #include "qtwin.h"
     #include <windows.h>
-    #include <winable.h>
+//    #include <winable.h>
 #endif
 
 QFile* DianVoteControl::VoteLog = new QFile(tr("Votelog.log"));
@@ -145,6 +145,7 @@ DianVoteControl::DianVoteControl(QWidget *parent) :
     // 创建Log文件，并打开，程序退出是关闭
     VoteLog->open(QIODevice::WriteOnly | QIODevice::Append);
 
+    // 这个是显示上一个结果下一个结果的基础
     resultList = new QList< QList < VoteData* >* >();
 
     desktopWidget = QApplication::desktop();
@@ -168,6 +169,8 @@ DianVoteControl::~DianVoteControl()
 void DianVoteControl::StartNewSession()
 {
     // 创建已投票者记录
+    // 因为drawer在画出投票结果的时候，
+    // 所有的数据基础就是voted指针所指向的数据链表
      voted = new QList< VoteData* >();
 }
 
@@ -183,6 +186,7 @@ void DianVoteControl::SavePreviousSession()
     emit setQuestionNum(resultIndex + 1);
 }
 
+// 显示前一个问题的选择结果
 void DianVoteControl::DoShowPreviousQuestion()
 {
     if(resultIndex == -1)
@@ -208,6 +212,7 @@ void DianVoteControl::DoShowPreviousQuestion()
     emit displayResult(true);
 }
 
+// 显示下一个问题的选择结果
 void DianVoteControl::DoShowNextQuestion()
 {
     if(resultIndex == (resultList->length() - 1))
@@ -224,6 +229,7 @@ void DianVoteControl::DoShowNextQuestion()
     emit displayResult(true);
 }
 
+// 显示options窗口
 void DianVoteControl::DoShowOptions()
 {
     if(options == NULL)
@@ -238,6 +244,7 @@ void DianVoteControl::DoShowOptions()
             options->show();
 }
 
+// 显示投票结果
 void DianVoteControl::DoShowResults()
 {
     if(!drawer->isVisible())
@@ -264,6 +271,8 @@ void DianVoteControl::DoShowStatics()
 
 }
 
+// 这个函数处理所有从控制手持端传上来的控制类信号
+// 并将这些控制信号转换成为键盘映射
 void DianVoteControl::HandlerControlMessage(quint16 id, quint8 option)
 {
     switch (option)
@@ -400,6 +409,7 @@ void DianVoteControl::HandlerControlMessage(quint16 id, quint8 option)
     }
 }
 
+//  预处理数据，相当于数据的解析
 void DianVoteControl::ParseData(quint16 id, quint8 option)
 {
     VoteData *data = new VoteData();
@@ -462,6 +472,7 @@ int DianVoteControl::GetLastTime()
     }
 }
 
+// 准备好Hid设备
 bool DianVoteControl::PrepareHid()
 {
     try
@@ -498,6 +509,7 @@ bool DianVoteControl::PrepareHid()
     }
 }
 
+// 开启Hid设备
 bool DianVoteControl::StartHid()
 {
     try
@@ -519,6 +531,7 @@ bool DianVoteControl::StartHid()
     }
 }
 
+// 关闭Hid设备
 bool DianVoteControl::StopHid()
 {
     try
@@ -539,6 +552,7 @@ bool DianVoteControl::StopHid()
     }
 }
 
+// 载入stylesheet
 void DianVoteControl::LoadStyleSheet(const QString &sheetName)
 {
     QDir dir(QCoreApplication::applicationDirPath());
@@ -554,6 +568,7 @@ void DianVoteControl::LoadStyleSheet(const QString &sheetName)
     qApp->setStyleSheet(styleSheet);
 }
 
+// 显示秒表
 void DianVoteControl::ShowStopWatch()
 {
     // 不管三七二十八，先把窗口设置成默认的大小
@@ -583,6 +598,7 @@ void DianVoteControl::DoHideStopWatch()
     stopWatch = NULL;
 }
 
+// 隐藏秒表
 void DianVoteControl::HideStopWatch()
 {
     // show的逆过程
@@ -632,6 +648,7 @@ void DianVoteControl::CloseRaceVoteWinner()
 }
 #endif  // do not compile this
 
+// 处理鼠标左键按住主窗口事件
 void DianVoteControl::mousePressEvent(QMouseEvent *event)
 {
     // 关闭欢迎界面
@@ -648,6 +665,8 @@ void DianVoteControl::mousePressEvent(QMouseEvent *event)
     }
 }
 
+// 处理鼠标移动消息
+// 与上一个函数配合，达到拖动主界面的功能
 void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
 {
     //获取设备屏幕大小
@@ -669,6 +688,8 @@ void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
         }
         */
 
+
+        // 不让主控界面在Y轴方向移出屏幕
         if((pos.y() <= DEFAULT_DOCK_SPACE))
         {
             pos.setY(0);
@@ -684,6 +705,7 @@ void DianVoteControl::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
+// 重定向一些内部消息
 void DianVoteControl::DianVoteMsgHandler(QtMsgType type, const char *msg)
 {
     QString log;
@@ -721,6 +743,7 @@ void DianVoteControl::ClearLogList()
 {
 }
 
+// 获取手持端ID列表
 void DianVoteControl::GetIDList()
 {
     try {
@@ -740,6 +763,7 @@ void DianVoteControl::GetIDList()
     }
 }
 
+// 获取手持端ID列表长度，即手持端的个数
 void DianVoteControl::GetIDListLength()
 {
     try {

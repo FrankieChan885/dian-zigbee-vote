@@ -41,6 +41,7 @@ void DrawPie::draw(QPainter *painter)
 
     DoWithCoodinate();
 
+    painter->setPen(Qt::white);
     for (int i = 0; i < optionNums; i++)
     {
         // ÉèÖÃÌî³äÑÕÉ«

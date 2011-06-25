@@ -3,6 +3,7 @@
 #include "shortcut.h"
 #include "qxtglobalshortcut.h"
 
+// 注册全局快捷键
 void DianVoteControl::RegistGlobalShortCut()
 {
     startOrStop = new QxtGlobalShortcut(QKeySequence(START_OR_STOP), this);
@@ -30,6 +31,8 @@ void DianVoteControl::StartOrStop()
     }
 }
 
+// 借助Application::desktop()获取到的桌面信息
+// 可以自由的将窗口从主屏幕移动到扩展屏幕或者反过来
 void DianVoteControl::ShowOrHideControler()
 {
     int screenCount = desktopWidget->screenCount();

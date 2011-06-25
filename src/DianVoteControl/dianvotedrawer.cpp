@@ -116,7 +116,7 @@ void DianVoteDrawer::draw(QPainter *painter)
     int FontSize = width() / FontSizeRatio;   // 计算字体大小
 
     DoWithCoordinate();
-
+    painter->setPen(Qt::white);
     QFont Font = QFont("Arial", FontSize, QFont::Bold, true);  // 设置字体
     QString questionIndex = QString("%1").arg(questionNum);
     painter->setFont(Font);
